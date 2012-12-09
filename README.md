@@ -13,9 +13,9 @@ Game Console is a real-time console that allows you to:
 
 Notes:<br />
 
-Gconsole needs nme installed.<br />
-Flash and Cpp targets tested and working fine.<br />
-If you're not using Windows, default font may look bad, use GC.setFont() in that case.
+* Gconsole needs nme installed.<br />
+* Flash and Cpp targets tested and working fine.<br />
+* If you're not using Windows, default font may look bad, use GC.setFont() in that case.
 ____________
 
 ### Example
