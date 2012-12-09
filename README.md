@@ -16,6 +16,7 @@ Notes:<br />
 * Gconsole needs nme installed.<br />
 * Flash and Cpp targets tested and working fine.<br />
 * If you're not using Windows, default font may look bad, use GC.setFont() in that case.
+
 ____________
 
 ### Example
