@@ -1,0 +1,12 @@
+<project name="gconsole" url="https://github.com/ProG4mr/gconsole" license="MIT">
+	<user name="ProG4mr"/>
+	<tag v="console" />
+	<tag v="logger" />
+	<tag v="monitor" />
+	<tag v="profiler" />
+	<tag v="utility" />
+	<tag v="game" />
+	<description>A game-like console that provides runtime acess to methods and variables, logging, monitoring, profiling, you name it.</description>
+	<depends name="nme"/>
+	<version name="1.0.0">Initial release</version>
+</project>
