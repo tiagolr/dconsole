@@ -219,7 +219,7 @@ class GameConsole extends Sprite
 	
 	private function onKeyDown(e:KeyboardEvent):Void 
 	{
-		#if !cpp // BUGFIX
+		#if !(cpp || neko) // BUGFIX
 		if (_isConsoleOn) 
 			e.stopImmediatePropagation(); 
 		#end
@@ -259,7 +259,7 @@ class GameConsole extends Sprite
 			default	:	_historyIndex = -1;
 		}
 			
-		#if !cpp // BUGFIX
+		#if !(cpp || neko) // BUGFIX
 		e.stopImmediatePropagation(); // BUG - cpp issues.
 		#end
 	}
@@ -271,7 +271,7 @@ class GameConsole extends Sprite
 		if (_historyIndex > _historyArray.length - 1) return; 
 		
 		_interface.txtPrompt.text = _historyArray[_historyIndex];
-		#if !cpp
+		#if !(cpp || neko)
 		_interface.txtPrompt.setSelection(_interface.txtPrompt.length, _interface.txtPrompt.length); 
 		#end
 	}
@@ -282,7 +282,7 @@ class GameConsole extends Sprite
 		_historyIndex++;
 		
 		_interface.txtPrompt.text = _historyArray[_historyIndex];
-		#if !cpp
+		#if !(cpp || neko)
 		_interface.txtPrompt.setSelection(_interface.txtPrompt.length, _interface.txtPrompt.length); 
 		#end
 	}
