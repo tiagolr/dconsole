@@ -149,12 +149,15 @@ class GameConsole extends Sprite
 		trace(GC_TRC_ERR + "dynamic passed with the field: " + name + " is not an object.");
 			return;
 		}
-		#if !cpp // BUGFIX
-		if (!Reflect.hasField(object, name)) {
+		#if !(cpp || neko)
+		if (!Reflect.hasField(object, name)) 
+		#else
+		if (Reflect.getProperty(object, name) == null) 
+		#end
+		{
 			trace (GC_TRC_ERR + name + " field was not found in object passed.");
 			return;
 		}
-		#end
 		
 		log(GCCommands.registerVariable(object, name, alias, monitor));
 	}
@@ -170,12 +173,16 @@ class GameConsole extends Sprite
 	
 	public function registerFunction(object:Dynamic, name:String, alias:String, ?monitor:Bool = false) 
 	{
-		#if !cpp // BUGFIX
-		if (!Reflect.hasField(object, name)) {
+		#if !(cpp || neko)
+		if (!Reflect.hasField(object, name)) 
+		#else
+		if (Reflect.getProperty(object, name) == null) 
+		#end
+		{
 			trace (GC_TRC_ERR + name + " field was not found in object passed.");
 			return;
 		}
-		#end
+		
 		if (!Reflect.isFunction(Reflect.field(object, name))) {
 			trace(GC_TRC_ERR + "could not find function: " + name + " in object passed.");
 			return;
