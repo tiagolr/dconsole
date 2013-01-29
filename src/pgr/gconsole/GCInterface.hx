@@ -184,7 +184,7 @@ class GCInterface extends Sprite
 		txtPrompt.width = _width;
 		txtPrompt.height = 32;
 		
-		#if cpp	// BUGFIX
+		#if (cpp || neko)	// BUGFIX
 		// fix margins bug.
 		txtConsole.x += 10;
 		txtConsole.width -= 10;
