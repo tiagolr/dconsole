@@ -1,6 +1,12 @@
 package pgr.gconsole;
+
+#if flash
+import flash.display.MovieClip;
+import flash.Lib;
+#else
 import nme.display.MovieClip;
 import nme.Lib;
+#end
 
  typedef RemoteObj = {
 	 var name	: String;
@@ -78,32 +84,6 @@ class GCCommands
 			}
 		}
 		return false;
-	}
-	
-	public static function unregisterObject(object:Dynamic):String
-	{
-		var i:Int = 0;
-		var numRefs = 0;
-		
-		while (i < _functions.length) {
-			if (Reflect.compare(_functions[i].object, object) == 0) {
-				_functions.splice(i, 1);
-				numRefs++;
-				continue;
-			}
-			i++;
-		}
-		
-		while (i < _variables.length) {
-			if (Reflect.compare(_variables[i].object, object) == 0) {
-				_functions.splice(i, 1);
-				numRefs++;
-				continue;
-			}
-			i++;
-		}
-		
-		return "removed " + numRefs + " fields.";
 	}
 	
 	public static function clearRegistry()

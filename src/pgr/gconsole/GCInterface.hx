@@ -1,12 +1,21 @@
 package pgr.gconsole;
 
 import GCThemes.Theme;
+#if flash
+import flash.display.Sprite;
+import flash.Lib;
+import flash.text.TextField;
+import flash.text.TextFieldType;
+import flash.text.TextFormat;
+import flash.text.TextFormatAlign;
+#else
 import nme.display.Sprite;
 import nme.Lib;
 import nme.text.TextField;
 import nme.text.TextFieldType;
 import nme.text.TextFormat;
 import nme.text.TextFormatAlign;
+#end
 
 /**
  * 
@@ -34,9 +43,9 @@ class GCInterface extends Sprite
 		
 		super();
 		
-		_width = Lib.stage.stageWidth;
-		_height = Std.int(Lib.stage.stageHeight * height);
-		align == "DOWN" ? _yOffset = Lib.stage.stageHeight - _height : _yOffset = 0;
+		_width = Lib.current.stage.stageWidth;
+		_height = Std.int(Lib.current.stage.stageHeight * height);
+		align == "DOWN" ? _yOffset = Lib.current.stage.stageHeight - _height : _yOffset = 0;
 		theme == null ? _theme = GCThemes.DEFAULT_THEME : _theme = theme;
 		
 		createMonitor();
@@ -79,7 +88,7 @@ class GCInterface extends Sprite
 	{
 		_monitorBg = new Sprite();
 		_monitorBg.graphics.beginFill(_theme.monBgColor, _theme.monBgAlpha);
-		_monitorBg.graphics.drawRect(0, 0, Lib.stage.stageWidth, Lib.stage.stageHeight);
+		_monitorBg.graphics.drawRect(0, 0, Lib.current.stage.stageWidth, Lib.current.stage.stageHeight);
 		_monitorBg.graphics.endFill();
 		addChild(_monitorBg);	
 		
@@ -104,27 +113,27 @@ class GCInterface extends Sprite
 		setMonitorFont();
 	}
 	
-	public function setConsoleFont(font:String = null, embed:Bool = true, size:Int = 14, bold:Bool = false, italic:Bool = false, underline:Bool = false )
+	public function setConsoleFont(font:String = null, embed:Bool = false, size:Int = 14, bold:Bool = false, italic:Bool = false, underline:Bool = false )
 	{
 		if (font == null) font = "Consolas";
-		embed ? txtConsole.embedFonts = false : txtConsole.embedFonts = true;
+		embed ? txtConsole.embedFonts = true : txtConsole.embedFonts = false;
 		txtConsole.defaultTextFormat = new TextFormat(font, size, _theme.consTxtColor, bold, italic, underline, '', '', TextFormatAlign.LEFT, 10, 10);
 	}
 	
-	public function setPromptFont(font:String = null, embed:Bool = true, size:Int = 16, yOffset:Int = 22, bold:Bool = false, ?italic:Bool = false, underline:Bool = false )
+	public function setPromptFont(font:String = null, embed:Bool = false, size:Int = 16, yOffset:Int = 22, bold:Bool = false, ?italic:Bool = false, underline:Bool = false )
 	{
 		if (font == null) font = "Consolas";
 		_promptFontYOffset = yOffset;
-		embed ? txtPrompt.embedFonts = false : txtPrompt.embedFonts = true;
+		embed ? txtPrompt.embedFonts = true : txtPrompt.embedFonts = false;
 		txtPrompt.defaultTextFormat = new TextFormat(font, size, _theme.promptTxtColor, bold, italic, underline, '', '' , TextFormatAlign.LEFT, 10, 10);
 		resizeTextFields();
 	}
 	
-	public function setMonitorFont(font:String = null, embed:Bool = true, size:Int = 14, bold:Bool = false, ?italic:Bool = false, underline:Bool = false )
+	public function setMonitorFont(font:String = null, embed:Bool = false, size:Int = 14, bold:Bool = false, ?italic:Bool = false, underline:Bool = false )
 	{
 		if (font == null) font = "Consolas";
-		embed ? txtMonitorLeft.embedFonts = false : txtMonitorLeft.embedFonts = true;
-		embed ? txtMonitorRight.embedFonts = false : txtMonitorRight.embedFonts = true;
+		embed ? txtMonitorLeft.embedFonts = true : txtMonitorLeft.embedFonts = false;
+		embed ? txtMonitorRight.embedFonts = true : txtMonitorRight.embedFonts = false;
 		txtMonitorLeft.defaultTextFormat = new TextFormat(font, size, _theme.monTxtColor, bold, italic, underline, '', '', TextFormatAlign.LEFT, 10,10);
 		txtMonitorRight.defaultTextFormat = new TextFormat(font, size, _theme.monTxtColor, bold, italic, underline, '', '', TextFormatAlign.LEFT, 10,10);
 	}
