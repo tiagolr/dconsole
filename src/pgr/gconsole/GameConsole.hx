@@ -2,219 +2,357 @@ package pgr.gconsole;
 
 import GCThemes.Theme;
 #if flash
+import flash.display.Sprite;
+import flash.events.Event;
+import flash.events.KeyboardEvent;
 import flash.Lib;
 #else
+import nme.display.Sprite;
+import nme.events.Event;
+import nme.events.KeyboardEvent;
 import nme.Lib;
 #end
+
 /**
+ * GameConsole is the main class of this lib, it should be instantiated only once
+ * and then use its instance to control the console.
+ * 
+ * Its recomended to use GC class as API for this lib instead of GameConsole class.
+ * 
  * @author TiagoLr ( ~~~ProG4mr~~~ )
  */
-
- /**
-  * GameConsole class provides user friendly interface to Game Console.
-  */
-class GameConsole 
-{
-	
+class GConsole extends Sprite
+{	
+	inline static private var GC_TRC_ERR = "gc_error: ";
 	/** Aligns console to bottom */
 	static public var ALIGN_DOWN:String = "DOWN";
 	/** Aligns console to top */
 	static public var ALIGN_UP:String = "UP";
 	
-	/**
-	 * Inits GameConsole.
-	 * @param	height	The height of the console (percent of app window height).
-	 * @param	align	Aligns console using "UP" or "DOWN".
-	 * @param	theme	Select the console theme from GCThemes.
-	 * @param	monitorRate The number of frames elapsed for each monitor refresh.
-	 */
-	public static function init(height:Float = 0.33, align:String = "DOWN", theme:Theme = null, monitorRate:Int = 10) 
+	private var _firstLine:Bool;
+	
+	private var _historyArray:Array<String>;
+	private var _historyIndex:Int;
+	private var _historyMaxSz:Int;
+	public var _interface:GCInterface;
+	
+	private var _elapsedFrames:Int;
+	private var _monitorRate:Int;
+	
+	private var _consoleScKey:Int;
+	
+	private var _isMonitorOn:Bool;
+	private var _isConsoleOn:Bool;
+	
+	public static var instance:GConsole;
+
+	public function new(height:Float = 0.33, align:String = "DOWN", theme:Theme = null, monitorRate:Int = 10) 
 	{
-		Lib.current.stage.addChild(new GConsole(height, align, theme, monitorRate));
+		super();
+		
+		if (height > 1) height = 1;
+		if (height < 0.1) height = 0.1;
+		_interface = new GCInterface(height,align,theme);
+		addChild(_interface);
+		
+		_monitorRate = monitorRate;
+		_consoleScKey = 9;
+		
+		_historyArray = new Array();
+		_historyIndex = -1;
+		_historyMaxSz = 100;	
+		_firstLine = true;
+		
+		enable();
+		hideConsole();
+		hideMonitor();
+		instance = this;
+		
+		GameConsole.log("~~~~~~~~~~ GAME CONSOLE ~~~~~~~~~~");
+	} 
+
+	public function setConsoleFont(font:String = null, embed:Bool = true, size:Int = 14, bold:Bool = false, italic:Bool = false, underline:Bool = false )
+	{
+		_interface.setConsoleFont(font, embed, size, bold, italic, underline);
 	}
-	/**
-	 * Sets the console font.
-	 * To change font color see <code>GCThemes</code>.
-	 * @param	font
-	 * @param	embed
-	 * @param	size
-	 * @param	bold
-	 * @param	italic
-	 * @param	underline
-	 */
-	public static function setConsoleFont(font:String = null, embed:Bool = true, size:Int = 14, bold:Bool = false, italic:Bool = false, underline:Bool = false )
+
+	public function setPromptFont(font:String = null, embed:Bool = true, size:Int = 16, yOffset:Int = 22, bold:Bool = false, ?italic:Bool = false, underline:Bool = false )
 	{
-		checkInstance();
-		GConsole.instance.setConsoleFont(font, embed, size, bold, italic, underline);
+		_interface.setPromptFont(font, embed, size, yOffset, bold, italic, underline);
 	}
-	/**
-	 * Sets the prompt font.
-	 * To change font color see <code>GCThemes</code>.
-	 * @param	font
-	 * @param	size
-	 * @param	yOffset	Use this to align a custom font with the prompt graphic field.
-	 * @param	bold
-	 * @param	italic
-	 * @param	underline
-	 */
-	public static function setPromptFont(font:String = null, embed:Bool = true, size:Int = 16, yOffset:Int = 22, bold:Bool = false, ?italic:Bool = false, underline:Bool = false )
+
+	public function setMonitorFont(font:String = null, embed:Bool = true, size:Int = 14, bold:Bool = false, ?italic:Bool = false, underline:Bool = false )
 	{
-		checkInstance();
-		GConsole.instance.setPromptFont(font, embed, size, yOffset, bold, italic, underline);
+		_interface.setMonitorFont(font, embed, size, bold, italic, underline);
 	}
-	/**
-	 * Sets the monitor font.
-	 * To change font color see <code>GCThemes</code>.
-	 * @param	font
-	 * @param	size
-	 * @param	yOffset	Use this to align the font with the prompt graphic field.
-	 * @param	bold
-	 * @param	italic
-	 * @param	underline
-	 */
-	public static function setMonitorFont(font:String = null, embed:Bool = true, size:Int = 14, bold:Bool = false, ?italic:Bool = false, underline:Bool = false )
+
+	public function showConsole() 
 	{
-		checkInstance();
-		GConsole.instance.setMonitorFont(font, embed, size, bold, italic, underline);
+		if (!this.visible) return;
+		Lib.current.stage.focus = _interface.txtPrompt;
+		_isConsoleOn = true;
+		_interface.toggleConsoleOn(true);
 	}
-	/**
-	 * Shows console.
-	 */
-	public static function showConsole() 
+
+	public function hideConsole()
 	{
-		checkInstance();
-		GConsole.instance.showConsole();
+		if (!this.visible) return;
+		_isConsoleOn = false;
+		_interface.toggleConsoleOn(false);
 	}
-	/**
-	 * Hides console.
-	 */
-	public static function hideConsole()
+
+	public function showMonitor() 
 	{
-		checkInstance();
-		GConsole.instance.showConsole();
+		_isMonitorOn = true;
+		_interface.toggleMonitor(true);
+		addEventListener(Event.ENTER_FRAME, updateMonitor);
+		
+		_elapsedFrames = _monitorRate + 1;
+		updateMonitor(null);	// renders first frame.
 	}
-	/**
-	 * Shows monitor and starts to follow registered fiedls in real time.
-	 * Only fields with 'monitor' flag set to true will be followed. 
-	 */
-	public static function showMonitor() 
+
+	public function hideMonitor()
 	{
-		checkInstance();
-		GConsole.instance.showMonitor();
+		_isMonitorOn = false;
+		_interface.toggleMonitor(false);
+		removeEventListener(Event.ENTER_FRAME, updateMonitor);
 	}
-	/**
-	 * Stops monitoring.
-	 */
-	public static function hideMonitor()
+
+	public function enable() 
 	{
-		checkInstance();
-		GConsole.instance.hideMonitor();
+		visible = true;
+		Lib.current.stage.addEventListener(KeyboardEvent.KEY_UP, onKeyUp, false, 10);
+		Lib.current.stage.addEventListener(KeyboardEvent.KEY_DOWN, onKeyDown, false, 10);
 	}
-	/**
-	 * Enables console and its listeners.
-	 */
-	public static function enable() 
+
+	public function disable() 
 	{
-		checkInstance();
-		GConsole.instance.enable();
+		if (_isMonitorOn) hideMonitor();
+		if (_isConsoleOn) hideConsole();
+		Lib.current.stage.removeEventListener(KeyboardEvent.KEY_UP, onKeyUp, false);
+		Lib.current.stage.removeEventListener(KeyboardEvent.KEY_DOWN, onKeyDown, false);
+		visible = false;
 	}
-	/**
-	 * Disable console and its listeners.
-	 */
-	public static function disable() 
+
+	public function setShortcutKeyCode(key:Int)
 	{
-		checkInstance();
-		GConsole.instance.disable();
-	}
-	/**
-	 * Sets the keycode to open the console.
-	 * @param	key		The keycode for the new console shortcut key.
-	 */
-	public static function setShortcutKeyCode(key:Int)
-	{
-		checkInstance();
-		GConsole.instance.setShortcutKeyCode(key);
-	}
-	/**
-	 * Logs a message to the console.
-	 * @param	data	The message to log. 
-	 */
-	public static function log(data:Dynamic) 
-	{
-		checkInstance();
-		GConsole.instance.log(data);
-	}
-	/**
-	 * Registers a variable to used in the console.
-	 * @param	object		Reference to object containing the variable.
-	 * @param	name		The name of the variable inside the object.
-	 * @param	alias		The display name that shows on screen console.
-	 * @param	monitor 	Whether to monitor/display this variable in realtime using monitor.
-	 */
-	public static function registerVariable(object:Dynamic, name:String, alias:String, monitor:Bool=false) 
-	{
-		checkInstance();
-		GConsole.instance.registerVariable(object, name, alias, monitor);
-	}
-	/**
-	 * Deletes field from registry.
-	 * @param	alias
-	 */
-	public static function unregisterVariable(alias:String)
-	{
-		checkInstance();
-		GConsole.instance.unregisterVariable(alias);
-	}
-	/**
-	 * Registers a function to be called from the console.
-	 * If monitor argument is set, this function will be displayed on monitor window.
-	 * 
-	 * @param	object	A Reference to object containing the function.
-	 * @param	name	The name of the function inside the object.
-	 * @param	alias	The display name that shows on screen console.
-	 * @param	monitor If true, the function will be called every n frames and output printed. Be careful with this one.
-	 */
-	public static function registerFunction(object:Dynamic, name:String, alias:String, ?monitor:Bool = false) 
-	{
-		checkInstance();
-		GConsole.instance.registerFunction(object, name, alias, monitor);
-	}
-	/**
-	 * Deletes field from registry.
-	 * @param	alias
-	 */
-	public static function unregisterFunction(alias:String)
-	{
-		checkInstance();
-		GConsole.instance.unregisterFunction(alias);
-	}
-	/**
-	 * Clears console logs.
-	 */
-	public static function clearConsole() 
-	{
-		checkInstance();
-		GConsole.instance.clearConsole();
-	}
-	/**
-	 * Removes all entrys from registry.
-	 */
-	public static function clearRegistry()
-	{
-		checkInstance();
-		GCCommands.clearRegistry();
-	}
-	/**
-	 * Brings console to front in stage. 
-	 * Useful when other ojects are added directly to stage, hiding the console.
-	 */
-	public static function toFront()
-	{
-		Lib.current.stage.swapChildren(GConsole.instance, Lib.current.stage.getChildAt(Lib.current.stage.numChildren - 1));
+		_consoleScKey = key;
 	}
 	
-	private static function checkInstance() 
+	public function log(data:Dynamic) 
 	{
-		if (GConsole.instance == null) init();
+		if (data == "") return;
+		_firstLine ?
+			_firstLine = false : 
+			_interface.txtConsole.text += '\n'; //add new line if console text was not clear.
+		
+		_interface.txtConsole.text += data.toString();
+		_interface.txtConsole.scrollV = _interface.txtConsole.maxScrollV;
 	}
+
+	public function registerVariable(object:Dynamic, name:String, alias:String, monitor:Bool=false) 
+	{
+		if (!Reflect.isObject(object)) {
+		trace(GC_TRC_ERR + "dynamic passed with the field: " + name + " is not an object.");
+			return;
+		}
+		#if !cpp // BUGFIX
+		if (!Reflect.hasField(object, name)) {
+			trace (GC_TRC_ERR + name + " field was not found in object passed.");
+			return;
+		}
+		#end
+		
+		log(GCCommands.registerVariable(object, name, alias, monitor));
+	}
+
+	public function unregisterVariable(alias:String)
+	{
+		if (GCCommands.unregisterVariable(alias)) {
+			log("variable " + alias + " unregistered.");
+		} else {
+			log("variable " + alias + " not found.");
+		}
+	}
+	
+	public function registerFunction(object:Dynamic, name:String, alias:String, ?monitor:Bool = false) 
+	{
+		#if !cpp // BUGFIX
+		if (!Reflect.hasField(object, name)) {
+			trace (GC_TRC_ERR + name + " field was not found in object passed.");
+			return;
+		}
+		#end
+		if (!Reflect.isFunction(Reflect.field(object, name))) {
+			trace(GC_TRC_ERR + "could not find function: " + name + " in object passed.");
+			return;
+		}
+		
+		log(GCCommands.registerFunction(object, name, alias, monitor));
+	}
+
+	public function unregisterFunction(alias:String)
+	{
+		if (GCCommands.unregisterFunction(alias)) {
+			log("function " + alias + " unregistered.");
+		} else {
+			log("function " + alias + " not found.");
+		}
+		
+	}
+	
+	public function clearConsole() 
+	{
+		_interface.txtConsole.text = '';
+		_firstLine = true;
+	}
+
+	public function clearRegistry()
+	{
+		GCCommands.clearRegistry();
+	}
+	
+	// INPUT HANDLING ------------------------------------------------------
+	
+	private function onKeyDown(e:KeyboardEvent):Void 
+	{
+		#if !cpp // BUGFIX
+		if (_isConsoleOn) 
+			e.stopImmediatePropagation(); 
+		#end
+	}
+	
+	private function onKeyUp(e:KeyboardEvent):Void 
+	{
+		if (e.ctrlKey && cast(e.keyCode,Int) == _consoleScKey ) {
+			_isMonitorOn ? hideMonitor() : showMonitor();
+			return;
+		}
+		
+		if (cast(e.keyCode,Int) == _consoleScKey) {
+			_isConsoleOn ? hideConsole() : showConsole();
+			return;
+		}
+		
+		// Read the following input if console is showing.
+		if (!_isConsoleOn)
+			return;	
+		
+		switch (e.keyCode) {
+			// ENTER
+			case 13	: 	processInputLine();
+			// PAGEUP
+			case 33 : 	_interface.txtConsole.scrollV -= _interface.txtConsole.bottomScrollV - _interface.txtConsole.scrollV +1;
+						if (_interface.txtConsole.scrollV < 0)
+							_interface.txtConsole.scrollV = 0;
+			// PAGEDOWN
+			case 34	:	_interface.txtConsole.scrollV += _interface.txtConsole.bottomScrollV - _interface.txtConsole.scrollV +1;
+						if (_interface.txtConsole.scrollV > _interface.txtConsole.maxScrollV)
+							_interface.txtConsole.scrollV = _interface.txtConsole.maxScrollV;
+			// UP
+			case 38	:	nextHistory();
+			// DOWN
+			case 40	: 	prevHistory();
+			default	:	_historyIndex = -1;
+		}
+			
+		#if !cpp // BUGFIX
+		e.stopImmediatePropagation(); // BUG - cpp issues.
+		#end
+	}
+	
+	private function prevHistory() 
+	{
+		_historyIndex--;
+		if (_historyIndex < 0 ) _historyIndex = 0;
+		if (_historyIndex > _historyArray.length - 1) return; 
+		
+		_interface.txtPrompt.text = _historyArray[_historyIndex];
+		#if !cpp
+		_interface.txtPrompt.setSelection(_interface.txtPrompt.length, _interface.txtPrompt.length); 
+		#end
+	}
+	
+	private function nextHistory() 
+	{
+		if (_historyIndex + 1 > _historyArray.length - 1) return;
+		_historyIndex++;
+		
+		_interface.txtPrompt.text = _historyArray[_historyIndex];
+		#if !cpp
+		_interface.txtPrompt.setSelection(_interface.txtPrompt.length, _interface.txtPrompt.length); 
+		#end
+	}
+	
+	// INPUT PARSE ----------------------------------------------------
+	
+	private function processInputLine() 
+	{
+		if (_interface.txtPrompt.text == '') 
+			return;
+		var temp:String = _interface.txtPrompt.text;
+		
+		_historyArray.insert(0, _interface.txtPrompt.text);
+		_historyIndex = -1;
+		if (_historyArray.length > _historyMaxSz)
+			_historyArray.splice(_historyArray.length - 1, 1);
+		
+		log(": " + _interface.txtPrompt.text);
+		_interface.txtPrompt.text = '';
+		parseInput(temp);
+	}
+	
+	private function parseInput(input:String) 
+	{
+		var args:Array<String> = input.split(' ');
+		var argsLC:Array<String> = input.toLowerCase().split(' ');
+		
+		switch (argsLC[0]) {
+			case "clear"	: clearConsole();
+			case "monitor"	: _isMonitorOn ? hideMonitor() : showMonitor();
+			case "help"		: log(GCCommands.showHelp());
+			case "commands" : log(GCCommands.showCommands());
+			case "vars"		: log(GCCommands.listVars());
+			case "fcns"		: log(GCCommands.listFunctions());
+			case "set"		: log(GCCommands.setVar(args));
+			case "call"		: log(GCCommands.callFunction(args));
+		}
+	}
+	
+	// MONITOR --------------------------------------------------------
+
+	private function updateMonitor(e:Event):Void 
+	{
+		_elapsedFrames++;
+		if (_elapsedFrames > _monitorRate) {
+			processMonitorOutput(GCCommands.getMonitorOutput());
+			_elapsedFrames = 0;
+		}
+	}
+	
+	private function processMonitorOutput(input:String) 
+	{
+		if (input.length == 0) return;
+		var str1:String;
+		var str2:String;
+		
+		var splitPoint:Int = Std.int(input.length / 2) - 1;
+		
+		while (splitPoint < input.length) {
+			if (input.charAt(splitPoint) == "\n") 
+				break;
+			splitPoint++;
+		}
+		
+		_interface.txtMonitorLeft.text = input.substr(0, splitPoint);
+		_interface.txtMonitorRight.text = input.substr(splitPoint + 1); 
+	}
+	
+	// GETTERS AND SETTERS ------------------------------------------------
+	
+	private function set_historyMaxSz(value:Int):Int 
+	{
+		return _historyMaxSz = value;
+	}
+	public var historyMaxSz(null, set_historyMaxSz):Int;
 }
