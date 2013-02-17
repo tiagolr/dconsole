@@ -14,10 +14,10 @@ import nme.Lib;
 #end
 
 /**
- * GameConsole is the main class of this lib, it should be instantiated only once
+ * GConsole is the main class of this lib, it should be instantiated only once
  * and then use its instance to control the console.
  * 
- * Its recomended to use GC class as API for this lib instead of GameConsole class.
+ * Its recomended to use GameConsole class as API for this lib.
  * 
  * @author TiagoLr ( ~~~ProG4mr~~~ )
  */
