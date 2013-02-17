@@ -11,11 +11,12 @@ Game Console is a real-time console that allows you to:
 * Profile your app (soon).
 * Add your own commands by extending this lib.
 
-Notes:<br />
+Notes and changes:<br />
 
-* Gconsole needs nme installed.<br />
-* Flash and Cpp targets tested and working fine.<br />
-* If you're not using Windows, default font may look bad, use GC.setFont() in that case.
+* Gconsole now works with flash and neko targets without nme lib (thanks to Beeblerox for neko fixes).<br />
+* Flash, cpp and neko targets have been tested and working fine.<br />
+* If you're not using Windows, default font may look bad, use GameConsole.setConsoleFont() in that case.<br />
+* The main interface has been renamed from GC to GameConsole.
 
 ____________
 
@@ -24,10 +25,12 @@ ____________
 Using gconsole is very straightforward:
 
 ```js
-    GC.init();
-    GC.log("This text will be logged.");
-    GC.registerVariable(object, "variable name", "variable alias");
-    GC.registerFunction(object, "function name", "function alias");
+    import pgr.gconsole.GameConsole;
+
+    GameConsole.init();
+    GameConsole.log("This text will be logged.");
+    GameConsole.registerVariable(object, "variable name", "variable alias");
+    GameConsole.registerFunction(object, "function name", "function alias");
 ```
 
 Now while running your game or app, press **TAB**, then type **"help"** or **"commands"**
@@ -48,7 +51,7 @@ For more screenshots, configuration tips etc.. check (again) [Wiki](https://gith
 ### Suggestions / Comments / Bugs 
 
 [Email me](mailto:prog4mr@gmail.com) any suggestions, comments, bug reports etc.. you have.<br />
-Or create a new issue (better for some cases). 
+Or create a new issue (even better). 
 
 
 Thank you, enjoy.
