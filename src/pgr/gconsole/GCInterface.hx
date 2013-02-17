@@ -1,7 +1,7 @@
 package pgr.gconsole;
 
 import GCThemes.Theme;
-#if flash
+#if (flash || neko)
 import flash.display.Sprite;
 import flash.Lib;
 import flash.text.TextField;

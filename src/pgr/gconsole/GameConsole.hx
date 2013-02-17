@@ -1,7 +1,7 @@
 package pgr.gconsole;
 
 import GCThemes.Theme;
-#if flash
+#if (flash || neko)
 import flash.Lib;
 #else
 import nme.Lib;

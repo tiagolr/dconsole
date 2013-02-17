@@ -1,6 +1,6 @@
 package pgr.gconsole;
 
-#if flash
+#if (flash || neko)
 import flash.display.MovieClip;
 import flash.Lib;
 #else

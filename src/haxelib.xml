@@ -8,5 +8,5 @@
 	<tag v="game" />
 	<description>A game-like console that provides runtime acess to methods and variables, logging, monitoring, profiling, you name it.</description>
 	<depends name="nme"/>
-	<version name="1.0.0">Initial release</version>
+	<version name="1.1.0">Small changes and fixes.</version>
 </project>
