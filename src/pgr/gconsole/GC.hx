@@ -30,7 +30,9 @@ class GameConsole
 	 */
 	public static function init(height:Float = 0.33, align:String = "DOWN", theme:Theme = null, monitorRate:Int = 10) 
 	{
-		Lib.current.stage.addChild(new GConsole(height, align, theme, monitorRate));
+		if (GameConsole.instance != null)
+			return; // GConsole has been initialized already.
+		Lib.stage.addChild(new GameConsole(height, align, theme, monitorRate));
 	}
 	/**
 	 * Sets the console font.

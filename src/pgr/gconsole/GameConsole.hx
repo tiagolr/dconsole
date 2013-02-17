@@ -156,12 +156,15 @@ class GConsole extends Sprite
 		trace(GC_TRC_ERR + "dynamic passed with the field: " + name + " is not an object.");
 			return;
 		}
-		#if !cpp // BUGFIX
-		if (!Reflect.hasField(object, name)) {
+		#if !(cpp || neko)
+		if (!Reflect.hasField(object, name)) 
+		#else
+		if (Reflect.getProperty(object, name) == null) 
+		#end
+		{
 			trace (GC_TRC_ERR + name + " field was not found in object passed.");
 			return;
 		}
-		#end
 		
 		log(GCCommands.registerVariable(object, name, alias, monitor));
 	}
@@ -177,12 +180,16 @@ class GConsole extends Sprite
 	
 	public function registerFunction(object:Dynamic, name:String, alias:String, ?monitor:Bool = false) 
 	{
-		#if !cpp // BUGFIX
-		if (!Reflect.hasField(object, name)) {
+		#if !(cpp || neko)
+		if (!Reflect.hasField(object, name)) 
+		#else
+		if (Reflect.getProperty(object, name) == null) 
+		#end
+		{
 			trace (GC_TRC_ERR + name + " field was not found in object passed.");
 			return;
 		}
-		#end
+		
 		if (!Reflect.isFunction(Reflect.field(object, name))) {
 			trace(GC_TRC_ERR + "could not find function: " + name + " in object passed.");
 			return;
@@ -216,7 +223,7 @@ class GConsole extends Sprite
 	
 	private function onKeyDown(e:KeyboardEvent):Void 
 	{
-		#if !cpp // BUGFIX
+		#if !(cpp || neko) // BUGFIX
 		if (_isConsoleOn) 
 			e.stopImmediatePropagation(); 
 		#end
@@ -256,7 +263,7 @@ class GConsole extends Sprite
 			default	:	_historyIndex = -1;
 		}
 			
-		#if !cpp // BUGFIX
+		#if !(cpp || neko) // BUGFIX
 		e.stopImmediatePropagation(); // BUG - cpp issues.
 		#end
 	}
@@ -268,7 +275,7 @@ class GConsole extends Sprite
 		if (_historyIndex > _historyArray.length - 1) return; 
 		
 		_interface.txtPrompt.text = _historyArray[_historyIndex];
-		#if !cpp
+		#if !(cpp || neko)
 		_interface.txtPrompt.setSelection(_interface.txtPrompt.length, _interface.txtPrompt.length); 
 		#end
 	}
@@ -279,7 +286,7 @@ class GConsole extends Sprite
 		_historyIndex++;
 		
 		_interface.txtPrompt.text = _historyArray[_historyIndex];
-		#if !cpp
+		#if !(cpp || neko)
 		_interface.txtPrompt.setSelection(_interface.txtPrompt.length, _interface.txtPrompt.length); 
 		#end
 	}
