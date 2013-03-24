@@ -1,6 +1,6 @@
 package pgr.gconsole;
 
-import GCThemes.Theme;
+import pgr.gconsole.GCThemes;
 #if (flash || neko)
 import flash.display.Sprite;
 import flash.events.Event;
