@@ -1,11 +1,7 @@
 package pgr.gconsole;
 
-import GCThemes.Theme;
-#if (flash || neko)
+
 import flash.Lib;
-#else
-import nme.Lib;
-#end
 /**
  * @author TiagoLr ( ~~~ProG4mr~~~ )
  */
@@ -28,7 +24,7 @@ class GameConsole
 	 * @param	theme	Select the console theme from GCThemes.
 	 * @param	monitorRate The number of frames elapsed for each monitor refresh.
 	 */
-	public static function init(height:Float = 0.33, align:String = "DOWN", theme:Theme = null, monitorRate:Int = 10) 
+	public static function init(height:Float = 0.33, align:String = "DOWN", theme:GCThemes.Theme = null, monitorRate:Int = 10) 
 	{
 		if (GConsole.instance != null)
 			return; // GConsole has been initialized already.

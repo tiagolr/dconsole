@@ -1,21 +1,12 @@
 package pgr.gconsole;
 
-import GCThemes.Theme;
-#if (flash || neko)
 import flash.display.Sprite;
 import flash.Lib;
 import flash.text.TextField;
 import flash.text.TextFieldType;
 import flash.text.TextFormat;
 import flash.text.TextFormatAlign;
-#else
-import nme.display.Sprite;
-import nme.Lib;
-import nme.text.TextField;
-import nme.text.TextFieldType;
-import nme.text.TextFormat;
-import nme.text.TextFormatAlign;
-#end
+
 
 /**
  * 
@@ -30,7 +21,7 @@ class GCInterface extends Sprite
 	private var _monitorBg:Sprite;
 	private var _border:Sprite;
 	private var _promptFontYOffset:Int;
-	private var _theme:Theme;
+	private var _theme:GCThemes.Theme;
 	private var _width:Int;
 	private var _yOffset:Int;
 	
@@ -39,7 +30,7 @@ class GCInterface extends Sprite
 	public var txtMonitorLeft:TextField;
 	public var txtMonitorRight:TextField;
 	
-	public function new(height:Float, align:String, theme:Theme) {
+	public function new(height:Float, align:String, theme:GCThemes.Theme) {
 		
 		super();
 		

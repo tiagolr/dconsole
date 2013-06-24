@@ -1,12 +1,7 @@
 package pgr.gconsole;
 
-#if (flash || neko)
 import flash.display.MovieClip;
 import flash.Lib;
-#else
-import nme.display.MovieClip;
-import nme.Lib;
-#end
 
  typedef RemoteObj = {
 	 var name	: String;

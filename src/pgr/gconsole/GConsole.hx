@@ -1,17 +1,9 @@
 package pgr.gconsole;
 
-import GCThemes.Theme;
-#if (flash || neko)
 import flash.display.Sprite;
 import flash.events.Event;
 import flash.events.KeyboardEvent;
 import flash.Lib;
-#else
-import nme.display.Sprite;
-import nme.events.Event;
-import nme.events.KeyboardEvent;
-import nme.Lib;
-#end
 
 /**
  * GConsole is the main class of this lib, it should be instantiated only once
@@ -46,7 +38,7 @@ class GConsole extends Sprite
 	
 	public static var instance:GConsole;
 
-	public function new(height:Float = 0.33, align:String = "DOWN", theme:Theme = null, monitorRate:Int = 10) 
+	public function new(height:Float = 0.33, align:String = "DOWN", theme:GCThemes.Theme = null, monitorRate:Int = 10) 
 	{
 		super();
 		
@@ -82,7 +74,7 @@ class GConsole extends Sprite
 	}
 
 	public function setMonitorFont(font:String = null, embed:Bool = true, size:Int = 14, bold:Bool = false, ?italic:Bool = false, underline:Bool = false )
-	{
+	{		
 		_interface.setMonitorFont(font, embed, size, bold, italic, underline);
 	}
 
@@ -121,8 +113,8 @@ class GConsole extends Sprite
 	public function enable() 
 	{
 		visible = true;
-		Lib.current.stage.addEventListener(KeyboardEvent.KEY_UP, onKeyUp, false, 10);
-		Lib.current.stage.addEventListener(KeyboardEvent.KEY_DOWN, onKeyDown, false, 10);
+		Lib.current.stage.addEventListener(KeyboardEvent.KEY_UP, onKeyUp, false);
+		Lib.current.stage.addEventListener(KeyboardEvent.KEY_DOWN, onKeyDown, false);
 	}
 
 	public function disable() 
@@ -241,10 +233,48 @@ class GConsole extends Sprite
 			return;
 		}
 		
+		
+		
 		// Read the following input if console is showing.
 		if (!_isConsoleOn)
 			return;	
 		
+		// Changed switch to if-else to avoid strande exception in haxe 3 regarding int and uint.
+		if (e.keyCode == 13)
+		{
+			processInputLine();
+		}
+		else 
+		if (e.keyCode == 33)
+		{
+			_interface.txtConsole.scrollV -= _interface.txtConsole.bottomScrollV - _interface.txtConsole.scrollV +1;
+			if (_interface.txtConsole.scrollV < 0)
+				_interface.txtConsole.scrollV = 0;
+		}
+		else 
+		if (e.keyCode == 34)
+		{
+			_interface.txtConsole.scrollV += _interface.txtConsole.bottomScrollV - _interface.txtConsole.scrollV +1;
+			if (_interface.txtConsole.scrollV > _interface.txtConsole.maxScrollV)
+				_interface.txtConsole.scrollV = _interface.txtConsole.maxScrollV;
+		}
+		else
+		if (e.keyCode == 38)
+		{
+			nextHistory();
+		}
+		else 
+		if (e.keyCode == 40)
+		{
+			prevHistory();
+		}
+		else
+		{
+			_historyIndex = -1;
+		}
+		
+		/*
+		}
 		switch (e.keyCode) {
 			// ENTER
 			case 13	: 	processInputLine();
@@ -262,6 +292,7 @@ class GConsole extends Sprite
 			case 40	: 	prevHistory();
 			default	:	_historyIndex = -1;
 		}
+		*/
 			
 		#if !(cpp || neko) // BUGFIX
 		e.stopImmediatePropagation(); // BUG - cpp issues.

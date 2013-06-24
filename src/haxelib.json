@@ -1,0 +1,11 @@
+{
+	"name": "gameconsole",
+	"url" : "https://github.com/ProG4mr/gameconsole",
+	"license": "MIT",
+	"tags": ["console", "logger", "monitor", "profiler", "utility", "game"],
+	"description": "A game-like console that provides runtime acess to methods and variables, logging, monitoring, profiling, you name it.",
+	"version": "1.1.0",
+	"releasenote": "Small changes and fixes.",
+	"contributors": ["prog4mr"],
+	"dependencies": {}
+}
