@@ -7,8 +7,8 @@ import flash.Lib;
  */
  
 enum ALIGN {
-	DOWN,
-	UP  ,
+	DOWN;
+	UP  ;
 }
 
  /**
