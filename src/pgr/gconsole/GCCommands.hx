@@ -92,28 +92,28 @@ class GCCommands
 	// ------------------------------------------------------------------------------
 	public static function showHelp():String 
 	{
-		var output = '';
-		output += '\n';
-		output += "GAME CONSOLE v1.0\n\n";
-		output += "Type \"commands\" to view availible commands.\n";
-		output += "Use 'PAGEUP' or 'PAGEDOWN' to scroll this console text.\n";
-		output += "Use 'UP' or 'DOWN' keys to view recent commands history.\n";
-		output += "Use 'CTRL' + 'CONSOLE SCKEY' to toggle monitor on/off.\n";
-		return output;
+		var output : StringBuf = new StringBuf();
+		output.add('\n');
+		output.add("GAME CONSOLE v1.0\n\n");
+		output.add("Type \"commands\" to view availible commands.\n");
+		output.add("Use 'PAGEUP' or 'PAGEDOWN' to scroll this console text.\n");
+		output.add("Use 'UP' or 'DOWN' keys to view recent commands history.\n");
+		output.add("Use 'CTRL' + 'CONSOLE SCKEY' to toggle monitor on/off.\n");
+		return output.toString();
 	}
 	
 	public static function showCommands():String
 	{
-		var output = '';
-		output += '\n';
-		output += "CLEAR                       clears console view.\n";
-		output += "HELP                        shows help menu.\n";
-		output += "MONITOR                     toggles monitor on or off.\n";
-		output += "VARS                        lists availible variables.\n";
-		output += "FCNS                        lists availible functions.\n";
-		output += "SET [variable] [value]      assigns value to variable.\n";
-		output += "CALL [function] [args]*     calls function.\n";
-		return output;
+		var output : StringBuf = new StringBuf();
+		output.add('\n');
+		output.add("CLEAR                       clears console view.\n");
+		output.add("HELP                        shows help menu.\n");
+		output.add("MONITOR                     toggles monitor on or off.\n");
+		output.add("VARS                        lists availible variables.\n");
+		output.add("FCNS                        lists availible functions.\n");
+		output.add("SET [variable] [value]      assigns value to variable.\n");
+		output.add("CALL [function] [args]*     calls function.\n");
+		return output.toString();
 	}
 
 	public static function setVar(args:Array<String>):String 
@@ -155,34 +155,34 @@ class GCCommands
 
 	public static function listVars():String
 	{
-		var logMessage:String = '';
+		var logMessage : StringBuf = new StringBuf();
 		for (i in 0..._variables.length) 
-			logMessage += (_variables[i].alias + '=' + Reflect.getProperty(_variables[i].object, _variables[i].name) + "  |  ");
+			logMessage.add(_variables[i].alias + '=' + Reflect.getProperty(_variables[i].object, _variables[i].name) + "  |  ");
 		
-		return logMessage;
+		return logMessage.toString();
 	}
 	
 	public static function listFunctions():String 
 	{
-		var list = '';
+		var list : StringBuf = new StringBuf();
 		for (i in 0..._functions.length) 
-			list += _functions[i].alias + '' + '\n'; 
+			list.add(_functions[i].alias + '' + '\n'); 
 			
-		return list;
+		return list.toString();
 	}
 	
 	public static function getMonitorOutput():String
 	{
-		var output:String = '';
+		var output:StringBuf = new StringBuf();
 		for (i in 0..._variables.length)
 			if (_variables[i].monitor)
-				output += (_variables[i].alias + ':' + Reflect.getProperty(_variables[i].object, _variables[i].name) + '\n');
+				output.add(_variables[i].alias + ':' + Reflect.getProperty(_variables[i].object, _variables[i].name) + '\n');
 		
 		for (i in 0..._functions.length)
 			if (_functions[i].monitor)
-				output += (_functions[i].alias + ':' + Reflect.callMethod(null, Reflect.getProperty(_functions[i].object, _functions[i].name), null) + '\n');
+				output.add(_functions[i].alias + ':' + Reflect.callMethod(null, Reflect.getProperty(_functions[i].object, _functions[i].name), null) + '\n');
 				
-		return output;
+		return output.toString();
 	}
 	//	AUX	------------------------------------------------------
 
