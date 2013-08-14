@@ -138,7 +138,7 @@ class GConsole extends Sprite
 			_firstLine = false : 
 			_interface.txtConsole.text += '\n'; //add new line if console text was not clear.
 		
-		_interface.txtConsole.text += data.toString();
+		_interface.txtConsole.text += Std.string(data);
 		_interface.txtConsole.scrollV = _interface.txtConsole.maxScrollV;
 	}
 
