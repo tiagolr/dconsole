@@ -10,12 +10,12 @@ This fork of [Game Console](https://github.com/ProG4mr/gameconsole) introduces a
 
 ## Changes
 
-* Default console toggle hotkey was changed to `. Tab used for cycle autocompletion options.
-* @call@ command was removed from console. Registered functions can be called directly by name.
+* Default console toggle hotkey was changed to `. Tab used for cycling autocompletion options.
+* call command was removed from console. Registered functions can be called directly by name.
 
 ## Usage
 
-Type something in the console and press tab until you get desired option. While you press tab console will switch options for part endered manually. After you press any other key whole completed string will be treated as new beginning for completion. If You want to start completing arguments you need have full funcion name in the input and at least one space after it.
+Type something in the console and press tab until you get desired option. While you press tab console will switch options for part entered manually. After you press any other key whole completed string will be treated as new beginning for completion. If You want to start completing arguments you need have full funcion name in the input and at least one space after it.
 Autocompletion for function's name enabled by default just after registration. The way of completion function arguments you can define in a function given as last argument of GameConsole.registerFunction():
 
 ```js
