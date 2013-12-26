@@ -82,6 +82,7 @@ class GConsole extends Sprite {
 
 	public function showConsole() {
 		if (!this.visible) return;
+		_interface.txtPrompt.text = StringTools.replace(_interface.txtPrompt.text, '`', '');
 		Lib.current.stage.focus = _interface.txtPrompt;
 		_isConsoleOn = true;
 		_interface.toggleConsoleOn(true);
