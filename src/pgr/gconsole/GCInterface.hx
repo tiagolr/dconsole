@@ -52,7 +52,7 @@ class GCInterface extends Sprite
 		
 		txtPrompt = new TextField();
 		txtPrompt.type = TextFieldType.INPUT;
-		txtPrompt.selectable = false;
+		txtPrompt.selectable = true;
 		txtPrompt.multiline = false;
 		txtPrompt.alpha = _theme.consTxtAlpha;
 		setPromptFont();

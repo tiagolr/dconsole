@@ -1,4 +1,5 @@
 package ;
+import flash.ui.Keyboard;
 import pgr.gconsole.GConsole;
 import massive.munit.Assert;
 import flash.events.KeyboardEvent;
@@ -17,6 +18,9 @@ class ConsoleTest {
         interfc = GConsole.instance._interface;
         clearText();
     }
+	@After public function tearDown():Void {
+		GConsole.instance = null;
+	}
 
     @Test public function testInput():Void {
         GameConsole.enable();
@@ -75,6 +79,16 @@ class ConsoleTest {
 
         Assert.isTrue(ai.length == 2 && af.length == 2 && as.length == 2);
     }
+
+	@Test public function testAutocompleteMainCommands():Void {
+		GameConsole.showConsole();
+		interfc.txtPrompt.text = "c";
+		Lib.current.stage.dispatchEvent(new KeyboardEvent(KeyboardEvent.KEY_UP, true, false, 0, Keyboard.TAB)); // ENTER
+		Assert.areEqual("clear", interfc.txtPrompt.text);
+
+
+
+	}
 
     private function clearText() {
         interfc.txtConsole.text = '';
