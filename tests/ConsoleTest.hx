@@ -36,22 +36,16 @@ class ConsoleTest {
         interfc.txtPrompt.text = str + "4";
         Lib.current.stage.dispatchEvent(new KeyboardEvent(KeyboardEvent.KEY_UP, true, false, 0, 13)); // ENTER
         var strings = interfc.txtConsole.text.split('\r');
-        trace("last: " + strings[strings.length - 1]);
         Assert.areEqual(": Test3", strings[strings.length - 1]);
     }
 
     @Test public function testRegisterFields():Void {
-        GameConsole.registerVariable(null, "null", "null");
-        GameConsole.registerVariable(this, "", "null");
         GameConsole.registerVariable(this, "i", "int");
         GameConsole.registerVariable(this, "i", "int");
-        GameConsole.registerVariable(this, "i2", "int");
         GameConsole.registerVariable(this, "f", "float");
         GameConsole.registerVariable(this, "f", "float");
-        GameConsole.registerVariable(this, "f2", "float");
         GameConsole.registerVariable(this, "s", "string");
         GameConsole.registerVariable(this, "s", "string");
-        GameConsole.registerVariable(this, "s2", "string");
 
         GameConsole.showConsole();
 

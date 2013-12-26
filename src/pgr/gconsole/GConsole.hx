@@ -145,7 +145,7 @@ class GConsole extends Sprite
 	public function registerVariable(object:Dynamic, name:String, alias:String, monitor:Bool=false) 
 	{
 		if (!Reflect.isObject(object)) {
-		trace(GC_TRC_ERR + "dynamic passed with the field: " + name + " is not an object.");
+		throw GC_TRC_ERR + "dynamic passed with the field: " + name + " is not an object.";
 			return;
 		}
 		#if !(cpp || neko)
@@ -154,7 +154,7 @@ class GConsole extends Sprite
 		if (Reflect.getProperty(object, name) == null) 
 		#end
 		{
-			trace (GC_TRC_ERR + name + " field was not found in object passed.");
+			throw  GC_TRC_ERR + name + " field was not found in object " + object + " passed.";
 			return;
 		}
 		
@@ -178,12 +178,12 @@ class GConsole extends Sprite
 		if (Reflect.getProperty(object, name) == null) 
 		#end
 		{
-			trace (GC_TRC_ERR + name + " field was not found in object passed.");
+			throw GC_TRC_ERR + name + " field was not found in object passed.";
 			return;
 		}
 		
 		if (!Reflect.isFunction(Reflect.field(object, name))) {
-			trace(GC_TRC_ERR + "could not find function: " + name + " in object passed.");
+			throw GC_TRC_ERR + "could not find function: " + name + " in object passed.";
 			return;
 		}
 		
