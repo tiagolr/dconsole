@@ -5,19 +5,25 @@ import flash.Lib;
 /**
  * @author TiagoLr ( ~~~ProG4mr~~~ )
  */
+ 
+enum ALIGN {
+	DOWN;
+	UP  ;
+}
 
  /**
   * GameConsole class provides user friendly interface to Game Console.
   */
 class GameConsole 
 {
+	
 	/** Aligns console to bottom */
 	static public var ALIGN_DOWN:String = "DOWN";
 	/** Aligns console to top */
 	static public var ALIGN_UP:String = "UP";
 	
 	
-	@:noCompletion public static var COLOR_WARN	: Int = 0x808000; // warning messages color.
+	
 	
 	@:noCompletion public static var COLOR_ERROR: Int = 0x800000; // error messages color.
 	
@@ -82,6 +88,26 @@ class GameConsole
 		checkInstance();
 		GConsole.instance.setMonitorFont(font, embed, size, bold, italic, underline);
 	}
+	
+	/**
+	 * Sets the monitor, console, and prompt fonts in one go.
+	 * Sizes and offsets use the default values.
+	 *
+	 * To change the font color, see <code>GCThemes</code>
+	 * @param font The path of the desired font file
+	 * @param embed ?
+	 * @param bold True if the font should be bold
+	 * @param italic True if the font should be italicized
+	 * @param underline True if the font should be underlined
+	 */
+	public static function setFont(font:String = null, embed:Bool = true, bold:Bool = false, ?iitalic:Bool = false, underline:Bool = false)
+	{
+		checkInstance();
+		GConsole.instance.setConsoleFont(font, embed, 14, bold, italic, underline);
+		GConsole.instance.setPromptFont(font, embed, 16, 22, bold, italic, underline);
+		GConsole.instance.setMonitorFont(font, embed, 14, bold, italic, underline);
+	}
+	
 	/**
 	 * Shows console.
 	 */
