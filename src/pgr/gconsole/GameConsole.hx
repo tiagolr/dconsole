@@ -104,7 +104,7 @@ class GameConsole
 	{
 		checkInstance();
 		GConsole.instance.setConsoleFont(font, embed, 14, bold, italic, underline);
-		GConsole.instance.setPromptFont(font, embed, 16, 22, bold, italic, underline);
+		GConsole.instance.setPromptFont(font, embed, 16, bold, italic, underline);
 		GConsole.instance.setMonitorFont(font, embed, 14, bold, italic, underline);
 	}
 	
