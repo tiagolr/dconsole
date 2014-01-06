@@ -23,7 +23,7 @@ class GameConsole
 	static public var ALIGN_UP:String = "UP";
 	
 	
-	
+	@:noCompletion public static var COLOR_WARN: Int = 0x008080; // warning messages color.
 	
 	@:noCompletion public static var COLOR_ERROR: Int = 0x800000; // error messages color.
 	
@@ -100,7 +100,7 @@ class GameConsole
 	 * @param italic True if the font should be italicized
 	 * @param underline True if the font should be underlined
 	 */
-	public static function setFont(font:String = null, embed:Bool = true, bold:Bool = false, ?iitalic:Bool = false, underline:Bool = false)
+	public static function setFont(font:String = null, embed:Bool = true, bold:Bool = false, ?italic:Bool = false, underline:Bool = false)
 	{
 		checkInstance();
 		GConsole.instance.setConsoleFont(font, embed, 14, bold, italic, underline);

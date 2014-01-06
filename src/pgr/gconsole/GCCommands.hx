@@ -153,12 +153,11 @@ class GCCommands
 	{
 		var output : StringBuf = new StringBuf();
 		output.add('\n');
-		output.add("GAME CONSOLE v1.0\n\n");
-		output.add("Type \"commands\" to view availible commands.\n");
+		output.add("Type \"COMMANDS\" to view availible commands.\n");
+		output.add("Use 'CTRL' + 'SPACE' for AUTO-COMPLETE .\n");
 		output.add("Use 'PAGEUP' or 'PAGEDOWN' to scroll this console text.\n");
 		output.add("Use 'UP' or 'DOWN' keys to view recent commands history.\n");
 		output.add("Use 'CTRL' + 'CONSOLE SCKEY' to toggle monitor on/off.\n");
-		return Std.string(output);
 		GameConsole.logInfo(output);
 	}
 
@@ -170,10 +169,10 @@ class GCCommands
 		output.add("HELP                        shows help menu.\n");
 		output.add("MONITOR                     toggles monitor on or off.\n");
 		output.add("VARS                        lists availible variables.\n");
-		output += "FUNCS                        lists availible functions.\n";
+		output.add("FUNCS                       lists availible functions.\n");
 		output.add("SET [variable] [value]      assigns value to variable.\n");
 		output.add("CALL [function] [args]*     calls function.\n");
-		return Std.string(output);
+		
 		GameConsole.logInfo(output);
 	}
 
@@ -251,48 +250,41 @@ class GCCommands
 				GameConsole.logError("object " + objs[0] + " not found.");
 			}
 		}
-
-		return "function " + args[1] + " not found";
 	}
 
 	public static function listVars()
 	{
 		var logMessage : StringBuf = new StringBuf();
-		for (i in 0..._variables.length)
-			logMessage.add(_variables[i].alias + '=' + Reflect.getProperty(_variables[i].object, _variables[i].name) + "  |  ");
 
 		for ( o in _variables.iterator() ) 
-			logMessage += (o.alias + '=' + Reflect.getProperty(o.object, o.name) + "  |  ");
+			logMessage.add(o.alias + '=' + Reflect.getProperty(o.object, o.name) + "  |  ");
 		
-		if (logMessage == '') {
-			logMessage = "no variables registered.";
-			GameConsole.logInfo(logMessage);
+		if (logMessage.toString() == '') {
+			GameConsole.logInfo("no variables registered.");
 		} else
 			GameConsole.logConfirmation(logMessage);
 	}
 
-	public static function listFunctions():String
+	public static function listFunctions()
 	{
 		var list : StringBuf = new StringBuf();
 		for (o in _functions.iterator()) 
-			list += o.alias + '' + '\n'; 
+			list.add(o.alias + '' + '\n'); 
 
-		if (list == '') {
-			list = "no functions registered.";
-			GameConsole.logInfo(list);
+		if (list.toString() == '') {
+			GameConsole.logInfo("no functions registered.");
 		} else
 			GameConsole.logConfirmation(list);
 	}
 	
 	public static function listObjects()
 	{
-		var list = '';
+		var list : StringBuf = new StringBuf();
 		for (o in _objects.iterator()) 
-			list += o.alias + '' + '\n'; 
+			list.add(o.alias + '' + '\n'); 
 			
-		if (list == '') {
-			list = "no objects registered.";
-			GameConsole.logInfo(list);
+		if (list.toString() == '') {
+			GameConsole.logInfo("no objects registered.");
 		} else 
 			GameConsole.logConfirmation(list);
 	}
@@ -302,11 +294,11 @@ class GCCommands
 		var output:StringBuf = new StringBuf();
 		for (v in _variables.iterator())
 			if (v.monitor)
-				output += (v.alias + ':' + Reflect.getProperty(v.object, v.name) + '\n');
+				output.add(v.alias + ':' + Reflect.getProperty(v.object, v.name) + '\n');
 
 		for (f in _functions.iterator())
 			if (f.monitor)
-				output += (f.alias + ':' + Reflect.callMethod(null, Reflect.getProperty(f.object, f.name), null) + '\n');
+				output.add(f.alias + ':' + Reflect.callMethod(null, Reflect.getProperty(f.object, f.name), null) + '\n');
 
 		return Std.string(output);
 	}
@@ -320,5 +312,4 @@ class GCCommands
 		return null;
 	}
 	//	AUX	------------------------------------------------------
-
 }

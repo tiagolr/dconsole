@@ -56,7 +56,6 @@ class GConsole extends Sprite
 		_historyArray = new Array();
 		_historyIndex = -1;
 		_historyMaxSz = 100;	
-		_firstLine = true;
 		
 		enable();
 		hideConsole();
