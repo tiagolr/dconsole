@@ -1,9 +1,10 @@
 package pgr.gconsole;
 
 import flash.display.MovieClip;
+import flash.errors.Error;
 import flash.Lib;
 
- typedef RemoteObj = {
+typedef Register = {
 	 var name	: String;
 	 var alias	: String;
 	 var object	: Dynamic;
@@ -17,80 +18,138 @@ import flash.Lib;
  */
 class GCCommands 
 {
-	inline static private var GC_LOG_ERR = "";
-	inline static private var GC_LOG_WAR = "";
 	
-	private static var _variables:Array<RemoteObj> = new Array<RemoteObj>();
-	private static var _functions:Array<RemoteObj> = new Array<RemoteObj>();
+	public static var _Oldvariables:Array<Register> = new Array<Register>();
+	public static var _Oldfunctions:Array<Register> = new Array<Register>();
+	public static var _Oldobjects:Array<Register> = new Array<Register>();
+	
+	
+	
+	public static var _variables:Map<String, Register> = new Map<String, Register>();
+	public static var _functions:Map<String, Register> = new Map<String, Register>();
+	public static var _objects:Map<String, Register> = new Map<String, Register>();
 	
 	public function new() { }
 	
-	public static function registerVariable(object:Dynamic, name:String, alias:String, monitor:Bool):String 
+	// ========================
+	// ======   REGISTER  =====
+	// ========================
+	public static function registerVariable(object:Dynamic, name:String, alias:String, monitor:Bool)
 	{
-		var aliasAlreadyExists = unregisterVariable(alias); // Used to remove duplicates.
+		if (alias == "")
+		{
+			alias = GCUtil.generateAlias("variable", object, name, alias);
+		}
+		
+		if (_variables.exists(alias)) 
+		{
+			GameConsole.logWarning("variable " + alias + " overriden.");
+		}
 			
-		_variables.push( {
+		_variables.set(alias, {
 			name 	: name,
 			alias	: alias,
 			object	: object,
 			monitor	: monitor,
 		} );
-	
-		if (aliasAlreadyExists)
-			return (GC_LOG_WAR + "alias " + alias + " for variable " + name + " already exists and will be overriden.");
-		else
-			return '';
 	}
+	
+	static public function registerFunction(object:Dynamic, name:String, alias:String, monitor:Bool)
+	{
+		if (alias == "")
+		{
+			alias = GCUtil.generateAlias("function", object, name, alias);
+		}
+		
+		if (_functions.exists(alias))
+		{
+			GameConsole.logWarning("function " + alias + " overriden");
+		}
+		_functions.set(alias, {
+			name 	: name,
+			alias	: alias,
+			object	: object,
+			monitor	: monitor,
+		} );
+	}
+	
+	static public function registerObject(object:Dynamic, alias:String)
+	{
+		if (alias == "")
+		{
+			alias = GCUtil.generateAlias("object", object, "", alias);
+		}
+		
+		if (_objects.exists(alias))
+		{
+			GameConsole.logWarning("object " + alias + " overriden.");
+		}
 
+		_objects.set(alias, {
+			name 	: "noName",
+			alias	: alias,
+			object	: object,
+			monitor	: false,
+		} );
+			
+	}
+	// ========================
+	// ====== UNREGISTER  =====
+	// ========================
 	public static function unregisterVariable(alias:String):Bool
 	{
-		for (i in 0..._variables.length) {
-			if (_variables[i].alias == alias) {
-				_variables.splice(i, 1);
-				return true;
-			}
+		if (_variables.exists(alias))
+		{
+			_variables.remove(alias);
+			return true;
 		}
 		return false;
 	}
 	
-	static public function registerFunction(object:Dynamic, name:String, alias:String, monitor:Bool):String 
-	{
-		var aliasAlreadyExists = unregisterFunction(alias); // Used to remove duplicates
 		
-		_functions.push( {
-			name 	: name,
-			alias	: alias,
-			object	: object,
-			monitor	: monitor,
-		} );
-		
-		if (aliasAlreadyExists)
-			return (GC_LOG_WAR + "alias " + alias + " for function " + name + " already exists and will be overriden");
-		else
-			return '';
-	}
-	
-	public static function unregisterFunction(alias:String):Bool 
+	public static function unregisterFunction(alias:String):Bool
 	{
-		for (i in 0..._functions.length) {
-			if (_functions[i].alias == alias) {
-				_functions.splice(i, 1);
-				return false;
-			}
+		if (_functions.exists(alias))
+		{
+			_functions.remove(alias);
+			return true;
 		}
 		return false;
 	}
+	
+	public static function unregisterObject(alias:String):Bool
+	{
+		if (_objects.exists(alias))
+		{
+			_objects.remove(alias);
+			return true;
+		}
+		return false;
+	}
+	
+	// TODO - delete this.
+	//static public function testMethod()
+	//{
+		//for (object in _objects) {
+			//var arr:Array<String> = Type.getClassFields(Type.getClass(object.object));
+			//for (str in arr) {
+				//GameConsole.log(str);
+			//}
+		//}
+		//
+	//}
 	
 	public static function clearRegistry()
 	{
-		_variables = new Array<RemoteObj>();
-		_functions = new Array<RemoteObj>();
+		_variables  = new Map<String, Register>();
+		_functions  = new Map<String, Register>();
+		_objects	= new Map<String, Register>();
 	}
 	
-	// ------------------------------------------------------------------------------
-	//	CONSOLE COMMANDS									  
-	// ------------------------------------------------------------------------------
-	public static function showHelp():String 
+	// ========================
+	// =====   COMMANDS   =====
+	// ========================
+	public static function showHelp()
 	{
 		var output = '';
 		output += '\n';
@@ -99,10 +158,11 @@ class GCCommands
 		output += "Use 'PAGEUP' or 'PAGEDOWN' to scroll this console text.\n";
 		output += "Use 'UP' or 'DOWN' keys to view recent commands history.\n";
 		output += "Use 'CTRL' + 'CONSOLE SCKEY' to toggle monitor on/off.\n";
-		return output;
+		
+		GameConsole.logInfo(output);
 	}
 	
-	public static function showCommands():String
+	public static function showCommands()
 	{
 		var output = '';
 		output += '\n';
@@ -110,84 +170,151 @@ class GCCommands
 		output += "HELP                        shows help menu.\n";
 		output += "MONITOR                     toggles monitor on or off.\n";
 		output += "VARS                        lists availible variables.\n";
-		output += "FCNS                        lists availible functions.\n";
+		output += "FUNCS                        lists availible functions.\n";
 		output += "SET [variable] [value]      assigns value to variable.\n";
 		output += "CALL [function] [args]*     calls function.\n";
-		return output;
+		
+		GameConsole.logInfo(output);
 	}
 
-	public static function setVar(args:Array<String>):String 
+	public static function setVar(args:Array<String>)
 	{
 		if (args.length != 3) {
-			return logIncorrectNumberArguments();
+			GameConsole.logError("incorrect number of arguments.");
+			return;
 		}
 		
-		for (i in 0..._variables.length) {
-			if (_variables[i].alias == args[1]) {
-				Reflect.setProperty(_variables[i].object, _variables[i].name, args[2]);
-				return "ok";
+		var objs = args[1].split('.');
+		
+		if (objs.length == 1) { // SET REGISTERED VARIABLE
+			if (_variables.exists(args[1]))
+			{
+				var v:Register = _variables.get(args[1]);
+				Reflect.setProperty(v.object, v.name, args[2]);
+				GameConsole.logConfirmation(v.name + " set.");
+			} else 
+			{
+				GameConsole.logError("variable " + args[1] + " not found.");
+			}
+		} else if (objs.length == 2) // SET VARIABLE INSIDE OBJECT
+		{
+			if (_objects.exists(objs[0]))
+			{
+				var o = _objects.get(objs[0]); // gets first object.
+				try {
+					Reflect.setProperty(o, objs[1], args[2]); // sets object property.
+				} catch (e:Error) { 
+					GameConsole.logError("Property " + objs[1] + " could not be set."); 
+					return; 
+				}
+				GameConsole.logConfirmation(args[1] + " set.");
+			} else
+			{
+				GameConsole.logError("object " + objs[0] + " not found.");
 			}
 		}
-			
-		return GC_LOG_ERR + "variable not found.";  
-		
 	}
 		
-	public static function callFunction(args:Array<String>):String
+	public static function callFunction(args:Array<String>)
 	{
 		if (args.length < 2) {
-			return (logIncorrectNumberArguments());
-			
+			GameConsole.logError("not enough arguments.");
+			return;
 		}
+		var objs = args[1].split('.');
 		
-		for (i in 0..._functions.length) {
-			if (_functions[i].alias == args[1]) {
-				
+		if (objs.length == 1) { // CALL REGISTERED FUNCTION
+			if (_functions.exists(args[1]))
+			{
+				var f = _functions.get(args[1]);
 				args.splice(0, 2);
-				Reflect.callMethod(null, Reflect.getProperty(_functions[i].object, _functions[i].name), args);
-				
-				return "ok";
+				Reflect.callMethod(null, Reflect.getProperty(f.object, f.name), args);
+				GameConsole.logConfirmation(f.name + " called.");
+			} else 
+			{
+				GameConsole.logError("function " + args[1] + " not found");
+			}
+		} else if (objs.length == 2) // CALL FUNCTION INSIDE OBJECT
+		{
+			if (_objects.exists(objs[0])) // gets first object.
+			{
+				var o = _objects.get(objs[0]);
+				try {
+					Reflect.callMethod(null, Reflect.getProperty(o, objs[1]), args); // calls object function.
+				} catch (e:Error) {
+					GameConsole.logError("function " + objs[1] + " could not be called."); 
+					return; 
+				}
+				GameConsole.logConfirmation(args[1] + " called.");
+			} else
+			{
+				GameConsole.logError("object " + objs[0] + " not found.");
 			}
 		}
-		
-		return "function " + args[1] + " not found";
 	}
 
-	public static function listVars():String
+	public static function listVars()
 	{
 		var logMessage:String = '';
-		for (i in 0..._variables.length) 
-			logMessage += (_variables[i].alias + '=' + Reflect.getProperty(_variables[i].object, _variables[i].name) + "  |  ");
 		
-		return logMessage;
+		for ( o in _variables.iterator() ) 
+			logMessage += (o.alias + '=' + Reflect.getProperty(o.object, o.name) + "  |  ");
+		
+		if (logMessage == '') {
+			logMessage = "no variables registered.";
+			GameConsole.logInfo(logMessage);
+		} else
+			GameConsole.logConfirmation(logMessage);
 	}
 	
-	public static function listFunctions():String 
+	public static function listFunctions()
 	{
 		var list = '';
-		for (i in 0..._functions.length) 
-			list += _functions[i].alias + '' + '\n'; 
+		for (o in _functions.iterator()) 
+			list += o.alias + '' + '\n'; 
 			
-		return list;
+		if (list == '') {
+			list = "no functions registered.";
+			GameConsole.logInfo(list);
+		} else
+			GameConsole.logConfirmation(list);
+	}
+	
+	public static function listObjects()
+	{
+		var list = '';
+		for (o in _objects.iterator()) 
+			list += o.alias + '' + '\n'; 
+			
+		if (list == '') {
+			list = "no objects registered.";
+			GameConsole.logInfo(list);
+		} else 
+			GameConsole.logConfirmation(list);
 	}
 	
 	public static function getMonitorOutput():String
 	{
 		var output:String = '';
-		for (i in 0..._variables.length)
-			if (_variables[i].monitor)
-				output += (_variables[i].alias + ':' + Reflect.getProperty(_variables[i].object, _variables[i].name) + '\n');
+		for (v in _variables.iterator())
+			if (v.monitor)
+				output += (v.alias + ':' + Reflect.getProperty(v.object, v.name) + '\n');
 		
-		for (i in 0..._functions.length)
-			if (_functions[i].monitor)
-				output += (_functions[i].alias + ':' + Reflect.callMethod(null, Reflect.getProperty(_functions[i].object, _functions[i].name), null) + '\n');
+		for (f in _functions.iterator())
+			if (f.monitor)
+				output += (f.alias + ':' + Reflect.callMethod(null, Reflect.getProperty(f.object, f.name), null) + '\n');
 				
 		return output;
 	}
+	
+	static public function getObject(alias:String) 
+	{
+		if (_objects.exists(alias))
+		{
+			return _objects.get(alias).object;
+		}  
+		return null;
+	}
 	//	AUX	------------------------------------------------------
 
-	private static function logIncorrectNumberArguments():String 
-	{
-		return GC_LOG_ERR + "incorrect number of arguments.";
-	}
 }

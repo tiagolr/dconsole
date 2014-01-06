@@ -8,11 +8,11 @@ package pgr.gconsole;
     var consBgColor 	: Int; // console background color
 	var consTxtColor 	: Int; // console text alpha
 	var consBgAlpha		: Float; // console background alpha
-	var	consTxtAlpha	: Float; // console text alpha
+	var consTxtAlpha	: Float; // console text alpha
 	
 	var monBgColor		: Int; // Monitor background color
 	var monTxtColor		: Int;	// Monitor text color
-	var	monBgAlpha		: Float; // monitor background alpha
+	var monBgAlpha		: Float; // monitor background alpha
 	var monTxtAlpha		: Float; // monitor text alpha
 } 
 
@@ -72,7 +72,7 @@ class GCThemes
 		monTxtColor		: 0xFFFFFF,
 		monBgColor		: 0x000000,
 		consBgAlpha		: .7,	
-		consTxtAlpha	: .7,			
+		consTxtAlpha	: 1,			
 		monBgAlpha		: .7,			
 		monTxtAlpha		: .7,
 	}

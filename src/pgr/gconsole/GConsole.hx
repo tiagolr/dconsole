@@ -4,6 +4,8 @@ import flash.display.Sprite;
 import flash.events.Event;
 import flash.events.KeyboardEvent;
 import flash.Lib;
+import flash.text.TextField;
+import flash.text.TextFormat;
 
 /**
  * GConsole is the main class of this lib, it should be instantiated only once
@@ -15,13 +17,13 @@ import flash.Lib;
  */
 class GConsole extends Sprite
 {	
+
+	
 	inline static private var GC_TRC_ERR = "gc_error: ";
 	/** Aligns console to bottom */
 	static public var ALIGN_DOWN:String = "DOWN";
 	/** Aligns console to top */
 	static public var ALIGN_UP:String = "UP";
-	
-	private var _firstLine:Bool;
 	
 	private var _historyArray:Array<String>;
 	private var _historyIndex:Int;
@@ -31,7 +33,8 @@ class GConsole extends Sprite
 	private var _elapsedFrames:Int;
 	private var _monitorRate:Int;
 	
-	private var _consoleScKey:Int;
+	/** Show console key. */ 
+	private var _consoleScKey:Int; 
 	
 	private var _isMonitorOn:Bool;
 	private var _isConsoleOn:Bool;
@@ -53,14 +56,13 @@ class GConsole extends Sprite
 		_historyArray = new Array();
 		_historyIndex = -1;
 		_historyMaxSz = 100;	
-		_firstLine = true;
 		
 		enable();
 		hideConsole();
 		hideMonitor();
 		instance = this;
 		
-		GameConsole.log("~~~~~~~~~~ GAME CONSOLE ~~~~~~~~~~");
+		GameConsole.logInfo("~~~~~~~~~~ GAME CONSOLE ~~~~~~~~~~ v1.02");
 	} 
 
 	public function setConsoleFont(font:String = null, embed:Bool = true, size:Int = 14, bold:Bool = false, italic:Bool = false, underline:Bool = false )
@@ -68,9 +70,9 @@ class GConsole extends Sprite
 		_interface.setConsoleFont(font, embed, size, bold, italic, underline);
 	}
 
-	public function setPromptFont(font:String = null, embed:Bool = true, size:Int = 16, yOffset:Int = 22, bold:Bool = false, ?italic:Bool = false, underline:Bool = false )
+	public function setPromptFont(font:String = null, embed:Bool = true, size:Int = 16, bold:Bool = false, ?italic:Bool = false, underline:Bool = false )
 	{
-		_interface.setPromptFont(font, embed, size, yOffset, bold, italic, underline);
+		_interface.setPromptFont(font, embed, size, bold, italic, underline);
 	}
 
 	public function setMonitorFont(font:String = null, embed:Bool = true, size:Int = 14, bold:Bool = false, ?italic:Bool = false, underline:Bool = false )
@@ -131,16 +133,31 @@ class GConsole extends Sprite
 		_consoleScKey = key;
 	}
 	
-	public function log(data:Dynamic) 
+	// ========================
+	// =====   LOG        =====
+	// ========================
+	public function log(data:Dynamic, color:Int = -1) 
 	{
 		if (data == "") return;
-		_firstLine ?
-			_firstLine = false : 
-			_interface.txtConsole.text += '\n'; //add new line if console text was not clear.
+			
 		
-		_interface.txtConsole.text += data.toString();
-		_interface.txtConsole.scrollV = _interface.txtConsole.maxScrollV;
+		var tf:TextField = _interface.txtConsole; 
+		tf.appendText(data.toString() + '\n');
+		
+		//if (tf.length > data.toString().length) // if its not the first line add new line at the end.
+			//tf.appendText('\n');
+		tf.scrollV = tf.maxScrollV;
+		
+		
+		// Applies color - is always applied to avoid bug.
+		if (color == -1)
+			color = _interface.theme.consTxtColor;
+		var format:TextFormat = new TextFormat();
+		format.color = color;
+		var l = data.toString().length;
+		tf.setTextFormat(format, tf.length - l - 1, tf.length - 1);
 	}
+	
 
 	public function registerVariable(object:Dynamic, name:String, alias:String, monitor:Bool=false) 
 	{
@@ -158,19 +175,19 @@ class GConsole extends Sprite
 			return;
 		}
 		
-		log(GCCommands.registerVariable(object, name, alias, monitor));
+		GCCommands.registerVariable(object, name, alias, monitor);
 	}
 
 	public function unregisterVariable(alias:String)
 	{
 		if (GCCommands.unregisterVariable(alias)) {
-			log("variable " + alias + " unregistered.");
+			GameConsole.logInfo(alias + " unregistered.");
 		} else {
-			log("variable " + alias + " not found.");
+			GameConsole.logError(alias + " not found.");
 		}
 	}
 	
-	public function registerFunction(object:Dynamic, name:String, alias:String, ?monitor:Bool = false) 
+	public function registerFunction(object:Dynamic, name:String, alias:String="", ?monitor:Bool = false) 
 	{
 		#if !(cpp || neko)
 		if (!Reflect.hasField(object, name)) 
@@ -178,7 +195,7 @@ class GConsole extends Sprite
 		if (Reflect.getProperty(object, name) == null) 
 		#end
 		{
-			trace (GC_TRC_ERR + name + " field was not found in object passed.");
+			trace(GC_TRC_ERR + name + " field was not found in object passed.");
 			return;
 		}
 		
@@ -187,23 +204,31 @@ class GConsole extends Sprite
 			return;
 		}
 		
-		log(GCCommands.registerFunction(object, name, alias, monitor));
+		GCCommands.registerFunction(object, name, alias, monitor);
 	}
 
 	public function unregisterFunction(alias:String)
 	{
 		if (GCCommands.unregisterFunction(alias)) {
-			log("function " + alias + " unregistered.");
+			GameConsole.logInfo(alias + " unregistered.");
 		} else {
-			log("function " + alias + " not found.");
+			GameConsole.logError(alias + " not found.");
+		}
+	}
+	
+	public function registerObject(object:Dynamic, alias:String) 
+	{
+		if (!Reflect.isObject(object)) {
+		trace(GC_TRC_ERR + "dynamic passed is not an object.");
+			return;
 		}
 		
+		GCCommands.registerObject(object, alias);
 	}
 	
 	public function clearConsole() 
 	{
 		_interface.txtConsole.text = '';
-		_firstLine = true;
 	}
 
 	public function clearRegistry()
@@ -223,55 +248,77 @@ class GConsole extends Sprite
 	
 	private function onKeyUp(e:KeyboardEvent):Void 
 	{
+		// SHOW/HIDE MONITOR.
 		if (e.ctrlKey && cast(e.keyCode,Int) == _consoleScKey ) {
 			_isMonitorOn ? hideMonitor() : showMonitor();
 			return;
 		}
-		
-		if (cast(e.keyCode,Int) == _consoleScKey) {
+		// SHOW/HIDE CONSOLE.
+		if (cast(e.keyCode,Int) == _consoleScKey) { 
 			_isConsoleOn ? hideConsole() : showConsole();
-			return;
+			return; 
 		}
-		
-		
-		
-		// Read the following input if console is showing.
-		if (!_isConsoleOn)
+		// IGNORE INPUT IF CONSOLE HIDDEN.
+		if (!_isConsoleOn) 
 			return;	
 		
-		// Changed switch to if-else to avoid strande exception in haxe 3 regarding int and uint.
-		if (e.keyCode == 13)
+		if (e.keyCode == 13) // ENTER KEY.
 		{
 			processInputLine();
 		}
 		else 
-		if (e.keyCode == 33)
+		if (e.keyCode == 33) // PAGE DOWN
 		{
 			_interface.txtConsole.scrollV -= _interface.txtConsole.bottomScrollV - _interface.txtConsole.scrollV +1;
 			if (_interface.txtConsole.scrollV < 0)
 				_interface.txtConsole.scrollV = 0;
 		}
 		else 
-		if (e.keyCode == 34)
+		if (e.keyCode == 34) // PAGE UP
 		{
 			_interface.txtConsole.scrollV += _interface.txtConsole.bottomScrollV - _interface.txtConsole.scrollV +1;
 			if (_interface.txtConsole.scrollV > _interface.txtConsole.maxScrollV)
 				_interface.txtConsole.scrollV = _interface.txtConsole.maxScrollV;
 		}
 		else
-		if (e.keyCode == 38)
+		if (e.keyCode == 38) // DOWN KEY
 		{
 			nextHistory();
 		}
 		else 
-		if (e.keyCode == 40)
+		if (e.keyCode == 40) // UP KEY
 		{
 			prevHistory();
+		}
+		else 
+		if (e.keyCode == 32 && e.ctrlKey)   // CONTROL + SPACE = Autocomplete
+		{   
+			// remove white space added pressing CTRL + SPACE.
+			_interface.txtPrompt.text = _interface.txtPrompt.text.substr(0, _interface.txtPrompt.text.length - 1); 
+			
+			var autoC:Array<String> = GCUtil.autoComplete(_interface.txtPrompt.text);
+			if (autoC != null)
+			{
+				if (autoC.length == 1) // only one entry in autocomplete.
+				{
+					_interface.txtPrompt.text = GCUtil.joinResult(_interface.txtPrompt.text, autoC[0]);
+					_interface.txtPrompt.setSelection(_interface.txtPrompt.text.length, _interface.txtPrompt.text.length);
+				}
+				else	// many entries in autocomplete, list them all.
+				{
+					GameConsole.log(" "); // new line.
+					for (entry in autoC)
+					{
+						GameConsole.logInfo(entry);
+					}
+				}
+			}
 		}
 		else
 		{
 			_historyIndex = -1;
-		}
+		} 
+
 		
 		/*
 		}
@@ -328,32 +375,35 @@ class GConsole extends Sprite
 	{
 		if (_interface.txtPrompt.text == '') 
 			return;
+			
 		var temp:String = _interface.txtPrompt.text;
-		
+		// HISTORY
 		_historyArray.insert(0, _interface.txtPrompt.text);
 		_historyIndex = -1;
 		if (_historyArray.length > _historyMaxSz)
 			_historyArray.splice(_historyArray.length - 1, 1);
-		
-		log(": " + _interface.txtPrompt.text);
+		// LOG AND CLEAN PROMPT
+		log(_interface.txtPrompt.text);
 		_interface.txtPrompt.text = '';
+		
 		parseInput(temp);
 	}
 	
 	private function parseInput(input:String) 
 	{
 		var args:Array<String> = input.split(' ');
-		var argsLC:Array<String> = input.toLowerCase().split(' ');
 		
-		switch (argsLC[0]) {
+		switch (args[0].toLowerCase()) {
 			case "clear"	: clearConsole();
 			case "monitor"	: _isMonitorOn ? hideMonitor() : showMonitor();
-			case "help"		: log(GCCommands.showHelp());
-			case "commands" : log(GCCommands.showCommands());
-			case "vars"		: log(GCCommands.listVars());
-			case "fcns"		: log(GCCommands.listFunctions());
-			case "set"		: log(GCCommands.setVar(args));
-			case "call"		: log(GCCommands.callFunction(args));
+			case "help"		: GCCommands.showHelp();
+			case "commands" : GCCommands.showCommands();
+			case "vars"		: GCCommands.listVars();
+			case "funcs"	: GCCommands.listFunctions();
+			case "objs"		: GCCommands.listObjects();
+			case "set"		: GCCommands.setVar(args);
+			case "call"		: GCCommands.callFunction(args);
+			default 		: GameConsole.logInfo("unknown command");
 		}
 	}
 	

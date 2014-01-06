@@ -17,6 +17,15 @@ class GameConsole
 	/** Aligns console to top */
 	static public var ALIGN_UP:String = "UP";
 	
+	
+	@:noCompletion public static var COLOR_WARN	: Int = 0x808000; // warning messages color.
+	
+	@:noCompletion public static var COLOR_ERROR: Int = 0x800000; // error messages color.
+	
+	@:noCompletion public static var COLOR_INFO	: Int = 0x000080; // info messages color.
+	
+	@:noCompletion public static var COLOR_CONF	: Int = 0x00FF00; // confirmation messages color.
+	
 	/**
 	 * Inits GameConsole.
 	 * @param	height	The height of the console (percent of app window height).
@@ -50,15 +59,14 @@ class GameConsole
 	 * To change font color see <code>GCThemes</code>.
 	 * @param	font
 	 * @param	size
-	 * @param	yOffset	Use this to align a custom font with the prompt graphic field.
 	 * @param	bold
 	 * @param	italic
 	 * @param	underline
 	 */
-	public static function setPromptFont(font:String = null, embed:Bool = true, size:Int = 16, yOffset:Int = 22, bold:Bool = false, ?italic:Bool = false, underline:Bool = false )
+	public static function setPromptFont(font:String = null, embed:Bool = true, size:Int = 16, bold:Bool = false, ?italic:Bool = false, underline:Bool = false )
 	{
 		checkInstance();
-		GConsole.instance.setPromptFont(font, embed, size, yOffset, bold, italic, underline);
+		GConsole.instance.setPromptFont(font, embed, size, bold, italic, underline);
 	}
 	/**
 	 * Sets the monitor font.
@@ -136,23 +144,60 @@ class GameConsole
 	/**
 	 * Logs a message to the console.
 	 * @param	data	The message to log. 
+	 * @param	color	The color of text. (-1 uses default color)
 	 */
-	public static function log(data:Dynamic) 
+	public static function log(data:Dynamic, color:Int = -1) 
 	{
 		checkInstance();
-		GConsole.instance.log(data);
+		GConsole.instance.log(data, color);
+	}
+	/**
+	 * Logs a warning message to the console.
+	 * @param	data	The message to log. 
+	 */
+	static public function logWarning(data:Dynamic)
+	{
+		checkInstance();
+		GConsole.instance.log(data, COLOR_WARN);
+	}
+	/**
+	 * Logs a error message to the console.
+	 * @param	data	The message to log. 
+	 */
+	static public function logError(data:Dynamic)
+	{
+		checkInstance();
+		GConsole.instance.log(data, COLOR_ERROR);
+	}
+	/**
+	 * Logs a confirmation message to the console.
+	 * @param	data	The message to log. 
+	 */
+	static public function logConfirmation(data:Dynamic)
+	{
+		checkInstance();
+		GConsole.instance.log(data, COLOR_CONF);
+	}
+	/**
+	 * Logs a info message to the console.
+	 * @param	data	The message to log. 
+	 */
+	static public function logInfo(data:Dynamic)
+	{
+		checkInstance();
+		GConsole.instance.log(data, COLOR_INFO);
 	}
 	/**
 	 * Registers a variable to used in the console.
 	 * @param	object		Reference to object containing the variable.
-	 * @param	name		The name of the variable inside the object.
-	 * @param	alias		The display name that shows on screen console.
+	 * @param	field		The name of the variable inside the object.
+	 * @param	alias		The display name that shows on screen console. (optional) - if no alias is given, an automatic alias will be created.
 	 * @param	monitor 	Whether to monitor/display this variable in realtime using monitor.
 	 */
-	public static function registerVariable(object:Dynamic, name:String, alias:String, monitor:Bool=false) 
+	public static function registerVariable(object:Dynamic, field:String, alias:String="", monitor:Bool=false) 
 	{
 		checkInstance();
-		GConsole.instance.registerVariable(object, name, alias, monitor);
+		GConsole.instance.registerVariable(object, field, alias, monitor);
 	}
 	/**
 	 * Deletes field from registry.
@@ -164,18 +209,28 @@ class GameConsole
 		GConsole.instance.unregisterVariable(alias);
 	}
 	/**
+	 * Registers an object to be used in the console.
+	 * @param	object		The object to register.
+	 * @param	alias		The alias displayed in the console. (optional) - if no alias is given, an automatic alias will be created.
+	 */
+	public static function registerObject(object:Dynamic, alias:String = "")
+	{
+		checkInstance();
+		GConsole.instance.registerObject(object, alias);
+	}
+	/**
 	 * Registers a function to be called from the console.
 	 * If monitor argument is set, this function will be displayed on monitor window.
 	 * 
-	 * @param	object	A Reference to object containing the function.
-	 * @param	name	The name of the function inside the object.
-	 * @param	alias	The display name that shows on screen console.
-	 * @param	monitor If true, the function will be called every n frames and output printed. Be careful with this one.
+	 * @param	object		A Reference to object containing the function.
+	 * @param	Function	The name of the function inside the object.
+	 * @param	alias		The display name that shows on screen console. (optional) - if no alias is given, an automatic alias will be created.
+	 * @param	monitor 	If true, the function will be called every n frames and output printed. Be careful with this one.
 	 */
-	public static function registerFunction(object:Dynamic, name:String, alias:String, ?monitor:Bool = false) 
+	public static function registerFunction(object:Dynamic, Function:String, alias:String="", ?monitor:Bool = false) 
 	{
 		checkInstance();
-		GConsole.instance.registerFunction(object, name, alias, monitor);
+		GConsole.instance.registerFunction(object, Function, alias, monitor);
 	}
 	/**
 	 * Deletes field from registry.
