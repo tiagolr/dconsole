@@ -11,14 +11,14 @@ typedef Register = {
 	 var monitor: Bool;
  }
  /**
- * GCCommands contains the logic used by GameConsole to execute the commands 
+ * GCCommands contains the logic used by GameConsole to execute the commands
  * given by the user.
- * 
+ *
  * @author TiagoLr ( ~~~ProG4mr~~~ )
  */
-class GCCommands 
+class GCCommands
 {
-	
+
 	public static var _Oldvariables:Array<Register> = new Array<Register>();
 	public static var _Oldfunctions:Array<Register> = new Array<Register>();
 	public static var _Oldobjects:Array<Register> = new Array<Register>();
@@ -28,9 +28,9 @@ class GCCommands
 	public static var _variables:Map<String, Register> = new Map<String, Register>();
 	public static var _functions:Map<String, Register> = new Map<String, Register>();
 	public static var _objects:Map<String, Register> = new Map<String, Register>();
-	
+
 	public function new() { }
-	
+
 	// ========================
 	// ======   REGISTER  =====
 	// ========================
@@ -53,7 +53,7 @@ class GCCommands
 			monitor	: monitor,
 		} );
 	}
-	
+
 	static public function registerFunction(object:Dynamic, name:String, alias:String, monitor:Bool)
 	{
 		if (alias == "")
@@ -91,7 +91,7 @@ class GCCommands
 			object	: object,
 			monitor	: false,
 		} );
-			
+
 	}
 	// ========================
 	// ====== UNREGISTER  =====
@@ -106,7 +106,7 @@ class GCCommands
 		return false;
 	}
 	
-		
+
 	public static function unregisterFunction(alias:String):Bool
 	{
 		if (_functions.exists(alias))
@@ -126,7 +126,7 @@ class GCCommands
 		}
 		return false;
 	}
-	
+
 	// TODO - delete this.
 	//static public function testMethod()
 	//{
@@ -145,34 +145,35 @@ class GCCommands
 		_functions  = new Map<String, Register>();
 		_objects	= new Map<String, Register>();
 	}
-	
+
 	// ========================
 	// =====   COMMANDS   =====
 	// ========================
 	public static function showHelp()
 	{
-		var output = '';
-		output += '\n';
-		output += "Type \"commands\" to view availible commands.\n";
-		output += "Use 'PAGEUP' or 'PAGEDOWN' to scroll this console text.\n";
-		output += "Use 'UP' or 'DOWN' keys to view recent commands history.\n";
-		output += "Use 'CTRL' + 'CONSOLE SCKEY' to toggle monitor on/off.\n";
-		
+		var output : StringBuf = new StringBuf();
+		output.add('\n');
+		output.add("GAME CONSOLE v1.0\n\n");
+		output.add("Type \"commands\" to view availible commands.\n");
+		output.add("Use 'PAGEUP' or 'PAGEDOWN' to scroll this console text.\n");
+		output.add("Use 'UP' or 'DOWN' keys to view recent commands history.\n");
+		output.add("Use 'CTRL' + 'CONSOLE SCKEY' to toggle monitor on/off.\n");
+		return Std.string(output);
 		GameConsole.logInfo(output);
 	}
-	
+
 	public static function showCommands()
 	{
-		var output = '';
-		output += '\n';
-		output += "CLEAR                       clears console view.\n";
-		output += "HELP                        shows help menu.\n";
-		output += "MONITOR                     toggles monitor on or off.\n";
-		output += "VARS                        lists availible variables.\n";
+		var output : StringBuf = new StringBuf();
+		output.add('\n');
+		output.add("CLEAR                       clears console view.\n");
+		output.add("HELP                        shows help menu.\n");
+		output.add("MONITOR                     toggles monitor on or off.\n");
+		output.add("VARS                        lists availible variables.\n");
 		output += "FUNCS                        lists availible functions.\n";
-		output += "SET [variable] [value]      assigns value to variable.\n";
-		output += "CALL [function] [args]*     calls function.\n";
-		
+		output.add("SET [variable] [value]      assigns value to variable.\n");
+		output.add("CALL [function] [args]*     calls function.\n");
+		return Std.string(output);
 		GameConsole.logInfo(output);
 	}
 
@@ -182,7 +183,7 @@ class GCCommands
 			GameConsole.logError("incorrect number of arguments.");
 			return;
 		}
-		
+
 		var objs = args[1].split('.');
 		
 		if (objs.length == 1) { // SET REGISTERED VARIABLE
@@ -213,7 +214,7 @@ class GCCommands
 			}
 		}
 	}
-		
+
 	public static function callFunction(args:Array<String>)
 	{
 		if (args.length < 2) {
@@ -221,7 +222,7 @@ class GCCommands
 			return;
 		}
 		var objs = args[1].split('.');
-		
+
 		if (objs.length == 1) { // CALL REGISTERED FUNCTION
 			if (_functions.exists(args[1]))
 			{
@@ -250,12 +251,16 @@ class GCCommands
 				GameConsole.logError("object " + objs[0] + " not found.");
 			}
 		}
+
+		return "function " + args[1] + " not found";
 	}
 
 	public static function listVars()
 	{
-		var logMessage:String = '';
-		
+		var logMessage : StringBuf = new StringBuf();
+		for (i in 0..._variables.length)
+			logMessage.add(_variables[i].alias + '=' + Reflect.getProperty(_variables[i].object, _variables[i].name) + "  |  ");
+
 		for ( o in _variables.iterator() ) 
 			logMessage += (o.alias + '=' + Reflect.getProperty(o.object, o.name) + "  |  ");
 		
@@ -265,13 +270,13 @@ class GCCommands
 		} else
 			GameConsole.logConfirmation(logMessage);
 	}
-	
-	public static function listFunctions()
+
+	public static function listFunctions():String
 	{
-		var list = '';
+		var list : StringBuf = new StringBuf();
 		for (o in _functions.iterator()) 
 			list += o.alias + '' + '\n'; 
-			
+
 		if (list == '') {
 			list = "no functions registered.";
 			GameConsole.logInfo(list);
@@ -291,19 +296,19 @@ class GCCommands
 		} else 
 			GameConsole.logConfirmation(list);
 	}
-	
+
 	public static function getMonitorOutput():String
 	{
-		var output:String = '';
+		var output:StringBuf = new StringBuf();
 		for (v in _variables.iterator())
 			if (v.monitor)
 				output += (v.alias + ':' + Reflect.getProperty(v.object, v.name) + '\n');
-		
+
 		for (f in _functions.iterator())
 			if (f.monitor)
 				output += (f.alias + ':' + Reflect.callMethod(null, Reflect.getProperty(f.object, f.name), null) + '\n');
-				
-		return output;
+
+		return Std.string(output);
 	}
 	
 	static public function getObject(alias:String) 
