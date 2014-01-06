@@ -18,7 +18,7 @@ import flash.text.TextFormat;
 class GConsole extends Sprite
 {	
 
-	
+	inline static public var VERSION = "2.00";
 	inline static private var GC_TRC_ERR = "gc_error: ";
 	/** Aligns console to bottom */
 	static public var ALIGN_DOWN:String = "DOWN";
@@ -62,7 +62,7 @@ class GConsole extends Sprite
 		hideMonitor();
 		instance = this;
 		
-		GameConsole.logInfo("~~~~~~~~~~ GAME CONSOLE ~~~~~~~~~~ v1.02");
+		GameConsole.logInfo("~~~~~~~~~~ GAME CONSOLE ~~~~~~~~~~ (v" + VERSION + ")");
 	} 
 
 	public function setConsoleFont(font:String = null, embed:Bool = true, size:Int = 14, bold:Bool = false, italic:Bool = false, underline:Bool = false )

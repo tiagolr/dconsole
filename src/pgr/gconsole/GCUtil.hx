@@ -39,11 +39,11 @@ class GCUtil
 		{
 			if (object == null && args.length == 1) 
 			{
-				listResults = listRegFunctions();
+				listResults = listRegFunctions(); // stores all functions.
 			} 
 			else 
 			{
-				listResults = autoCListFunctions(object);
+				listResults = autoCListFunctions(object); // stores all object functions.
 			}
 		}
 		// set variable
@@ -51,17 +51,17 @@ class GCUtil
 		{
 			if (object == null && args.length == 1)
 			{
-				listResults = listRegVariables();
+				listResults = listRegVariables(); // stores all variables.
 			} 
 			else 
 			{
-				listResults = autoCListVariables(object);
+				listResults = autoCListVariables(object); // stores all object variables.
 			}
 		}
 		// filter results
 		if (listResults != null && listResults.length > 0)
 		{
-			autoCFilterResults(args[args.length - 1], listResults);
+			autoCFilterResults(args[args.length - 1], listResults); // filter stored results according to input.
 		}
 		
 		return listResults;
@@ -133,12 +133,12 @@ class GCUtil
 	{
 		var results:Array<String> = new Array<String>();
 		
-		for (entry in GCCommands._objects) 
+		for (entry in GCCommands._functions) 
 		{
 			results.push(entry.alias);
 		}
 		
-		for (entry in GCCommands._functions) 
+		for (entry in GCCommands._objects) 
 		{
 			results.push(entry.alias);
 		}
@@ -150,12 +150,12 @@ class GCUtil
 	{
 		var results:Array<String> = new Array<String>();
 		
-		for (entry in GCCommands._objects) 
+		for (entry in GCCommands._variables) 
 		{
 			results.push(entry.alias);
 		}
 		
-		for (entry in GCCommands._variables) 
+		for (entry in GCCommands._objects) 
 		{
 			results.push(entry.alias);
 		}

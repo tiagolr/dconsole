@@ -11,7 +11,6 @@ import flash.Lib;
   */
 class GameConsole 
 {
-	
 	/** Aligns console to bottom */
 	static public var ALIGN_DOWN:String = "DOWN";
 	/** Aligns console to top */

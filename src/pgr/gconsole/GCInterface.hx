@@ -37,7 +37,7 @@ class GCInterface extends Sprite
 	public var txtMonitorRight:TextField;
 	
 	var inited:Bool = false;
-	
+	var margin:Int = 0;
 	var timer:Int = 0;
 	var carretTimmer:Int = 0;
 	
@@ -88,16 +88,22 @@ class GCInterface extends Sprite
 		
 		timer = Lib.getTimer();
 		addEventListener(Event.ENTER_FRAME, updateCarret, false, 0, true);
+		txtPrompt.addEventListener(Event.CHANGE, onChangePromptText, false, 0, true);
+		
+		onChangePromptText(null);
 		
 		inited = true;
 	}
 	
+	private function onChangePromptText(e:Event):Void 
+	{
+		_carret.x = txtPrompt.textWidth + 3;
+	}
+	
 	private function updateCarret(e:Event):Void 
 	{
-		//GameConsole.log(txtPrompt.x);
 		carretTimmer += Lib.getTimer() - timer;
 		timer  = Lib.getTimer();
-		_carret.x = txtPrompt.textWidth + 3;
 		
 		if (carretTimmer > 500)
 		{
@@ -139,7 +145,7 @@ class GCInterface extends Sprite
 	{
 		if (font == null) font = "Consolas";
 		embed ? txtConsole.embedFonts = true : txtConsole.embedFonts = false;
-		txtConsole.defaultTextFormat = new TextFormat(font, size, theme.consTxtColor, bold, italic, underline, '', '', TextFormatAlign.LEFT, 10, 10);
+		txtConsole.defaultTextFormat = new TextFormat(font, size, theme.consTxtColor, bold, italic, underline, '', '', TextFormatAlign.LEFT, margin, margin);
 		if (inited) // Update graphics.
 		{
 			drawUI();
@@ -151,7 +157,7 @@ class GCInterface extends Sprite
 	{
 		if (font == null) font = "Consolas";
 		embed ? txtPrompt.embedFonts = true : txtPrompt.embedFonts = false;
-		txtPrompt.defaultTextFormat = new TextFormat(font, size, theme.promptTxtColor, bold, italic, underline, '', '' , TextFormatAlign.LEFT, 0, 10);
+		txtPrompt.defaultTextFormat = new TextFormat(font, size, theme.promptTxtColor, bold, italic, underline, '', '' , TextFormatAlign.LEFT);
 		if (inited) // Update graphics.
 		{
 			drawUI();
@@ -209,7 +215,7 @@ class GCInterface extends Sprite
 		txtConsole.x = 0;
 		txtConsole.y = 0 + _yOffset;
 		txtConsole.width = _width;
-		txtConsole.height = _height - txtPrompt.textHeight;
+		txtConsole.height = _height - txtPrompt.textHeight + 2;
 		
 		txtPrompt.x = 0;
 		txtPrompt.y = _height - txtPrompt.textHeight + _yOffset - 2; // -2 just for the good look.

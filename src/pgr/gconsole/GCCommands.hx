@@ -153,7 +153,6 @@ class GCCommands
 	{
 		var output = '';
 		output += '\n';
-		output += "GAME CONSOLE v1.0\n\n";
 		output += "Type \"commands\" to view availible commands.\n";
 		output += "Use 'PAGEUP' or 'PAGEDOWN' to scroll this console text.\n";
 		output += "Use 'UP' or 'DOWN' keys to view recent commands history.\n";
