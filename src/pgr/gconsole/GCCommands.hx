@@ -1,16 +1,16 @@
 package pgr.gconsole;
 
-import flash.display.MovieClip;
 import flash.errors.Error;
 import flash.Lib;
 
 typedef Register = {
-	 var name	: String;
-	 var alias	: String;
-	 var object	: Dynamic;
-	 var monitor: Bool;
- }
- /**
+	var name:String;
+	var alias:String;
+	var object:Dynamic;
+	var monitor:Bool;
+	var completion:String -> Array<String>;
+}
+/**
  * GCCommands contains the logic used by GameConsole to execute the commands
  * given by the user.
  *
@@ -47,11 +47,12 @@ class GCCommands
 		}
 			
 		_variables.set(alias, {
-			name 	: name,
-			alias	: alias,
-			object	: object,
-			monitor	: monitor,
-		} );
+		name : name,
+		alias : alias,
+		object : object,
+		monitor : monitor,
+		completion : null
+		});
 	}
 
 	static public function registerFunction(object:Dynamic, name:String, alias:String, monitor:Bool)
@@ -80,6 +81,7 @@ class GCCommands
 			alias = GCUtil.generateAlias("object", object, "", alias);
 		}
 		
+
 		if (_objects.exists(alias))
 		{
 			GameConsole.logWarning("object " + alias + " overriden.");
@@ -90,7 +92,8 @@ class GCCommands
 			alias	: alias,
 			object	: object,
 			monitor	: false,
-		} );
+		completion : completion
+		});
 
 	}
 	// ========================
@@ -150,7 +153,7 @@ class GCCommands
 	// =====   COMMANDS   =====
 	// ========================
 	public static function showHelp()
-	{
+	public static function showHelp():String {
 		var output : StringBuf = new StringBuf();
 		output.add('\n');
 		output.add("Type \"COMMANDS\" to view availible commands.\n");
@@ -226,7 +229,7 @@ class GCCommands
 			if (_functions.exists(args[1]))
 			{
 				var f = _functions.get(args[1]);
-				args.splice(0, 2);
+				args = args.filter(function(s:String) {
 				Reflect.callMethod(null, Reflect.getProperty(f.object, f.name), args);
 				GameConsole.logConfirmation(f.name + " called.");
 			} else 
@@ -276,13 +279,13 @@ class GCCommands
 		} else
 			GameConsole.logConfirmation(list);
 	}
-	
+
 	public static function listObjects()
 	{
 		var list : StringBuf = new StringBuf();
 		for (o in _objects.iterator()) 
 			list.add(o.alias + '' + '\n'); 
-			
+
 		if (list.toString() == '') {
 			GameConsole.logInfo("no objects registered.");
 		} else 
@@ -302,6 +305,24 @@ class GCCommands
 
 		return Std.string(output);
 	}
+
+	public static function getFunctionNames():Array<String> {
+		var out:Array<String> = [];
+		for (fnction in _functions) {
+			out.push(fnction.alias);
+		}
+		return out;
+	}
+
+	public static function getFunctionDescription(alias:String):RemoteObj {
+		for (i in 0..._functions.length) {
+			if (_functions[i].alias == alias) {
+				return _functions[i];
+			}
+		}
+		return null;
+	}
+
 	
 	static public function getObject(alias:String) 
 	{

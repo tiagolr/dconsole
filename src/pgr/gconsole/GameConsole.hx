@@ -122,7 +122,7 @@ class GameConsole
 	public static function hideConsole()
 	{
 		checkInstance();
-		GConsole.instance.showConsole();
+		GConsole.instance.hideConsole();
 	}
 	/**
 	 * Shows monitor and starts to follow registered fiedls in real time.
