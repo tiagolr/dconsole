@@ -1,6 +1,6 @@
 package pgr.gconsole;
 
-import pgr.gconsole.GCCommands.RemoteObj;
+import pgr.gconsole.GCCommands.Register;
 import flash.ui.Keyboard;
 import flash.display.Sprite;
 import flash.events.Event;
@@ -22,9 +22,9 @@ class GConsole extends Sprite {
 
 	inline static public var VERSION = "2.00";
 	inline static private var GC_TRC_ERR = "gc_error: ";
-/** Aligns console to bottom */
+	/** Aligns console to bottom */
 	static public var ALIGN_DOWN:String = "DOWN";
-/** Aligns console to top */
+	/** Aligns console to top */
 	static public var ALIGN_UP:String = "UP";
 
 	private var _historyArray:Array<String>;
@@ -56,7 +56,8 @@ class GConsole extends Sprite {
 		addChild(_interface);
 
 		_monitorRate = monitorRate;
-		_consoleScKey = Keyboard.BACKQUOTE;
+		//_consoleScKey = Keyboard.BACKQUOTE;
+		_consoleScKey = Keyboard.TAB;
 
 		_historyArray = new Array();
 		_historyIndex = -1;
@@ -68,6 +69,7 @@ class GConsole extends Sprite {
 		instance = this;
 
 		GameConsole.logInfo("~~~~~~~~~~ GAME CONSOLE ~~~~~~~~~~ (v" + VERSION + ")");
+		
 	}
 
 	public function setConsoleFont(font:String = null, embed:Bool = true, size:Int = 14, bold:Bool = false, italic:Bool = false, underline:Bool = false) {
@@ -130,9 +132,9 @@ class GConsole extends Sprite {
 		_consoleScKey = key;
 	}
 
-	// ========================
-	// =====   LOG        =====
-	// ========================
+// ========================
+// =====   LOG        =====
+// ========================
 	public function log(data:Dynamic, color:Int = -1) 
 	{
 		if (data == "") return;
@@ -140,15 +142,11 @@ class GConsole extends Sprite {
 		
 		var tf:TextField = _interface.txtConsole; 
 		tf.appendText(data.toString() + '\n');
-		
-		//if (tf.length > data.toString().length) // if its not the first line add new line at the end.
-			//tf.appendText('\n');
 		tf.scrollV = tf.maxScrollV;
-		
 		
 		// Applies color - is always applied to avoid bug.
 		if (color == -1)
-			color = _interface.theme.consTxtColor;
+			color = _interface.theme.CON_TXT_C;
 		var format:TextFormat = new TextFormat();
 		format.color = color;
 		var l = data.toString().length;
@@ -163,8 +161,9 @@ class GConsole extends Sprite {
 #if !(cpp || neko)
 		if (!Reflect.hasField(object, name))
 #else
-		if (Reflect.getProperty(object, name) == null) 
-		#end {
+		if (Reflect.getProperty(object, name) == null)  
+		#end 
+		{
 			throw GC_TRC_ERR + name + " field was not found in object " + object + " passed.";
 			return;
 		}
@@ -185,7 +184,7 @@ class GConsole extends Sprite {
 		if (!Reflect.hasField(object, name))
 #else
 		if (Reflect.getProperty(object, name) == null) 
-		#end {
+#end {
 			throw GC_TRC_ERR + name + " field was not found in object passed.";
 			return;
 		}
@@ -195,7 +194,7 @@ class GConsole extends Sprite {
 			return;
 		}
 
-		log(GCCommands.registerFunction(object, name, alias, monitor, completionHandler));
+		GCCommands.registerFunction(object, name, alias, monitor, completionHandler);
 	}
 
 	public function unregisterFunction(alias:String) {
@@ -248,7 +247,8 @@ class GConsole extends Sprite {
 		if (!_isConsoleOn) 
 			return;
 
-		if (e.keyCode == 13) // ENTER KEY.
+		if (e.keyCode == Keyboard.CAPS_LOCK) { // ENTER KEY.
+			log("COMPLETEILINE");
 			completeInputLine();
 			return;
 		} else {
@@ -257,35 +257,25 @@ class GConsole extends Sprite {
 		}
 
 		if (e.keyCode == 13) {
-		{
 			processInputLine();
 		}
 		else if (e.keyCode == 33) {
-		if (e.keyCode == 33) // PAGE DOWN
-		{
 			_interface.txtConsole.scrollV -= _interface.txtConsole.bottomScrollV - _interface.txtConsole.scrollV +1;
 			if (_interface.txtConsole.scrollV < 0)
 				_interface.txtConsole.scrollV = 0;
 		}
-		else if (e.keyCode == 34) {
-		if (e.keyCode == 34) // PAGE UP
-		{
+	if (e.keyCode == 34) { // PAGE UP
 			_interface.txtConsole.scrollV += _interface.txtConsole.bottomScrollV - _interface.txtConsole.scrollV +1;
 			if (_interface.txtConsole.scrollV > _interface.txtConsole.maxScrollV)
 				_interface.txtConsole.scrollV = _interface.txtConsole.maxScrollV;
 		}
 		else
-		if (e.keyCode == 38) // DOWN KEY
-		{
+		if (e.keyCode == 38) {// DOWN KEY
 			nextHistory();
 		}
-		else if (e.keyCode == 40) {
-		if (e.keyCode == 40) // UP KEY
-		{
+		else if (e.keyCode == 40) { // UP KEY
 			prevHistory();
-		}
-		else {
-		if (e.keyCode == 32 && e.ctrlKey)   // CONTROL + SPACE = Autocomplete
+		} else if (e.keyCode == 32 && e.ctrlKey)   // CONTROL + SPACE = AUTOCOMPLETE
 		{   
 			// remove white space added pressing CTRL + SPACE.
 			_interface.txtPrompt.text = _interface.txtPrompt.text.substr(0, _interface.txtPrompt.text.length - 1); 
@@ -293,7 +283,7 @@ class GConsole extends Sprite {
 			var autoC:Array<String> = GCUtil.autoComplete(_interface.txtPrompt.text);
 			if (autoC != null)
 			{
-				if (autoC.length == 1) // only one entry in autocomplete.
+				if (autoC.length == 1) // only one entry in autocomplete - replace user entry.
 				{
 					_interface.txtPrompt.text = GCUtil.joinResult(_interface.txtPrompt.text, autoC[0]);
 					_interface.txtPrompt.setSelection(_interface.txtPrompt.text.length, _interface.txtPrompt.text.length);
@@ -308,31 +298,10 @@ class GConsole extends Sprite {
 				}
 			}
 		}
-		else
-			_historyIndex = -1;
-		} 
-
-		
-/*
+		else 
+		{
+			_historyIndex = -1; 
 		}
-		switch (e.keyCode) {
-			// ENTER
-			case 13	: 	processInputLine();
-			// PAGEUP
-			case 33 : 	_interface.txtConsole.scrollV -= _interface.txtConsole.bottomScrollV - _interface.txtConsole.scrollV +1;
-						if (_interface.txtConsole.scrollV < 0)
-							_interface.txtConsole.scrollV = 0;
-			// PAGEDOWN
-			case 34	:	_interface.txtConsole.scrollV += _interface.txtConsole.bottomScrollV - _interface.txtConsole.scrollV +1;
-						if (_interface.txtConsole.scrollV > _interface.txtConsole.maxScrollV)
-							_interface.txtConsole.scrollV = _interface.txtConsole.maxScrollV;
-			// UP
-			case 38	:	nextHistory();
-			// DOWN
-			case 40	: 	prevHistory();
-			default	:	_historyIndex = -1;
-		}
-		*/
 
 #if !(cpp || neko) // BUGFIX
 		e.stopImmediatePropagation(); // BUG - cpp issues.
@@ -361,7 +330,6 @@ class GConsole extends Sprite {
 	}
 
 // INPUT PARSE ----------------------------------------------------
-
 	private function processInputLine() {
 		if (_interface.txtPrompt.text == '')
 			return;
@@ -373,7 +341,7 @@ class GConsole extends Sprite {
 		if (_historyArray.length > _historyMaxSz)
 			_historyArray.splice(_historyArray.length - 1, 1);
 		// LOG AND CLEAN PROMPT
-		log(_interface.txtPrompt.text);
+		log("> " + _interface.txtPrompt.text);
 		_interface.txtPrompt.text = '';
 		
 		parseInput(temp);
@@ -423,8 +391,8 @@ class GConsole extends Sprite {
 		_interface.txtMonitorLeft.text = input.substr(0, splitPoint);
 		_interface.txtMonitorRight.text = input.substr(splitPoint + 1);
 	}
-// COMPLETION --------------------------------------------------------
-
+	
+// ARGUMENS COMPLETION By Pecheny --------------------------------------------------------
 
 	private function completeInputLine() {
 		if (_interface.txtPrompt.text == '') {
@@ -442,14 +410,14 @@ class GConsole extends Sprite {
 			}
 		}
 		if (_completionMainPart.indexOf(" ") > -1) {
-			completeArguments(temp);
+			completeArguments(temp);                    
 		} else {
-			completeCommand(functions, args);
+			completeCommand(functions, args);          
 		}
 	}
 
 	private function completeCommand(functions:Array<String>, args:Array<String>):Void {
-		functions = functions.filter(function(name:String) {return (name.indexOf(_completionMainPart) == 0);});
+		functions = functions.filter(function(name:String) {return (name.indexOf(_completionMainPart) == 0);});  
 		if (functions.length > 0) {
 			if (args.length > 1) {
 				var current = args.shift();
@@ -466,7 +434,7 @@ class GConsole extends Sprite {
 		var mainPartArray = _completionMainPart.split(" ");
 		mainPartArray.shift();
 		var mainPart = assembleString(mainPartArray);
-		var remoteObj:RemoteObj = GCCommands.getFunctionDescription(alias);
+		var remoteObj:Register = GCCommands.getFunction(alias);
 		if (remoteObj != null && remoteObj.completion != null) {
 			var completionList = remoteObj.completion(mainPart);
 			if (completionList.length > 0) {

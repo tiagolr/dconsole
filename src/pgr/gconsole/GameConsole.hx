@@ -22,15 +22,6 @@ class GameConsole
 	/** Aligns console to top */
 	static public var ALIGN_UP:String = "UP";
 	
-	
-	@:noCompletion public static var COLOR_WARN: Int = 0x008080; // warning messages color.
-	
-	@:noCompletion public static var COLOR_ERROR: Int = 0x800000; // error messages color.
-	
-	@:noCompletion public static var COLOR_INFO	: Int = 0x000080; // info messages color.
-	
-	@:noCompletion public static var COLOR_CONF	: Int = 0x00FF00; // confirmation messages color.
-	
 	/**
 	 * Inits GameConsole.
 	 * @param	height	The height of the console (percent of app window height).
@@ -183,7 +174,7 @@ class GameConsole
 	static public function logWarning(data:Dynamic)
 	{
 		checkInstance();
-		GConsole.instance.log(data, COLOR_WARN);
+		GConsole.instance.log(data, GConsole.instance._interface.theme.LOG_WAR);
 	}
 	/**
 	 * Logs a error message to the console.
@@ -192,7 +183,7 @@ class GameConsole
 	static public function logError(data:Dynamic)
 	{
 		checkInstance();
-		GConsole.instance.log(data, COLOR_ERROR);
+		GConsole.instance.log(data, GConsole.instance._interface.theme.LOG_ERR);
 	}
 	/**
 	 * Logs a confirmation message to the console.
@@ -201,7 +192,7 @@ class GameConsole
 	static public function logConfirmation(data:Dynamic)
 	{
 		checkInstance();
-		GConsole.instance.log(data, COLOR_CONF);
+		GConsole.instance.log(data, GConsole.instance._interface.theme.LOG_CON);
 	}
 	/**
 	 * Logs a info message to the console.
@@ -210,7 +201,7 @@ class GameConsole
 	static public function logInfo(data:Dynamic)
 	{
 		checkInstance();
-		GConsole.instance.log(data, COLOR_INFO);
+		GConsole.instance.log(data, GConsole.instance._interface.theme.LOG_INF);
 	}
 	/**
 	 * Registers a variable to used in the console.

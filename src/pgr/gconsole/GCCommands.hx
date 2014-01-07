@@ -2,6 +2,7 @@ package pgr.gconsole;
 
 import flash.errors.Error;
 import flash.Lib;
+import pgr.gconsole.GCCommands.Register;
 
 typedef Register = {
 	var name:String;
@@ -18,13 +19,6 @@ typedef Register = {
  */
 class GCCommands
 {
-
-	public static var _Oldvariables:Array<Register> = new Array<Register>();
-	public static var _Oldfunctions:Array<Register> = new Array<Register>();
-	public static var _Oldobjects:Array<Register> = new Array<Register>();
-	
-	
-	
 	public static var _variables:Map<String, Register> = new Map<String, Register>();
 	public static var _functions:Map<String, Register> = new Map<String, Register>();
 	public static var _objects:Map<String, Register> = new Map<String, Register>();
@@ -55,7 +49,7 @@ class GCCommands
 		});
 	}
 
-	static public function registerFunction(object:Dynamic, name:String, alias:String, monitor:Bool)
+	static public function registerFunction(object:Dynamic, name:String, alias:String, monitor:Bool, ?completionHandler:String -> Array<String>)
 	{
 		if (alias == "")
 		{
@@ -71,6 +65,7 @@ class GCCommands
 			alias	: alias,
 			object	: object,
 			monitor	: monitor,
+			completion : completionHandler,
 		} );
 	}
 	
@@ -92,7 +87,7 @@ class GCCommands
 			alias	: alias,
 			object	: object,
 			monitor	: false,
-		completion : completion
+			completion : null,
 		});
 
 	}
@@ -152,8 +147,7 @@ class GCCommands
 	// ========================
 	// =====   COMMANDS   =====
 	// ========================
-	public static function showHelp()
-	public static function showHelp():String {
+	public static function showHelp() {
 		var output : StringBuf = new StringBuf();
 		output.add('\n');
 		output.add("Type \"COMMANDS\" to view availible commands.\n");
@@ -229,7 +223,7 @@ class GCCommands
 			if (_functions.exists(args[1]))
 			{
 				var f = _functions.get(args[1]);
-				args = args.filter(function(s:String) {
+				args.splice(0, 2);
 				Reflect.callMethod(null, Reflect.getProperty(f.object, f.name), args);
 				GameConsole.logConfirmation(f.name + " called.");
 			} else 
@@ -308,18 +302,15 @@ class GCCommands
 
 	public static function getFunctionNames():Array<String> {
 		var out:Array<String> = [];
-		for (fnction in _functions) {
-			out.push(fnction.alias);
+		for (f in _functions.iterator()) {
+			out.push(f.alias);
 		}
 		return out;
 	}
 
-	public static function getFunctionDescription(alias:String):RemoteObj {
-		for (i in 0..._functions.length) {
-			if (_functions[i].alias == alias) {
-				return _functions[i];
-			}
-		}
+	public static function getFunction(alias:String):Register {
+		if (_functions.exists(alias))
+			return _functions.get(alias);
 		return null;
 	}
 
