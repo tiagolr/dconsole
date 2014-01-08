@@ -154,7 +154,7 @@ class GCCommands
 		output.add("Use 'CTRL' + 'SPACE' for AUTO-COMPLETE .\n");
 		output.add("Use 'PAGEUP' or 'PAGEDOWN' to scroll this console text.\n");
 		output.add("Use 'UP' or 'DOWN' keys to view recent commands history.\n");
-		output.add("Use 'CTRL' + 'CONSOLE SCKEY' to toggle monitor on/off.\n");
+		output.add("Use 'CTRL' + 'SPACE' for AUTOCOMPLETE.\n");
 		GameConsole.logInfo(output);
 	}
 

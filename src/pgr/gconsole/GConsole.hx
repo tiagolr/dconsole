@@ -150,7 +150,7 @@ class GConsole extends Sprite {
 		var format:TextFormat = new TextFormat();
 		format.color = color;
 		var l = data.toString().length;
-		tf.setTextFormat(format, tf.length - l - 1, tf.length - 1);
+		tf.setTextFormat(format, tf.text.length - l - 1, tf.text.length - 1);
 	}
 	
 	public function registerVariable(object:Dynamic, name:String, alias:String, monitor:Bool = false) {
@@ -232,7 +232,7 @@ class GConsole extends Sprite {
 #end
 	}
 
-	private function onKeyUp(e:KeyboardEvent):Void {
+		private function onKeyUp(e:KeyboardEvent):Void {
 		// SHOW/HIDE MONITOR.
 		if (e.ctrlKey && cast(e.keyCode, Int) == _consoleScKey) {
 			_isMonitorOn ? hideMonitor() : showMonitor();
@@ -248,7 +248,6 @@ class GConsole extends Sprite {
 			return;
 
 		if (e.keyCode == Keyboard.CAPS_LOCK) { // ENTER KEY.
-			log("COMPLETEILINE");
 			completeInputLine();
 			return;
 		} else {

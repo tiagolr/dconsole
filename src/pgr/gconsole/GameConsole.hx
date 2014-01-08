@@ -91,12 +91,12 @@ class GameConsole
 	 * @param italic True if the font should be italicized
 	 * @param underline True if the font should be underlined
 	 */
-	public static function setFont(font:String = null, embed:Bool = true, bold:Bool = false, ?italic:Bool = false, underline:Bool = false)
+	public static function setFont(font:String = null, embed:Bool = true, size:Int = 16, bold:Bool = false, ?italic:Bool = false, underline:Bool = false)
 	{
 		checkInstance();
-		GConsole.instance.setConsoleFont(font, embed, 14, bold, italic, underline);
-		GConsole.instance.setPromptFont(font, embed, 16, bold, italic, underline);
-		GConsole.instance.setMonitorFont(font, embed, 14, bold, italic, underline);
+		GConsole.instance.setConsoleFont(font, embed, size, bold, italic, underline);
+		GConsole.instance.setPromptFont(font, embed, size, bold, italic, underline);
+		GConsole.instance.setMonitorFont(font, embed, size, bold, italic, underline);
 	}
 	
 	/**

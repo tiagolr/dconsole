@@ -1,54 +1,71 @@
 # Game Console
 
-This fork of [Game Console](https://github.com/ProG4mr/gameconsole) introduces autocompletion. Documentation about Game Console usage not concerned with autocompletion see on original project's page.
+Game Console is a real-time console that allows you to:
 
-## Features
+* View or edit variables.
+* Call methods.
+* Log messages.
+* Monitor variables.
+* Monitor methods.
+* Customize appearence with themes.
+* Profile your app (soon).
+* Add your own commands by extending this lib.
+* Autocomplete (in progress).
 
-* Autocomplete commands and registered functions
-* Cyclic switch between all available options
-* Autocomplete function arguments within options defined by user (see examples).
+Notes and changes:<br />
 
-## Changes
+V 2.00<br />
 
-* Default console toggle hotkey was changed to `. Tab used for cycling autocompletion options.
-* call command was removed from console. Registered functions can be called directly by name.
+* AutoAlias - If no alias is passed, an alias is generated based on the class name. <br />
+* Message logging can now be colored. <br />
+* Can now register objects and access its methods and functions(eg: set registeredMC.x 20)
+* AutoComplete works for one level of depth (does not work yet for object.object.field).
+* Arguments autocomplete by A.Pecheney. (toggle arguments key = "F1" atm)
 
-## Usage
+V 1.10<br />
 
-Type something in the console and press tab until you get desired option. While you press tab console will switch options for part entered manually. After you press any other key whole completed string will be treated as new beginning for completion. If You want to start completing arguments you need have full funcion name in the input and at least one space after it.
-Autocompletion for function's name enabled by default just after registration. The way of completion function arguments you can define in a function given as last argument of GameConsole.registerFunction():
+* Gconsole works with flash and neko targets without nme lib.<br />
+* Flash, cpp and neko targets have been tested and working fine.<br />
+* If you're not using Windows, default font may look bad, use GameConsole.setConsoleFont() in that case.<br />
+* The main interface has been renamed from GC to GameConsole.
+
+____________
+
+### Example
+
+Using gconsole is very straightforward:
 
 ```js
-    GameConsole.registerFunction(object, "function name", "function alias", completionFunction);
-```
-completionFunction takes string of part entered manually as a parameter and should  return array of available options for current beginning.
+    import pgr.gconsole.GameConsole;
 
-## Examples
-
-Cycle arguments from given list ignoring all placed after  name of the function:
-```js
-GameConsole.registerFunction(this, "emptyFunc", "empty",
-		function(s:String) {
-			return ["foo", "bar"];
-		});
+    GameConsole.init();
+    GameConsole.log("This text will be logged.");
+    GameConsole.registerVariable(object, "variable name"); 
+    GameConsole.registerFunction(object, "function name");
+	GameConsole.registerObject(object);
 ```
 
-Cycle options with respect to beginning placed after name of the function:
+Now while running your game or app, press **TAB**, then type **"help"** or **"commands"**
+to see what commands or keys are availible.
 
-```js
-GameConsole.registerFunction(this, "traceArg", "lust", true, function(s:String) {
-            return ["bar", "foo"].filter(
-                function(val:String) {
-                    if (s == "") return true;
-                    return val.indexOf(s) == 0 ;
-                });
-        });
-```
-Place mouse cursor position after function:
-```js
-GameConsole.registerFunction(this, "traceArg", "lust", true, function(s:String) {
-            return [""+ Lib.current.stage.mouseX  + " " + Lib.current.stage.mouseY ];
-        });
-```
+For more help and check the [Wiki](https://github.com/ProG4mr/gconsole/wiki) (may not be up-to-date) and/or see the comments in GameConsole.hx.
+
+### Screenshots<br />
+
+A screen shot of gconsole running on Adam's Atomic Mode game.<br />
+![ss3](http://i1148.photobucket.com/albums/o562/ProG4mr/ss3.png "Using Mode game")<br /><br />
+
+### In the future:
+
+* Better sintax using object.field = x and object.function() instead of get function and set field.
+* Better autocomplete behaviour (similar to blender console).
+* No depth restrictions autocomplete and object fields and methods access. (can do object.object.object.x = value)
+* Profiler.
+
+### Suggestions / Comments / Bugs 
+
+[Email me](mailto:prog4mr@gmail.com) any suggestions, comments, bug reports etc.. you have.<br />
+Or create a new issue (even better). 
 
 
+Thank you, enjoy.

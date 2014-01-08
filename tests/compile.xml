@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<project>
+	<app main="TestRunner" file="test" path="bin" />
+
+	<source path="src" />
+	<haxelib name="openfl" />
+	<haxelib name="gameconsole" />
+</project>
