@@ -6,7 +6,7 @@ set TARGET=neko
 @echo off
 :yes
 cls
-call lime test compile.xml %TARGET%
+call haxelib run lime test compile.xml %TARGET%
 rmdir bin /s /q
 
 SET /P ANSWER=Run tests again? (Y/N)?

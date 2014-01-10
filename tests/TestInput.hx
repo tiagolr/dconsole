@@ -16,23 +16,17 @@ import pgr.gconsole.GConsole;
  // NOTE - After running test prompt does not focus automatically.
 class TestInput extends TestCase
 {	 
-	var interfc:GCInterface;
-	var console:GConsole;
-	var i:Int;
-	var f:Float;
-	var s:String;
+	public var interfc:GCInterface;
+	public var console:GConsole;
+	public var i:Int;
+	public var f:Float;
+	public var s:String;
 	
 	override public function setup() {
-		if (console == null) {
-			GameConsole.init();
-			console = GConsole.instance;
-			interfc = console._interface;
-		}
+        GameConsole.init();
+        console = GConsole.instance;
+        interfc = console._interface;
 		clearText();
-		console.clearRegistry();
-		console.clearConsole();
-		console.disable();
-		console.enable();
 	}
 	
 	override public function tearDown() {
@@ -74,7 +68,7 @@ class TestInput extends TestCase
 	public function testRegisterFields()
 	{
 		clearText();
-	
+
 		try
 		{
 		console.registerVariable(null, "null", "null");
@@ -82,41 +76,41 @@ class TestInput extends TestCase
 		{
 			assertTrue(msg.lastIndexOf("null is not an object") > 0);
 		}
-		
+
 		//console.registerVariable(this, "", "null");
-		console.registerVariable(this, "i", "int");
+		console.registerVariable(this,  "i", "int");
 		console.registerVariable(this, "i", "int");
 		console.registerVariable(this, "f", "float");
 		console.registerVariable(this, "f", "float");
 		console.registerVariable(this, "s", "string");
 		console.registerVariable(this, "s", "string");
-		
+
 		try {
 		console.registerVariable(this, "i2", "int");
 		} catch (msg:String) {
 			assertTrue(msg.lastIndexOf("field was not found") > 0);
 		}
-		
+
 		console.showConsole();
-		
+
 		interfc.txtPrompt.text = "set int 1234";
 		console.stage.dispatchEvent(new KeyboardEvent(KeyboardEvent.KEY_UP, true, false, 0, 13)); // ENTER
-		
+
 		interfc.txtPrompt.text = "set float 0.1234";
 		console.stage.dispatchEvent(new KeyboardEvent(KeyboardEvent.KEY_UP, true, false, 0, 13)); // ENTER
-		
+
 		interfc.txtPrompt.text = "set string string";
 		console.stage.dispatchEvent(new KeyboardEvent(KeyboardEvent.KEY_UP, true, false, 0, 13)); // ENTER
-		
+
 		console.clearConsole();
-		
+
 		interfc.txtPrompt.text = "vars";
 		console.stage.dispatchEvent(new KeyboardEvent(KeyboardEvent.KEY_UP, true, false, 0, 13)); // ENTER
-		
-		var ai = (~/(int).+(1234)/).split(interfc.txtConsole.text);	
+
+		var ai = (~/(int).+(1234)/).split(interfc.txtConsole.text);
 		var af = (~/(float).+(0.1234)/).split(interfc.txtConsole.text);
 		var as = (~/(string).+(string)/).split(interfc.txtConsole.text);
-		
+
 		assertTrue(ai.length == 2 && af.length == 2 && as.length == 2);
 	}
 	
@@ -140,36 +134,39 @@ class TestInput extends TestCase
 		assertTrue(true);
 	}
 	
-	//public function testAutocompleteMainCommands():Void {
-		//GameConsole.showConsole();
-		//interfc.txtPrompt.text = "c";
-		//Lib.current.stage.dispatchEvent(new KeyboardEvent(KeyboardEvent.KEY_UP, true, false, 0, Keyboard.CAPS_LOCK)); // ENTER
-		//assertEquals("clear", interfc.txtPrompt.text);
-		//Lib.current.stage.dispatchEvent(new KeyboardEvent(KeyboardEvent.KEY_UP, true, false, 0, Keyboard.CAPS_LOCK)); // ENTER
-		//assertEquals("commands", interfc.txtPrompt.text);
-	//}
-//
-	//public function testAutocompleteRegisteredCommands():Void {
-		//GameConsole.showConsole();
-		//GameConsole.registerFunction(this, "emptyFunc", "empty");
-		//interfc.txtPrompt.text = "e";
-		//Lib.current.stage.dispatchEvent(new KeyboardEvent(KeyboardEvent.KEY_UP, true, false, 0, Keyboard.F1)); // ENTER
-		//assertEquals("empty", interfc.txtPrompt.text);
-	//}
-//
-	//public function testAutocompleteArguments():Void {
-		//GameConsole.showConsole();
-		//GConsole.instance.registerFunction(this, "emptyFunc", "empty", false, 
-		//function(s:String) {
-			//return ["foo", "bar"];
-		//});
-		//interfc.txtPrompt.text = "empty ";
-		//Lib.current.stage.dispatchEvent(new KeyboardEvent(KeyboardEvent.KEY_UP, true, false, 0, Keyboard.F1)); // ENTER
-		//assertEquals("empty foo", interfc.txtPrompt.text);
-		//Lib.current.stage.dispatchEvent(new KeyboardEvent(KeyboardEvent.KEY_UP, true, false, 0, Keyboard.F1)); // ENTER
-		//assertEquals("empty bar", interfc.txtPrompt.text);
-	//}
+	public function testAutocompleteMainCommands():Void {
+		GameConsole.showConsole();
+		interfc.txtPrompt.text = "c";
+        console.stage.dispatchEvent(new KeyboardEvent(KeyboardEvent.KEY_UP, true, false, 0, Keyboard.F1)); // ENTER
+		assertEquals("clear", interfc.txtPrompt.text);
+        console.stage.dispatchEvent(new KeyboardEvent(KeyboardEvent.KEY_UP, true, false, 0, Keyboard.F1)); // ENTER
+		assertEquals("commands", interfc.txtPrompt.text);
+	}
 
+	public function testAutocompleteRegisteredCommands():Void {
+		GameConsole.showConsole();
+		GameConsole.registerFunction(this, "emptyFunc", "empty");
+		interfc.txtPrompt.text = "e";
+        console.stage.dispatchEvent(new KeyboardEvent(KeyboardEvent.KEY_UP, true, false, 0, Keyboard.F1)); // ENTER
+		assertEquals("empty", interfc.txtPrompt.text);
+	}
+
+	public function testAutocompleteArguments():Void {
+		GameConsole.showConsole();
+		GConsole.instance.registerFunction(this, "emptyFunc", "empty", false,
+		function(s:String) {
+			return ["foo", "bar"];
+		});
+		interfc.txtPrompt.text = "empty ";
+        console.stage.dispatchEvent(new KeyboardEvent(KeyboardEvent.KEY_UP, true, false, 0, Keyboard.F1)); // ENTER
+		assertEquals("empty foo", interfc.txtPrompt.text);
+        console.stage.dispatchEvent(new KeyboardEvent(KeyboardEvent.KEY_UP, true, false, 0, Keyboard.F1)); // ENTER
+		assertEquals("empty bar", interfc.txtPrompt.text);
+	}
+
+    public function emptyFunc():Void {
+
+    }
 	private function clearText() {
 		interfc.txtConsole.text = '';
 		interfc.txtPrompt.text = '';

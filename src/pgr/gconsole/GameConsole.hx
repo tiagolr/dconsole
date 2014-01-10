@@ -243,10 +243,10 @@ class GameConsole
 	 * @param	alias		The display name that shows on screen console. (optional) - if no alias is given, an automatic alias will be created.
 	 * @param	monitor 	If true, the function will be called every n frames and output printed. Be careful with this one.
 	 */
-	public static function registerFunction(object:Dynamic, Function:String, alias:String="", ?monitor:Bool = false) 
+	public static function registerFunction(object:Dynamic, name:String, alias:String, ?monitor:Bool = false, ?completionHandler:String -> Array<String>)
 	{
 		checkInstance();
-		GConsole.instance.registerFunction(object, Function, alias, monitor);
+		GConsole.instance.registerFunction(object, name, alias, monitor, completionHandler);
 	}
 	/**
 	 * Deletes field from registry.
