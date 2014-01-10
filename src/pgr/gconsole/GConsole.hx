@@ -354,7 +354,7 @@ class GConsole extends Sprite {
 			case "objs"		: GCCommands.listObjects();
 			case "set"		: GCCommands.setVar(args);
 			case "call"		: GCCommands.callFunction(args);
-			default 		: GCCommands.callFunction(args);
+            default     : GameConsole.logInfo("unknown command");
 		}
 	}
 
