@@ -158,11 +158,9 @@ class GConsole extends Sprite {
 			throw GC_TRC_ERR + "dynamic passed with the field: " + name + " is not an object.";
 			return;
 		}
-#if !(cpp || neko)
-		if (!Reflect.hasField(object, name))
-#else
-		if (Reflect.getProperty(object, name) == null)  
-		#end 
+
+		if (Type.getInstanceFields(Type.getClass(object)).indexOf(name) < 0)
+
 		{
 			throw GC_TRC_ERR + name + " field was not found in object " + object + " passed.";
 			return;
@@ -180,11 +178,7 @@ class GConsole extends Sprite {
 	}
 
 	public function registerFunction(object:Dynamic, name:String, alias:String, ?monitor:Bool = false, ?completionHandler:String -> Array<String>) {
-#if !(cpp || neko)
-		if (!Reflect.hasField(object, name))
-#else
-		if (Reflect.getProperty(object, name) == null) 
-#end {
+        if (Type.getInstanceFields(Type.getClass(object)).indexOf(name) < 0) {
 			throw GC_TRC_ERR + name + " field was not found in object passed.";
 			return;
 		}
@@ -247,7 +241,7 @@ class GConsole extends Sprite {
 		if (!_isConsoleOn) 
 			return;
 
-		if (e.keyCode == Keyboard.CAPS_LOCK) { // ENTER KEY.
+		if (e.keyCode == Keyboard.F1) { // ENTER KEY.
 			completeInputLine();
 			return;
 		} else {
@@ -360,7 +354,7 @@ class GConsole extends Sprite {
 			case "objs"		: GCCommands.listObjects();
 			case "set"		: GCCommands.setVar(args);
 			case "call"		: GCCommands.callFunction(args);
-			default 		: GameConsole.logInfo("unknown command");
+            default     : GameConsole.logInfo("unknown command");
 		}
 	}
 
@@ -416,7 +410,7 @@ class GConsole extends Sprite {
 	}
 
 	private function completeCommand(functions:Array<String>, args:Array<String>):Void {
-		functions = functions.filter(function(name:String) {return (name.indexOf(_completionMainPart) == 0);});  
+		functions = functions.filter(function(name:String) {return (name.indexOf(_completionMainPart) == 0);});
 		if (functions.length > 0) {
 			if (args.length > 1) {
 				var current = args.shift();
