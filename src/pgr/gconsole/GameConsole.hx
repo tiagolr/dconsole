@@ -279,6 +279,7 @@ class GameConsole
 	 */
 	public static function toFront()
 	{
+		checkInstance();
 		Lib.current.stage.swapChildren(GConsole.instance, Lib.current.stage.getChildAt(Lib.current.stage.numChildren - 1));
 	}
 	
