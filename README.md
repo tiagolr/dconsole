@@ -70,4 +70,3 @@ Or create a new issue (even better).
 
 Thank you, enjoy.
 
-[![Bitdeli Badge](https://d2weczhvl823v0.cloudfront.net/ProG4mr/gameconsole/trend.png)](https://bitdeli.com/free "Bitdeli Badge")
