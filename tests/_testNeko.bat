@@ -7,11 +7,11 @@ set TARGET=neko
 :yes
 cls
 call lime test compile.xml %TARGET%
-rmdir bin /s /q
 
 SET /P ANSWER=Run tests again? (Y/N)?
 if /i {%ANSWER%}=={y} (goto :yes)
 if /i {%ANSWER%}=={yes} (goto :yes)
+rmdir bin /s /q
 exit /b 1 
 
 

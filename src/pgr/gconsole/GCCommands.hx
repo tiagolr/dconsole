@@ -1,5 +1,6 @@
 package pgr.gconsole;
 
+import flash.errors.ArgumentError;
 import flash.errors.Error;
 import flash.Lib;
 import pgr.gconsole.GCCommands.Register;
@@ -19,134 +20,71 @@ typedef Register = {
  */
 class GCCommands
 {
-	public static var _variables:Map<String, Register> = new Map<String, Register>();
-	public static var _functions:Map<String, Register> = new Map<String, Register>();
-	public static var _objects:Map<String, Register> = new Map<String, Register>();
+	public static var functionsMap:Map<String, Dynamic> = new Map<String, Dynamic>();
+	public static var objectsMap:Map<String, Dynamic> = new Map<String, Dynamic>();
 
 	public function new() { }
 
-	// ========================
-	// ======   REGISTER  =====
-	// ========================
-	public static function registerVariable(object:Dynamic, name:String, alias:String, monitor:Bool)
-	{
-		if (alias == "")
-		{
-			alias = GCUtil.generateAlias("variable", object, name, alias);
+	//---------------------------------------------------------------------------------
+	//  REGISTER
+	//---------------------------------------------------------------------------------
+	static public function registerFunction(Function:Dynamic, alias:String) {
+		
+		// generate new alias
+		if (alias == "") {
+			alias = GCUtil.generateFunctionAlias(Function); 
 		}
 		
-		if (_variables.exists(alias)) 
-		{
-			GameConsole.logWarning("variable " + alias + " overriden.");
-		}
-			
-		_variables.set(alias, {
-		name : name,
-		alias : alias,
-		object : object,
-		monitor : monitor,
-		completion : null
-		});
-	}
-
-	static public function registerFunction(object:Dynamic, name:String, alias:String, monitor:Bool, ?completionHandler:String -> Array<String>)
-	{
-		if (alias == "")
-		{
-			alias = GCUtil.generateAlias("function", object, name, alias);
-		}
-		
-		if (_functions.exists(alias))
-		{
+		// override existing function
+		if (functionsMap.exists(alias)) {
 			GameConsole.logWarning("function " + alias + " overriden");
 		}
-		_functions.set(alias, {
-			name 	: name,
-			alias	: alias,
-			object	: object,
-			monitor	: monitor,
-			completion : completionHandler,
-		} );
+		
+		
+		functionsMap.set(alias, Function);
 	}
 	
-	static public function registerObject(object:Dynamic, alias:String)
-	{
-		if (alias == "")
-		{
+	
+	static public function registerObject(object:Dynamic, alias:String) {
+		if (alias == "") {
 			alias = GCUtil.generateAlias("object", object, "", alias);
 		}
 		
 
-		if (_objects.exists(alias))
-		{
+		if (objectsMap.exists(alias)) {
 			GameConsole.logWarning("object " + alias + " overriden.");
 		}
 
-		_objects.set(alias, {
-			name 	: "noName",
-			alias	: alias,
-			object	: object,
-			monitor	: false,
-			completion : null,
-		});
-
+		objectsMap.set(alias, object);
 	}
-	// ========================
-	// ====== UNREGISTER  =====
-	// ========================
-	public static function unregisterVariable(alias:String):Bool
-	{
-		if (_variables.exists(alias))
-		{
-			_variables.remove(alias);
+	//---------------------------------------------------------------------------------
+	//  UNREGISTER
+	//---------------------------------------------------------------------------------
+	public static function unregisterFunction(alias:String):Bool {
+		if (functionsMap.exists(alias)) {
+			functionsMap.remove(alias);
 			return true;
 		}
 		return false;
 	}
 	
-
-	public static function unregisterFunction(alias:String):Bool
-	{
-		if (_functions.exists(alias))
-		{
-			_functions.remove(alias);
+	public static function unregisterObject(alias:String):Bool {
+		if (objectsMap.exists(alias)) {
+			objectsMap.remove(alias);
 			return true;
 		}
 		return false;
 	}
 	
-	public static function unregisterObject(alias:String):Bool
-	{
-		if (_objects.exists(alias))
-		{
-			_objects.remove(alias);
-			return true;
-		}
-		return false;
-	}
-
-	// TODO - delete this.
-	//static public function testMethod()
-	//{
-		//for (object in _objects) {
-			//var arr:Array<String> = Type.getClassFields(Type.getClass(object.object));
-			//for (str in arr) {
-				//GameConsole.log(str);
-			//}
-		//}
-		//
-	//}
 	
-	public static function clearRegistry()
-	{
-		_variables  = new Map<String, Register>();
-		_functions  = new Map<String, Register>();
-		_objects	= new Map<String, Register>();
+	public static function clearRegistry() {
+		functionsMap  = new Map<String, Dynamic>();
+		objectsMap	= new Map<String, Dynamic>();
 	}
 
-	// ========================
-	// =====   COMMANDS   =====
-	// ========================
+	//---------------------------------------------------------------------------------
+	//  RUNTIME COMMANDS
+	//---------------------------------------------------------------------------------
 	public static function showHelp() {
 		var output : StringBuf = new StringBuf();
 		output.add('\n');
@@ -158,8 +96,8 @@ class GCCommands
 		GameConsole.logInfo(output);
 	}
 
-	public static function showCommands()
-	{
+	
+	public static function showCommands() {
 		var output : StringBuf = new StringBuf();
 		output.add('\n');
 		output.add("CLEAR                       clears console view.\n");
@@ -173,112 +111,151 @@ class GCCommands
 		GameConsole.logInfo(output);
 	}
 
-	public static function setVar(args:Array<String>)
-	{
-		if (args.length != 3) {
-			GameConsole.logError("incorrect number of arguments.");
+	/**
+	 * Safely calls a function via Reflection with an array of dynamic arguments. Prevents a crash from happening
+	 * if there are too many Arguments (the additional ones are removed and the function is called anyway) or too few
+	 * 
+	 * @param	FunctionAlias	The reference to the function to call.
+	 * @param	Args			An array of arguments.
+	 * 
+	 */
+	public static function callFunction(Args:Array<String>) {
+		var object:Dynamic = null;
+		var funcName:String = "";
+		
+		if (Args.length == 0) {
+			GameConsole.logError("incorrect number of arguments");
 			return;
 		}
 
-		var objs = args[1].split('.');
-		
-		if (objs.length == 1) { // SET REGISTERED VARIABLE
-			if (_variables.exists(args[1]))
-			{
-				var v:Register = _variables.get(args[1]);
-				Reflect.setProperty(v.object, v.name, args[2]);
-				GameConsole.logConfirmation(v.name + " set.");
-			} else 
-			{
-				GameConsole.logError("variable " + args[1] + " not found.");
-			}
-		} else if (objs.length == 2) // SET VARIABLE INSIDE OBJECT
-		{
-			if (_objects.exists(objs[0]))
-			{
-				var o = _objects.get(objs[0]); // gets first object.
-				try {
-					Reflect.setProperty(o, objs[1], args[2]); // sets object property.
-				} catch (e:Error) { 
-					GameConsole.logError("Property " + objs[1] + " could not be set."); 
-					return; 
+		// search registry for existing function.
+		var Function = getFunction(Args[0]);
+		if (Function == null) {
+			
+			// function not found, get function name from input.
+			if (Args[0].split('.').length > 0) {
+				var objArgs = Args[0].split('.');
+				funcName = objArgs.pop(); // remove function call
+				object = GCUtil.lookForObject(objArgs);
+				if (object == null) {
+					GameConsole.logError("function not found");
+					return;
 				}
-				GameConsole.logConfirmation(args[1] + " set.");
-			} else
-			{
-				GameConsole.logError("object " + objs[0] + " not found.");
+			} else {
+				GameConsole.logError("function not found");
+				return;
 			}
 		}
+		
+		// call function.
+		Args.shift();
+		try {
+			if (object == null) {
+				Reflect.callMethod(null, Function, Args);
+			} else {
+				Reflect.callMethod(object, Reflect.getProperty(object, funcName), Args);
+			}
+			GameConsole.logConfirmation("done");
+		}
+		catch (e:ArgumentError) {
+			if (e.errorID == 1063) {
+				/* Retrieve the number of expected arguments from the error message
+				The first 4 digits in the message are the error-type (1063), 5th is 
+				the one we are looking for */
+				var expected:Int = Std.parseInt(filterDigits(e.message).charAt(4));
+				
+				// We can deal with too many parameters...
+				if (expected < Args.length) {
+					// Shorten args accordingly
+					var shortenedArgs:Array<Dynamic> = Args.slice(0, expected);
+					// Try again
+					Reflect.callMethod(null, Function, shortenedArgs);
+				}
+				// ...but not with too few
+				else {
+					GameConsole.logError("invalid number or parameters: " + expected + " expected, " + Args.length + " passed");
+				}
+			}
+		}
+		catch (e:Error) {
+			GameConsole.logError("function not found");
+		}
 	}
-
-	public static function callFunction(args:Array<String>)
-	{
+	
+	static public function printProperty(args:Array<String>) {
+		
+		if (args.length == 1) {
+			args.push(null);
+		} else {
+			args[1] = null;
+		}
+		
+		setVariable(args, true);
+	}
+	
+	static public function setVariable(args:Array<String>, print:Bool = true) {
+		var object:Dynamic = null;
+		var varName:String = "";
+		
 		if (args.length < 2) {
-			GameConsole.logError("not enough arguments.");
+			GameConsole.logError("incorrect number of arguments");
 			return;
 		}
-		var objs = args[1].split('.');
+		
+		// parse input, retreive object and variable name.
+		if (args[0].split('.').length > 0) {
+			var objArgs = args[0].split('.');
+			varName = objArgs.pop(); // remove function call
+			object = GCUtil.lookForObject(objArgs);
+			if (object == null) {
+				GameConsole.logError("object not found");
+				return;
+			}
+		} else {
+			GameConsole.logError("property not found");
+			return;
+		}
+		
+		try {
+			
+			if (args[1] != null) {
+				Reflect.setProperty(object, varName, args[1]);
+			}
+			
+			if (print) {
+				var p = Reflect.getProperty(object, varName);
+				GameConsole.log(p);
+			} else {
+				GameConsole.logConfirmation("done");
+			}
+			
+		} catch (e:Error) {
+			GameConsole.logError("failed to set property");
+			return;
+		} 
+	}
+	
 
-		if (objs.length == 1) { // CALL REGISTERED FUNCTION
-			if (_functions.exists(args[1]))
-			{
-				var f = _functions.get(args[1]);
-				args.splice(0, 2);
-				Reflect.callMethod(null, Reflect.getProperty(f.object, f.name), args);
-				GameConsole.logConfirmation(f.name + " called.");
-			} else 
-			{
-				GameConsole.logError("function " + args[1] + " not found");
-			}
-		} else if (objs.length == 2) // CALL FUNCTION INSIDE OBJECT
-		{
-			if (_objects.exists(objs[0])) // gets first object.
-			{
-				var o = _objects.get(objs[0]);
-				try {
-					Reflect.callMethod(null, Reflect.getProperty(o, objs[1]), args); // calls object function.
-				} catch (e:Error) {
-					GameConsole.logError("function " + objs[1] + " could not be called."); 
-					return; 
-				}
-				GameConsole.logConfirmation(args[1] + " called.");
-			} else
-			{
-				GameConsole.logError("object " + objs[0] + " not found.");
-			}
+	public static function listFunctions() {
+		var list = "";
+		for (key in functionsMap.keys()) {
+			list += key + '\n'; 
+		}
+
+		if (list.toString() == "") {
+			GameConsole.logInfo("no functions registered.");
+		} else {
+			GameConsole.logConfirmation(list);
 		}
 	}
 
-	public static function listVars()
-	{
-		var logMessage : StringBuf = new StringBuf();
-
-		for ( o in _variables.iterator() ) 
-			logMessage.add(o.alias + '=' + Reflect.getProperty(o.object, o.name) + "  |  ");
-		
-		if (logMessage.toString() == '') {
-			GameConsole.logInfo("no variables registered.");
-		} else
-			GameConsole.logConfirmation(logMessage);
-	}
-
-	public static function listFunctions()
-	{
-		var list : StringBuf = new StringBuf();
-		for (o in _functions.iterator()) 
-			list.add(o.alias + '' + '\n'); 
-
-		if (list.toString() == '') {
-			GameConsole.logInfo("no functions registered.");
-		} else
-			GameConsole.logConfirmation(list);
-	}
-
+	
 	public static function listObjects()
 	{
-		var list : StringBuf = new StringBuf();
-		for (o in _objects.iterator()) 
-			list.add(o.alias + '' + '\n'); 
+		var list = "";
+		for (key in objectsMap.keys())  {
+			list += key + '\n'; 
+		}
 
 		if (list.toString() == '') {
 			GameConsole.logInfo("no objects registered.");
@@ -286,42 +263,52 @@ class GCCommands
 			GameConsole.logConfirmation(list);
 	}
 
-	public static function getMonitorOutput():String
-	{
-		var output:StringBuf = new StringBuf();
-		for (v in _variables.iterator())
+	
+	public static function getMonitorOutput():String {
+		/*var output:StringBuf = new StringBuf();
+		for (v in propertiesMap.iterator())
 			if (v.monitor)
 				output.add(v.alias + ':' + Reflect.getProperty(v.object, v.name) + '\n');
 
-		for (f in _functions.iterator())
+		for (f in functionsMap.iterator())
 			if (f.monitor)
 				output.add(f.alias + ':' + Reflect.callMethod(null, Reflect.getProperty(f.object, f.name), null) + '\n');
 
-		return Std.string(output);
+		return Std.string(output);*/
+		return "";
 	}
+	
 
-	public static function getFunctionNames():Array<String> {
-		var out:Array<String> = [];
-		for (f in _functions.iterator()) {
-			out.push(f.alias);
-		}
-		return out;
-	}
-
-	public static function getFunction(alias:String):Register {
-		if (_functions.exists(alias))
-			return _functions.get(alias);
+	static public function getFunction(alias:String):Register {
+		if (functionsMap.exists(alias))
+			return functionsMap.get(alias);
 		return null;
 	}
 
 	
-	static public function getObject(alias:String) 
-	{
-		if (_objects.exists(alias))
-		{
-			return _objects.get(alias).object;
+	static public function getObject(alias:String) {
+		if (objectsMap.exists(alias)) {
+			return objectsMap.get(alias);
 		}  
 		return null;
 	}
-	//	AUX	------------------------------------------------------
+	
+	/** 
+	 * Takes a string and filters out everything but the digits.
+	 * 
+	 * @param 	Input	The input string
+	 * @return 	The output string, digits-only
+	 */
+	static function filterDigits(Input:String):String
+	{
+		var output = new StringBuf();
+		for (i in 0...Input.length) {
+			var c = Input.charCodeAt(i);
+			if (c >= '0'.code && c <= '9'.code) {
+				output.addChar(c);
+			}
+		}
+		return output.toString();
+	}
+	
 }

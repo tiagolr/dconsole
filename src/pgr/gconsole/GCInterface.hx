@@ -88,8 +88,7 @@ class GCInterface extends Sprite
 	}
 	
 	
-	private function createMonitor()
-	{
+	private function createMonitor() {
 		_monitorBg = new Sprite();
 		_monitorBg.graphics.beginFill(theme.MON_C, theme.MON_A);
 		_monitorBg.graphics.drawRect(0, 0, Lib.current.stage.stageWidth, Lib.current.stage.stageHeight);
@@ -117,41 +116,45 @@ class GCInterface extends Sprite
 		setMonitorFont();
 	}
 	
-	public function setConsoleFont(font:String = null, embed:Bool = false, size:Int = 14, bold:Bool = false, italic:Bool = false, underline:Bool = false )
-	{
-		if (font == null) font = "Consolas";
+	
+	public function setConsoleFont(font:String = null, embed:Bool = false, size:Int = 14, bold:Bool = false, italic:Bool = false, underline:Bool = false ){
+		if (font == null) {
+			font = "Consolas";
+		}
 		embed ? txtConsole.embedFonts = true : txtConsole.embedFonts = false;
 		txtConsole.defaultTextFormat = new TextFormat(font, size, theme.CON_TXT_C, bold, italic, underline, '', '', TextFormatAlign.LEFT, margin, margin);
-		if (inited) // Update graphics.
-		{
+		if (inited) { // Update graphics.
 			drawUI();
 			resizeTextFields();
 		}
 	}
 	
-	public function setPromptFont(font:String = null, embed:Bool = false, size:Int = 16, bold:Bool = false, ?italic:Bool = false, underline:Bool = false )
-	{
-		if (font == null) font = "Consolas";
+	
+	public function setPromptFont(font:String = null, embed:Bool = false, size:Int = 16, bold:Bool = false, ?italic:Bool = false, underline:Bool = false ){
+		if (font == null) {
+			font = "Consolas";
+		}
 		embed ? txtPrompt.embedFonts = true : txtPrompt.embedFonts = false;
 		txtPrompt.defaultTextFormat = new TextFormat(font, size, theme.PRM_TXT_C, bold, italic, underline, '', '' , TextFormatAlign.LEFT);
-		if (inited) // Update graphics.
-		{
+		if (inited) {// Update graphics.
 			drawUI();
 			resizeTextFields();	
 		}
 	}
 	
-	public function setMonitorFont(font:String = null, embed:Bool = false, size:Int = 14, bold:Bool = false, ?italic:Bool = false, underline:Bool = false )
-	{
-		if (font == null) font = "Consolas";
+	
+	public function setMonitorFont(font:String = null, embed:Bool = false, size:Int = 14, bold:Bool = false, ?italic:Bool = false, underline:Bool = false ){
+		if (font == null) {
+			font = "Consolas";
+		}
 		embed ? txtMonitorLeft.embedFonts = true : txtMonitorLeft.embedFonts = false;
 		embed ? txtMonitorRight.embedFonts = true : txtMonitorRight.embedFonts = false;
 		txtMonitorLeft.defaultTextFormat = new TextFormat(font, size, theme.MON_TXT_C, bold, italic, underline, '', '', TextFormatAlign.LEFT, 10,10);
 		txtMonitorRight.defaultTextFormat = new TextFormat(font, size, theme.MON_TXT_C, bold, italic, underline, '', '', TextFormatAlign.LEFT, 10,10);
 	}
 	
-	public function drawUI() 
-	{	
+	
+	public function drawUI() {	
 		// draw console background.
 		_bg.graphics.clear();
 		_bg.graphics.beginFill(theme.CON_C, 1);
@@ -184,8 +187,8 @@ class GCInterface extends Sprite
 		}
 	}
 	
-	private function resizeTextFields() 
-	{
+	
+	private function resizeTextFields() {
 		if (txtConsole == null || txtPrompt == null) return;
 		
 		txtConsole.x = 0;
@@ -208,20 +211,55 @@ class GCInterface extends Sprite
 		txtPrompt.text = '';
 		#end
 	}
-	public function toggleMonitor(turnOn:Bool) 
-	{	
+	
+	
+	public function toggleMonitor(turnOn:Bool) {	
 		_monitorBg.visible		= turnOn;
 		txtMonitorLeft.visible	= turnOn;
 		txtMonitorRight.visible	= turnOn;
 	}
 	
-	public function toggleConsoleOn(turnOn:Bool) 
-	{
+	
+	public function toggleConsoleOn(turnOn:Bool) {
 		_bg.visible 	 	= turnOn;
 		_promptBg.visible	= turnOn;
 		_border.visible		= turnOn;
 		txtConsole.visible	= turnOn;
 		txtPrompt.visible	= turnOn;
 	}
+	/**
+	 * Removes last input char
+	 */
+	public function removeLastChar() {
+		if (txtPrompt.text.length > 0) {
+			txtPrompt.text = txtPrompt.text.substr(0, txtPrompt.text.length - 1);
+		}
+	}
+	
+	
+	public function getInputTxt():String {
+		return txtPrompt.text;
+	}
+	
+	
+	public function setInputTxt(string:String) {
+		txtPrompt.text = string;
+	}
+	
+	
+	public function getConsoleText():String {
+		return txtConsole.text;
+	}
+	
+	
+	public function clearInputText() {
+		txtPrompt.text = "";
+	}
+	
+	
+	public function clearConsoleText() {
+		txtConsole.text = "";
+	}
 
+	
 }

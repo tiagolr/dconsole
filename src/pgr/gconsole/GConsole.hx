@@ -17,11 +17,11 @@ import flash.text.TextFormat;
  * 
  * @author TiagoLr ( ~~~ProG4mr~~~ )
  */
-using Lambda;
 class GConsole extends Sprite {
 
-	inline static public var VERSION = "2.00";
+	inline static public var VERSION = "3.0.0";
 	inline static private var GC_TRC_ERR = "gc_error: ";
+	
 	/** Aligns console to bottom */
 	static public var ALIGN_DOWN:String = "DOWN";
 	/** Aligns console to top */
@@ -29,24 +29,23 @@ class GConsole extends Sprite {
 
 	private var _historyArray:Array<String>;
 	private var _historyIndex:Int;
-	private var _historyMaxSz:Int;
 	public var _interface:GCInterface;
 
 	private var _elapsedFrames:Int;
 	private var _monitorRate:Int;
 
-	/** Show console key. */ 
-	private var _consoleScKey:Int; 
+	/** shortcutkey to show/hide console. */ 
+	public var key_showHide:Int; 
 
 	private var _isMonitorOn:Bool;
-	private var _isConsoleOn:Bool;
-	private var _isCompleting:Bool;
-	private var _completionMainPart:String = "";
-
+	
 	private static var commandNames:Array<String> = { ["clear", "monitor", "help", "commands", "vars", "funcs", "set"];};
-
 	public static var instance:GConsole;
+	
+	public var enabled(default, null):Bool;
+	public var hidden(default, null):Bool;
 
+	
 	public function new(height:Float = 0.33, align:String = "DOWN", theme:GCThemes.Theme = null, monitorRate:Int = 10) {
 		super();
 
@@ -56,13 +55,10 @@ class GConsole extends Sprite {
 		addChild(_interface);
 
 		_monitorRate = monitorRate;
-		//_consoleScKey = Keyboard.BACKQUOTE;
-		_consoleScKey = Keyboard.TAB;
+		key_showHide = Keyboard.TAB;
 
-		_historyArray = new Array();
-		_historyIndex = -1;
-		_historyMaxSz = 100;
-
+		clearHistory();
+		
 		enable();
 		hideConsole();
 		hideMonitor();
@@ -72,33 +68,45 @@ class GConsole extends Sprite {
 		
 	}
 
+	
 	public function setConsoleFont(font:String = null, embed:Bool = true, size:Int = 14, bold:Bool = false, italic:Bool = false, underline:Bool = false) {
 		_interface.setConsoleFont(font, embed, size, bold, italic, underline);
 	}
 
+	
 	public function setPromptFont(font:String = null, embed:Bool = true, size:Int = 16, bold:Bool = false, ?italic:Bool = false, underline:Bool = false )
 	{
 		_interface.setPromptFont(font, embed, size, bold, italic, underline);
 	}
 
+	
 	public function setMonitorFont(font:String = null, embed:Bool = true, size:Int = 14, bold:Bool = false, ?italic:Bool = false, underline:Bool = false) {
 		_interface.setMonitorFont(font, embed, size, bold, italic, underline);
 	}
 
+	
 	public function showConsole() {
-		if (!this.visible) return;
-		_interface.txtPrompt.text = StringTools.replace(_interface.txtPrompt.text, '`', '');
+		if (!enabled) {
+			return;
+		}
+		
+		hidden = false;
+		visible = true;
+		
 		Lib.current.stage.focus = _interface.txtPrompt;
-		_isConsoleOn = true;
-		_interface.toggleConsoleOn(true);
 	}
 
+	
 	public function hideConsole() {
-		if (!this.visible) return;
-		_isConsoleOn = false;
-		_interface.toggleConsoleOn(false);
+		if (!enabled) {
+			return;
+		}
+		
+		hidden = true;
+		visible = false;
 	}
 
+	
 	public function showMonitor() {
 		_isMonitorOn = true;
 		_interface.toggleMonitor(true);
@@ -108,95 +116,81 @@ class GConsole extends Sprite {
 		updateMonitor(null);	// renders first frame.
 	}
 
+	
 	public function hideMonitor() {
 		_isMonitorOn = false;
 		_interface.toggleMonitor(false);
 		removeEventListener(Event.ENTER_FRAME, updateMonitor);
 	}
 
+	
 	public function enable() {
-		visible = true;
+		
+		enabled = true;
+		
+		if (!hidden) {
+			this.visible = true;
+		}
+		
+		// prevents duplicating events
+		Lib.current.stage.removeEventListener(KeyboardEvent.KEY_UP, onKeyUp, false);
+		Lib.current.stage.removeEventListener(KeyboardEvent.KEY_DOWN, onKeyDown, false);
+		
 		Lib.current.stage.addEventListener(KeyboardEvent.KEY_UP, onKeyUp, false);
 		Lib.current.stage.addEventListener(KeyboardEvent.KEY_DOWN, onKeyDown, false);
 	}
 
+	
 	public function disable() {
-		if (_isMonitorOn) hideMonitor();
-		if (_isConsoleOn) hideConsole();
+		
+		enabled = false;
+		this.visible = false;
+		
+		//if (_isMonitorOn) hideMonitor(); // TODO monitor
 		Lib.current.stage.removeEventListener(KeyboardEvent.KEY_UP, onKeyUp, false);
 		Lib.current.stage.removeEventListener(KeyboardEvent.KEY_DOWN, onKeyDown, false);
-		visible = false;
 	}
 
+	
 	public function setShortcutKeyCode(key:Int) {
-		_consoleScKey = key;
+		key_showHide = key;
 	}
 
-// ========================
-// =====   LOG        =====
-// ========================
-	public function log(data:Dynamic, color:Int = -1) 
-	{
-		if (data == "") return;
-			
+	
+	public function log(data:Dynamic, color:Int = -1) {
 		
+		if (data == "") {
+			return;
+		}
+		
+		// Adds text to console interface
 		var tf:TextField = _interface.txtConsole; 
-		tf.appendText(data.toString() + '\n');
+		tf.appendText(Std.string(data) + '\n');
 		tf.scrollV = tf.maxScrollV;
 		
 		// Applies color - is always applied to avoid bug.
-		if (color == -1)
+		if (color == -1) {
 			color = _interface.theme.CON_TXT_C;
+		}
+		
+		// Applies text formatting
 		var format:TextFormat = new TextFormat();
 		format.color = color;
-		var l = data.toString().length;
+		var l = Std.string(data).length;
 		tf.setTextFormat(format, tf.text.length - l - 1, tf.text.length - 1);
 	}
 	
-	public function registerVariable(object:Dynamic, name:String, alias:String, monitor:Bool = false) {
-		if (!Reflect.isObject(object)) {
-			throw GC_TRC_ERR + "dynamic passed with the field: " + name + " is not an object.";
-			return;
-		}
-#if !(cpp || neko)
-		if (!Reflect.hasField(object, name))
-#else
-		if (Reflect.getProperty(object, name) == null)  
-		#end 
-		{
-			throw GC_TRC_ERR + name + " field was not found in object " + object + " passed.";
+	public function registerFunction(Function:Dynamic, alias:String = "") {
+
+		if (!Reflect.isFunction(Function)) {
+			throw GC_TRC_ERR + "Function " + Std.string(Function) + " is not valid.";
 			return;
 		}
 
-		GCCommands.registerVariable(object, name, alias, monitor);
+		GCCommands.registerFunction(Function, alias);
 	}
 
-	public function unregisterVariable(alias:String) {
-		if (GCCommands.unregisterVariable(alias)) {
-			GameConsole.logInfo(alias + " unregistered.");
-		} else {
-			GameConsole.logError(alias + " not found.");
-		}
-	}
-
-	public function registerFunction(object:Dynamic, name:String, alias:String, ?monitor:Bool = false, ?completionHandler:String -> Array<String>) {
-#if !(cpp || neko)
-		if (!Reflect.hasField(object, name))
-#else
-		if (Reflect.getProperty(object, name) == null) 
-#end {
-			throw GC_TRC_ERR + name + " field was not found in object passed.";
-			return;
-		}
-
-		if (!Reflect.isFunction(Reflect.field(object, name))) {
-			throw GC_TRC_ERR + "could not find function: " + name + " in object passed.";
-			return;
-		}
-
-		GCCommands.registerFunction(object, name, alias, monitor, completionHandler);
-	}
-
+	
 	public function unregisterFunction(alias:String) {
 		if (GCCommands.unregisterFunction(alias)) {
 			GameConsole.logInfo(alias + " unregistered.");
@@ -205,56 +199,65 @@ class GConsole extends Sprite {
 		}
 	}
 	
+	
 	public function registerObject(object:Dynamic, alias:String) 
 	{
 		if (!Reflect.isObject(object)) {
-		trace(GC_TRC_ERR + "dynamic passed is not an object.");
+			trace(GC_TRC_ERR + "dynamic passed is not an object.");
 			return;
 		}
 
 		GCCommands.registerObject(object, alias);
 	}
 
-	public function clearConsole() {
-		_interface.txtConsole.text = '';
+	/**
+	 * Clears input text;
+	 */
+	public function clearConsoleText() {
+		_interface.clearConsoleText();
 	}
 
+	
 	public function clearRegistry() {
 		GCCommands.clearRegistry();
 	}
-
-// INPUT HANDLING ------------------------------------------------------
-
-	private function onKeyDown(e:KeyboardEvent):Void {
-#if !(cpp || neko) // BUGFIX
-		if (_isConsoleOn)
-			e.stopImmediatePropagation();
-#end
+	
+	public function clearHistory() {
+		_historyArray = new Array<String>();
+		_historyIndex = -1;
 	}
 
-		private function onKeyUp(e:KeyboardEvent):Void {
+
+	//---------------------------------------------------------------------------------
+	//  INPUT HANDLING
+	//---------------------------------------------------------------------------------
+	private function onKeyDown(e:KeyboardEvent):Void {
+		#if !(cpp || neko) // BUGFIX
+		if (enabled && !hidden)
+			e.stopImmediatePropagation();
+		#end
+	}
+	
+	private function onKeyUp(e:KeyboardEvent):Void {
 		// SHOW/HIDE MONITOR.
-		if (e.ctrlKey && cast(e.keyCode, Int) == _consoleScKey) {
+		if (e.ctrlKey && cast(e.keyCode, Int) == key_showHide) {
 			_isMonitorOn ? hideMonitor() : showMonitor();
 			return;
 		}
 		// SHOW/HIDE CONSOLE.
-		if (cast(e.keyCode, Int) == _consoleScKey) {
-			_isConsoleOn ? hideConsole() : showConsole();
+		if (cast(e.keyCode, Int) == key_showHide) {
+			if (!hidden) {
+				hideConsole();
+			} else {
+				showConsole();
+			}
 			return;
 		}
 		// IGNORE INPUT IF CONSOLE HIDDEN.
-		if (!_isConsoleOn) 
+		if (hidden) 
 			return;
 
-		if (e.keyCode == Keyboard.CAPS_LOCK) { // ENTER KEY.
-			completeInputLine();
-			return;
-		} else {
-			_isCompleting = false;
-			_completionMainPart = "";
-		}
-
+		// ENTER KEY
 		if (e.keyCode == 13) {
 			processInputLine();
 		}
@@ -263,13 +266,13 @@ class GConsole extends Sprite {
 			if (_interface.txtConsole.scrollV < 0)
 				_interface.txtConsole.scrollV = 0;
 		}
-	if (e.keyCode == 34) { // PAGE UP
+		if (e.keyCode == 34) { // PAGE UP
 			_interface.txtConsole.scrollV += _interface.txtConsole.bottomScrollV - _interface.txtConsole.scrollV +1;
 			if (_interface.txtConsole.scrollV > _interface.txtConsole.maxScrollV)
 				_interface.txtConsole.scrollV = _interface.txtConsole.maxScrollV;
 		}
 		else
-		if (e.keyCode == 38) {// DOWN KEY
+		if (e.keyCode == 38) { // DOWN KEY
 			nextHistory();
 		}
 		else if (e.keyCode == 40) { // UP KEY
@@ -277,9 +280,9 @@ class GConsole extends Sprite {
 		} else if (e.keyCode == 32 && e.ctrlKey)   // CONTROL + SPACE = AUTOCOMPLETE
 		{   
 			// remove white space added pressing CTRL + SPACE.
-			_interface.txtPrompt.text = _interface.txtPrompt.text.substr(0, _interface.txtPrompt.text.length - 1); 
+			_interface.removeLastChar();
 			
-			var autoC:Array<String> = GCUtil.autoComplete(_interface.txtPrompt.text);
+			var autoC:Array<String> = GCUtil.autoComplete(_interface.getInputTxt());
 			if (autoC != null)
 			{
 				if (autoC.length == 1) // only one entry in autocomplete - replace user entry.
@@ -302,9 +305,9 @@ class GConsole extends Sprite {
 			_historyIndex = -1; 
 		}
 
-#if !(cpp || neko) // BUGFIX
+		#if !(cpp || neko) // BUGFIX
 		e.stopImmediatePropagation(); // BUG - cpp issues.
-#end
+		#end
 	}
 
 	private function prevHistory() {
@@ -313,32 +316,37 @@ class GConsole extends Sprite {
 		if (_historyIndex > _historyArray.length - 1) return;
 
 		_interface.txtPrompt.text = _historyArray[_historyIndex];
-#if !(cpp || neko)
+		#if !(cpp || neko)
 		_interface.txtPrompt.setSelection(_interface.txtPrompt.length, _interface.txtPrompt.length);
-#end
+		#end
 	}
 
 	private function nextHistory() {
-		if (_historyIndex + 1 > _historyArray.length - 1) return;
+		
+		if (_historyIndex + 1 > _historyArray.length - 1) {
+			return;
+		}
+		
 		_historyIndex++;
 
 		_interface.txtPrompt.text = _historyArray[_historyIndex];
-#if !(cpp || neko)
+		#if !(cpp || neko)
 		_interface.txtPrompt.setSelection(_interface.txtPrompt.length, _interface.txtPrompt.length);
-#end
+		#end
 	}
 
-// INPUT PARSE ----------------------------------------------------
+
 	private function processInputLine() {
-		if (_interface.txtPrompt.text == '')
+		
+		// no input to process
+		if (_interface.txtPrompt.text == '') {
 			return;
+		}
 			
 		var temp:String = _interface.txtPrompt.text;
 		// HISTORY
 		_historyArray.insert(0, _interface.txtPrompt.text);
 		_historyIndex = -1;
-		if (_historyArray.length > _historyMaxSz)
-			_historyArray.splice(_historyArray.length - 1, 1);
 		// LOG AND CLEAN PROMPT
 		log("> " + _interface.txtPrompt.text);
 		_interface.txtPrompt.text = '';
@@ -349,25 +357,32 @@ class GConsole extends Sprite {
 
 	private function parseInput(input:String) {
 		var args:Array<String> = input.split(' ');
+		var commandName = args[0].toLowerCase();
+		args.shift();
 		
-		switch (args[0].toLowerCase()) {
-			case "clear"	: clearConsole();
+		switch (commandName) {
+			case "clear"	: clearConsoleText();
 			case "monitor"	: _isMonitorOn ? hideMonitor() : showMonitor();
 			case "help"		: GCCommands.showHelp();
 			case "commands" : GCCommands.showCommands();
-			case "vars"		: GCCommands.listVars();
 			case "funcs"	: GCCommands.listFunctions();
 			case "objs"		: GCCommands.listObjects();
-			case "set"		: GCCommands.setVar(args);
+			case "print"	: GCCommands.printProperty(args);
+			case "set"		: GCCommands.setVariable(args);
 			case "call"		: GCCommands.callFunction(args);
-			default 		: GameConsole.logInfo("unknown command");
+				
+			default : 
+				GameConsole.logInfo("unknown command");
 		}
 	}
 
-// MONITOR --------------------------------------------------------
 
+	//---------------------------------------------------------------------------------
+	//  MONITOR
+	//---------------------------------------------------------------------------------
 	private function updateMonitor(e:Event):Void {
 		_elapsedFrames++;
+		
 		if (_elapsedFrames > _monitorRate) {
 			processMonitorOutput(GCCommands.getMonitorOutput());
 			_elapsedFrames = 0;
@@ -375,7 +390,10 @@ class GConsole extends Sprite {
 	}
 
 	private function processMonitorOutput(input:String) {
-		if (input.length == 0) return;
+		if (input.length == 0) {
+			return;
+		}
+		
 		var str1:String;
 		var str2:String;
 
@@ -391,87 +409,4 @@ class GConsole extends Sprite {
 		_interface.txtMonitorRight.text = input.substr(splitPoint + 1);
 	}
 	
-// ARGUMENS COMPLETION By Pecheny --------------------------------------------------------
-
-	private function completeInputLine() {
-		if (_interface.txtPrompt.text == '') {
-			return;
-		}
-		var temp:String = _interface.txtPrompt.text;
-		var args:Array<String> = temp.split(' ');
-		var functions = GCCommands.getFunctionNames();
-		functions = functions.concat(commandNames);
-		if (_completionMainPart == "") {
-			if ((functions.indexOf(args[0]) > -1)) {
-				_completionMainPart = temp;
-			} else {
-				_completionMainPart = args[0];
-			}
-		}
-		if (_completionMainPart.indexOf(" ") > -1) {
-			completeArguments(temp);                    
-		} else {
-			completeCommand(functions, args);          
-		}
-	}
-
-	private function completeCommand(functions:Array<String>, args:Array<String>):Void {
-		functions = functions.filter(function(name:String) {return (name.indexOf(_completionMainPart) == 0);});  
-		if (functions.length > 0) {
-			if (args.length > 1) {
-				var current = args.shift();
-				updateInput(cycleRecords(functions, current) + " " + assembleString(args));
-			} else {
-				updateInput(cycleRecords(functions, args[0]));
-			}
-		}
-	}
-
-	private function completeArguments(string:String):Void {
-		var args:Array<String> = string.split(' ');
-		var alias = args.shift();
-		var mainPartArray = _completionMainPart.split(" ");
-		mainPartArray.shift();
-		var mainPart = assembleString(mainPartArray);
-		var remoteObj:Register = GCCommands.getFunction(alias);
-		if (remoteObj != null && remoteObj.completion != null) {
-			var completionList = remoteObj.completion(mainPart);
-			if (completionList.length > 0) {
-				updateInput(alias + " " + cycleRecords(completionList, args[0]));
-			}
-		}
-	}
-
-	private function updateInput(val:String):Void {
-		_interface.txtPrompt.text = val;
-		_interface.txtPrompt.setSelection(val.length, val.length);
-	}
-
-	private function cycleRecords(list:Array<String>, current:String):String {
-		var completed:String;
-		var currentOptIndex = list.indexOf(current);
-		if (currentOptIndex > -1) {
-			var idx = currentOptIndex > list.length - 2 ? 0 : currentOptIndex + 1;
-			completed = list[idx];
-		} else {
-			completed = list[0];
-		}
-		return completed;
-	}
-
-	private function assembleString(array:Array<String>):String {
-		var str = "";
-		for (part in array) {
-			str += part + " ";
-		}
-		str = str.substr(0, str.length - 1);
-		return str;
-	}
-
-// GETTERS AND SETTERS ------------------------------------------------
-
-	private function set_historyMaxSz(value:Int):Int {
-		return _historyMaxSz = value;
-	}
-	public var historyMaxSz(null, set_historyMaxSz):Int;
 }

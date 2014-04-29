@@ -29,8 +29,7 @@ class GameConsole
 	 * @param	theme	Select the console theme from GCThemes.
 	 * @param	monitorRate The number of frames elapsed for each monitor refresh.
 	 */
-	public static function init(height:Float = 0.33, align:String = "DOWN", theme:GCThemes.Theme = null, monitorRate:Int = 10) 
-	{
+	public static function init(height:Float = 0.33, align:String = "DOWN", theme:GCThemes.Theme = null, monitorRate:Int = 10) {
 		if (GConsole.instance != null)
 			return; // GConsole has been initialized already.
 		Lib.current.stage.addChild(new GConsole(height, align, theme, monitorRate));
@@ -45,8 +44,7 @@ class GameConsole
 	 * @param	italic
 	 * @param	underline
 	 */
-	public static function setConsoleFont(font:String = null, embed:Bool = true, size:Int = 14, bold:Bool = false, italic:Bool = false, underline:Bool = false )
-	{
+	public static function setConsoleFont(font:String = null, embed:Bool = true, size:Int = 14, bold:Bool = false, italic:Bool = false, underline:Bool = false ){
 		checkInstance();
 		GConsole.instance.setConsoleFont(font, embed, size, bold, italic, underline);
 	}
@@ -59,8 +57,7 @@ class GameConsole
 	 * @param	italic
 	 * @param	underline
 	 */
-	public static function setPromptFont(font:String = null, embed:Bool = true, size:Int = 16, bold:Bool = false, ?italic:Bool = false, underline:Bool = false )
-	{
+	public static function setPromptFont(font:String = null, embed:Bool = true, size:Int = 16, bold:Bool = false, ?italic:Bool = false, underline:Bool = false ){
 		checkInstance();
 		GConsole.instance.setPromptFont(font, embed, size, bold, italic, underline);
 	}
@@ -74,8 +71,7 @@ class GameConsole
 	 * @param	italic
 	 * @param	underline
 	 */
-	public static function setMonitorFont(font:String = null, embed:Bool = true, size:Int = 14, bold:Bool = false, ?italic:Bool = false, underline:Bool = false )
-	{
+	public static function setMonitorFont(font:String = null, embed:Bool = true, size:Int = 14, bold:Bool = false, ?italic:Bool = false, underline:Bool = false ){
 		checkInstance();
 		GConsole.instance.setMonitorFont(font, embed, size, bold, italic, underline);
 	}
@@ -91,8 +87,7 @@ class GameConsole
 	 * @param italic True if the font should be italicized
 	 * @param underline True if the font should be underlined
 	 */
-	public static function setFont(font:String = null, embed:Bool = true, size:Int = 16, bold:Bool = false, ?italic:Bool = false, underline:Bool = false)
-	{
+	public static function setFont(font:String = null, embed:Bool = true, size:Int = 16, bold:Bool = false, ?italic:Bool = false, underline:Bool = false){
 		checkInstance();
 		GConsole.instance.setConsoleFont(font, embed, size, bold, italic, underline);
 		GConsole.instance.setPromptFont(font, embed, size, bold, italic, underline);
@@ -102,16 +97,14 @@ class GameConsole
 	/**
 	 * Shows console.
 	 */
-	public static function showConsole() 
-	{
+	public static function showConsole() {
 		checkInstance();
 		GConsole.instance.showConsole();
 	}
 	/**
 	 * Hides console.
 	 */
-	public static function hideConsole()
-	{
+	public static function hideConsole() {
 		checkInstance();
 		GConsole.instance.hideConsole();
 	}
@@ -119,8 +112,7 @@ class GameConsole
 	 * Shows monitor and starts to follow registered fiedls in real time.
 	 * Only fields with 'monitor' flag set to true will be followed. 
 	 */
-	public static function showMonitor() 
-	{
+	public static function showMonitor() {
 		checkInstance();
 		GConsole.instance.showMonitor();
 	}
@@ -135,16 +127,14 @@ class GameConsole
 	/**
 	 * Enables console and its listeners.
 	 */
-	public static function enable() 
-	{
+	public static function enable() {
 		checkInstance();
 		GConsole.instance.enable();
 	}
 	/**
 	 * Disable console and its listeners.
 	 */
-	public static function disable() 
-	{
+	public static function disable() {
 		checkInstance();
 		GConsole.instance.disable();
 	}
@@ -152,8 +142,7 @@ class GameConsole
 	 * Sets the keycode to open the console.
 	 * @param	key		The keycode for the new console shortcut key.
 	 */
-	public static function setShortcutKeyCode(key:Int)
-	{
+	public static function setShortcutKeyCode(key:Int) {
 		checkInstance();
 		GConsole.instance.setShortcutKeyCode(key);
 	}
@@ -162,8 +151,7 @@ class GameConsole
 	 * @param	data	The message to log. 
 	 * @param	color	The color of text. (-1 uses default color)
 	 */
-	public static function log(data:Dynamic, color:Int = -1) 
-	{
+	public static function log(data:Dynamic, color:Int = -1) {
 		checkInstance();
 		GConsole.instance.log(data, color);
 	}
@@ -171,8 +159,7 @@ class GameConsole
 	 * Logs a warning message to the console.
 	 * @param	data	The message to log. 
 	 */
-	static public function logWarning(data:Dynamic)
-	{
+	static public function logWarning(data:Dynamic) {
 		checkInstance();
 		GConsole.instance.log(data, GConsole.instance._interface.theme.LOG_WAR);
 	}
@@ -180,8 +167,7 @@ class GameConsole
 	 * Logs a error message to the console.
 	 * @param	data	The message to log. 
 	 */
-	static public function logError(data:Dynamic)
-	{
+	static public function logError(data:Dynamic) {
 		checkInstance();
 		GConsole.instance.log(data, GConsole.instance._interface.theme.LOG_ERR);
 	}
@@ -189,8 +175,7 @@ class GameConsole
 	 * Logs a confirmation message to the console.
 	 * @param	data	The message to log. 
 	 */
-	static public function logConfirmation(data:Dynamic)
-	{
+	static public function logConfirmation(data:Dynamic) {
 		checkInstance();
 		GConsole.instance.log(data, GConsole.instance._interface.theme.LOG_CON);
 	}
@@ -198,39 +183,16 @@ class GameConsole
 	 * Logs a info message to the console.
 	 * @param	data	The message to log. 
 	 */
-	static public function logInfo(data:Dynamic)
-	{
+	static public function logInfo(data:Dynamic) {
 		checkInstance();
 		GConsole.instance.log(data, GConsole.instance._interface.theme.LOG_INF);
-	}
-	/**
-	 * Registers a variable to used in the console.
-	 * @param	object		Reference to object containing the variable.
-	 * @param	field		The name of the variable inside the object.
-	 * @param	alias		The display name that shows on screen console. (optional) - if no alias is given, an automatic alias will be created.
-	 * @param	monitor 	Whether to monitor/display this variable in realtime using monitor.
-	 */
-	public static function registerVariable(object:Dynamic, field:String, alias:String="", monitor:Bool=false) 
-	{
-		checkInstance();
-		GConsole.instance.registerVariable(object, field, alias, monitor);
-	}
-	/**
-	 * Deletes field from registry.
-	 * @param	alias
-	 */
-	public static function unregisterVariable(alias:String)
-	{
-		checkInstance();
-		GConsole.instance.unregisterVariable(alias);
 	}
 	/**
 	 * Registers an object to be used in the console.
 	 * @param	object		The object to register.
 	 * @param	alias		The alias displayed in the console. (optional) - if no alias is given, an automatic alias will be created.
 	 */
-	public static function registerObject(object:Dynamic, alias:String = "")
-	{
+	public static function registerObject(object:Dynamic, alias:String = "") {
 		checkInstance();
 		GConsole.instance.registerObject(object, alias);
 	}
@@ -243,33 +205,29 @@ class GameConsole
 	 * @param	alias		The display name that shows on screen console. (optional) - if no alias is given, an automatic alias will be created.
 	 * @param	monitor 	If true, the function will be called every n frames and output printed. Be careful with this one.
 	 */
-	public static function registerFunction(object:Dynamic, Function:String, alias:String="", ?monitor:Bool = false) 
-	{
+	public static function registerFunction(Function:Dynamic, alias:String="") {
 		checkInstance();
-		GConsole.instance.registerFunction(object, Function, alias, monitor);
+		GConsole.instance.registerFunction(Function, alias);
 	}
 	/**
 	 * Deletes field from registry.
 	 * @param	alias
 	 */
-	public static function unregisterFunction(alias:String)
-	{
+	public static function unregisterFunction(alias:String) {
 		checkInstance();
 		GConsole.instance.unregisterFunction(alias);
 	}
 	/**
 	 * Clears console logs.
 	 */
-	public static function clearConsole() 
-	{
+	public static function clearConsole() {
 		checkInstance();
-		GConsole.instance.clearConsole();
+		GConsole.instance.clearConsoleText();
 	}
 	/**
 	 * Removes all entrys from registry.
 	 */
-	public static function clearRegistry()
-	{
+	public static function clearRegistry() {
 		checkInstance();
 		GCCommands.clearRegistry();
 	}
@@ -277,14 +235,15 @@ class GameConsole
 	 * Brings console to front in stage. 
 	 * Useful when other ojects are added directly to stage, hiding the console.
 	 */
-	public static function toFront()
-	{
+	public static function toFront() {
 		checkInstance();
 		Lib.current.stage.swapChildren(GConsole.instance, Lib.current.stage.getChildAt(Lib.current.stage.numChildren - 1));
 	}
 	
-	private static function checkInstance() 
-	{
+	//---------------------------------------------------------------------------------
+	//  PRIVATE / AUX
+	//---------------------------------------------------------------------------------
+	private static function checkInstance() {
 		if (GConsole.instance == null) init();
 	}
 }

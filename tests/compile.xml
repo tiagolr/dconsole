@@ -3,6 +3,9 @@
 <project>
 	<app main="TestRunner" file="test" path="bin" />
 
+	<set name="SHOW_CONSOLE" value="1"/>
+	<haxedef name="SHOW_CONSOLE"/>
+	
 	<source path="src" />
 	<haxelib name="openfl" />
 	<haxelib name="gameconsole" />

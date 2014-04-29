@@ -8,12 +8,10 @@ import pgr.gconsole.GameConsole;
 import pgr.gconsole.GConsole;
 
 /**
- * Tests console log output.
+ * Tests console reaction to keystrokes.
+ * 
  * @author TiagoLr ( ~~~ProG4mr~~~ )
  */
-
- 
- // NOTE - After running test prompt does not focus automatically.
 class TestInput extends TestCase
 {	 
 	var interfc:GCInterface;
@@ -28,11 +26,12 @@ class TestInput extends TestCase
 			console = GConsole.instance;
 			interfc = console._interface;
 		}
-		clearText();
-		console.clearRegistry();
-		console.clearConsole();
-		console.disable();
+		
+		console.setShortcutKeyCode(Keyboard.TAB);
+		interfc.clearInputText();
+		console.clearConsoleText();
 		console.enable();
+		console.showConsole();
 	}
 	
 	override public function tearDown() {
@@ -40,145 +39,107 @@ class TestInput extends TestCase
 		GConsole.instance = null;
 	}
 	
-	public function testLog() 
-	{
-		console.showConsole();
-		console.log("testing Log..");
-		assertEquals("testing Log..", interfc.txtConsole.text.substr(0, 13));  
-	}
-
-	// Tests keyboard input while console is disabled and hidden.
-	public function testInput() 
-	{
-		clearText();
-		var str = "Test";
-		
-		interfc.txtPrompt.text = str + "1";
-		console.stage.dispatchEvent(new KeyboardEvent(KeyboardEvent.KEY_UP, true, false, 0, 13)); // ENTER  
-		console.showConsole();
-		console.disable();
-		console.showConsole();
-		interfc.txtPrompt.text = str + "2";
-		console.stage.dispatchEvent(new KeyboardEvent(KeyboardEvent.KEY_UP, true, false, 0, 13)); // ENTER
-		console.enable();
-		console.showConsole();
-		interfc.txtPrompt.text = str + "3";
-		console.stage.dispatchEvent(new KeyboardEvent(KeyboardEvent.KEY_UP, true, false, 0, 13)); // ENTER
+	/**
+	 * Tests show/hide commands.
+	 */
+	public function testVisibility() {
 		console.hideConsole();
-		interfc.txtPrompt.text = str + "4";
-		console.stage.dispatchEvent(new KeyboardEvent(KeyboardEvent.KEY_UP, true, false, 0, 13)); // ENTER
-		
-		assertEquals("Test3" , interfc.txtConsole.text.substr(2, 5));
-	}
-	
-	public function testRegisterFields()
-	{
-		clearText();
-	
-		try
-		{
-		console.registerVariable(null, "null", "null");
-		} catch (msg:String)
-		{
-			assertTrue(msg.lastIndexOf("null is not an object") > 0);
-		}
-		
-		//console.registerVariable(this, "", "null");
-		console.registerVariable(this, "i", "int");
-		console.registerVariable(this, "i", "int");
-		console.registerVariable(this, "f", "float");
-		console.registerVariable(this, "f", "float");
-		console.registerVariable(this, "s", "string");
-		console.registerVariable(this, "s", "string");
-		
-		try {
-		console.registerVariable(this, "i2", "int");
-		} catch (msg:String) {
-			assertTrue(msg.lastIndexOf("field was not found") > 0);
-		}
-		
+		assertFalse(console.visible);
 		console.showConsole();
-		
-		interfc.txtPrompt.text = "set int 1234";
-		console.stage.dispatchEvent(new KeyboardEvent(KeyboardEvent.KEY_UP, true, false, 0, 13)); // ENTER
-		
-		interfc.txtPrompt.text = "set float 0.1234";
-		console.stage.dispatchEvent(new KeyboardEvent(KeyboardEvent.KEY_UP, true, false, 0, 13)); // ENTER
-		
-		interfc.txtPrompt.text = "set string string";
-		console.stage.dispatchEvent(new KeyboardEvent(KeyboardEvent.KEY_UP, true, false, 0, 13)); // ENTER
-		
-		console.clearConsole();
-		
-		interfc.txtPrompt.text = "vars";
-		console.stage.dispatchEvent(new KeyboardEvent(KeyboardEvent.KEY_UP, true, false, 0, 13)); // ENTER
-		
-		var ai = (~/(int).+(1234)/).split(interfc.txtConsole.text);	
-		var af = (~/(float).+(0.1234)/).split(interfc.txtConsole.text);
-		var as = (~/(string).+(string)/).split(interfc.txtConsole.text);
-		
-		assertTrue(ai.length == 2 && af.length == 2 && as.length == 2);
+		assertTrue(console.visible);
 	}
 	
-	public function testUnregisterFields()
-	{
+	/**
+	 * Tests opening/closing console with shortcut key
+	 */
+	public function testConsoleToggleKey() {
+		console.hideConsole();
+		console.stage.dispatchEvent(new KeyboardEvent(KeyboardEvent.KEY_UP, true, false, 0, Keyboard.TAB));
+		assertTrue(console.visible);
+		console.stage.dispatchEvent(new KeyboardEvent(KeyboardEvent.KEY_UP, true, false, 0, Keyboard.TAB));
+		assertFalse(console.visible);
+	}
+	
+	/**
+	 * Tests disabled console behaviour to keystrokes.
+	 */
+	public function testDisable() {
+		console.disable();
+		console.stage.dispatchEvent(new KeyboardEvent(KeyboardEvent.KEY_UP, true, false, 0, Keyboard.TAB));
+		assertFalse(console.visible);
+		console.showConsole();
+		assertFalse(console.visible);
+		console.enable();
+		assertTrue(console.visible);
+	}
+	
+	/**
+	 * Tests hidden console behaviour to keystrokes.
+	 */
+	public function testHiddenConsole() {
+		console.hideConsole();
+		
+		interfc.setInputTxt("SomeText");
+		console.stage.dispatchEvent(new KeyboardEvent(KeyboardEvent.KEY_UP, true, false, 0, Keyboard.ENTER)); 
+		assertTrue(interfc.getConsoleText() == "");
+		
+		console.stage.dispatchEvent(new KeyboardEvent(KeyboardEvent.KEY_UP, true, false, 0, Keyboard.TAB));
+		assertTrue(console.visible);
+		console.stage.dispatchEvent(new KeyboardEvent(KeyboardEvent.KEY_UP, true, false, 0, Keyboard.ENTER)); 
+		assertFalse(interfc.getConsoleText() == "");
+	}
+	
+	
+	public function testLogging() {
+		
+		// test clearconsole()
+		assertTrue(interfc.getConsoleText() == "");
+		
+		// test simple text logging
+		console.log("testlog");
+		assertTrue(interfc.getConsoleText().lastIndexOf("testlog") != -1);
+		
+		// test clearconsole()
+		console.clearConsoleText();
+		assertTrue(interfc.getConsoleText() == "");
+		
+		// test complex input
+		
+		// test null logging
+		
+		// test different data types logging - object, function, float, bool.
+		
+	}
+	
+	
+	/**
+	 * Test history
+	 */
+	public function testHistory() {
+		
+		// no history, try next history, previous history, prompt text remains the same.
+		
+		// enter some commands.
+		
+		// test previousHistory
+		
+		// test nextHistory
+		
+		// test cycling history
+		
+		
+		
 		assertTrue(true);
 	}
 	
-	public function testUnregisterObject()
-	{
+	public function testScroll() {
+		
+		// enter a lot of text.
+		// test pageUp, see if scroll changes.
+		// test pageDown, see if scroll returns back.
+		
 		assertTrue(true);
-	}
-	
-	public function testRegisterFunctions()
-	{
-		assertTrue(true);
-	}
-	
-	public function testMonitor()
-	{
-		assertTrue(true);
-	}
-	
-	//public function testAutocompleteMainCommands():Void {
-		//GameConsole.showConsole();
-		//interfc.txtPrompt.text = "c";
-		//Lib.current.stage.dispatchEvent(new KeyboardEvent(KeyboardEvent.KEY_UP, true, false, 0, Keyboard.CAPS_LOCK)); // ENTER
-		//assertEquals("clear", interfc.txtPrompt.text);
-		//Lib.current.stage.dispatchEvent(new KeyboardEvent(KeyboardEvent.KEY_UP, true, false, 0, Keyboard.CAPS_LOCK)); // ENTER
-		//assertEquals("commands", interfc.txtPrompt.text);
-	//}
-//
-	//public function testAutocompleteRegisteredCommands():Void {
-		//GameConsole.showConsole();
-		//GameConsole.registerFunction(this, "emptyFunc", "empty");
-		//interfc.txtPrompt.text = "e";
-		//Lib.current.stage.dispatchEvent(new KeyboardEvent(KeyboardEvent.KEY_UP, true, false, 0, Keyboard.F1)); // ENTER
-		//assertEquals("empty", interfc.txtPrompt.text);
-	//}
-//
-	//public function testAutocompleteArguments():Void {
-		//GameConsole.showConsole();
-		//GConsole.instance.registerFunction(this, "emptyFunc", "empty", false, 
-		//function(s:String) {
-			//return ["foo", "bar"];
-		//});
-		//interfc.txtPrompt.text = "empty ";
-		//Lib.current.stage.dispatchEvent(new KeyboardEvent(KeyboardEvent.KEY_UP, true, false, 0, Keyboard.F1)); // ENTER
-		//assertEquals("empty foo", interfc.txtPrompt.text);
-		//Lib.current.stage.dispatchEvent(new KeyboardEvent(KeyboardEvent.KEY_UP, true, false, 0, Keyboard.F1)); // ENTER
-		//assertEquals("empty bar", interfc.txtPrompt.text);
-	//}
-
-	private function clearText() {
-		interfc.txtConsole.text = '';
-		interfc.txtPrompt.text = '';
-		interfc.txtMonitorLeft.text = '';
-		interfc.txtMonitorRight.text = '';
-	}
-	
-	private function returnString(str:String):String {
-		return str;
+		
 	}
 	
 }
