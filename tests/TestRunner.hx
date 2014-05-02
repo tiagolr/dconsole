@@ -9,6 +9,7 @@ class TestRunner {
 		r.add(new TestRegister());
 		r.add(new TestCommands());
 		r.add(new TestUtils());
+		r.add(new TestMonitor());
         r.run();
 		
 		#if !flash

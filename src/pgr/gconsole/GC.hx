@@ -1,20 +1,13 @@
 package pgr.gconsole;
 
-
 import flash.Lib;
-/**
- * @author TiagoLr ( ~~~ProG4mr~~~ )
- */
- 
-enum ALIGN {
-	DOWN;
-	UP  ;
-}
 
  /**
-  * GameConsole class provides user friendly interface to Game Console.
+  * GC class provides user API to Game Console.
+  * 
+  * @author TiagoLr ( ~~~ProG4mr~~~ )
   */
-class GameConsole 
+class GC 
 {
 	
 	/** Aligns console to bottom */
@@ -30,8 +23,10 @@ class GameConsole
 	 * @param	monitorRate The number of frames elapsed for each monitor refresh.
 	 */
 	public static function init(height:Float = 0.33, align:String = "DOWN", theme:GCThemes.Theme = null, monitorRate:Int = 10) {
-		if (GConsole.instance != null)
+		if (GConsole.instance != null) {
 			return; // GConsole has been initialized already.
+		}
+		
 		Lib.current.stage.addChild(new GConsole(height, align, theme, monitorRate));
 	}
 	/**
@@ -46,7 +41,7 @@ class GameConsole
 	 */
 	public static function setConsoleFont(font:String = null, embed:Bool = true, size:Int = 14, bold:Bool = false, italic:Bool = false, underline:Bool = false ){
 		checkInstance();
-		GConsole.instance.setConsoleFont(font, embed, size, bold, italic, underline);
+		GConsole.instance.interfc.setConsoleFont(font, embed, size, bold, italic, underline);
 	}
 	/**
 	 * Sets the prompt font.
@@ -59,7 +54,7 @@ class GameConsole
 	 */
 	public static function setPromptFont(font:String = null, embed:Bool = true, size:Int = 16, bold:Bool = false, ?italic:Bool = false, underline:Bool = false ){
 		checkInstance();
-		GConsole.instance.setPromptFont(font, embed, size, bold, italic, underline);
+		GConsole.instance.interfc.setPromptFont(font, embed, size, bold, italic, underline);
 	}
 	/**
 	 * Sets the monitor font.
@@ -73,7 +68,7 @@ class GameConsole
 	 */
 	public static function setMonitorFont(font:String = null, embed:Bool = true, size:Int = 14, bold:Bool = false, ?italic:Bool = false, underline:Bool = false ){
 		checkInstance();
-		GConsole.instance.setMonitorFont(font, embed, size, bold, italic, underline);
+		GConsole.instance.monitor.setFont(font, embed, size, bold, italic, underline);
 	}
 	
 	/**
@@ -89,9 +84,9 @@ class GameConsole
 	 */
 	public static function setFont(font:String = null, embed:Bool = true, size:Int = 16, bold:Bool = false, ?italic:Bool = false, underline:Bool = false){
 		checkInstance();
-		GConsole.instance.setConsoleFont(font, embed, size, bold, italic, underline);
-		GConsole.instance.setPromptFont(font, embed, size, bold, italic, underline);
-		GConsole.instance.setMonitorFont(font, embed, size, bold, italic, underline);
+		GConsole.instance.interfc.setConsoleFont(font, embed, size, bold, italic, underline);
+		GConsole.instance.interfc.setPromptFont(font, embed, size, bold, italic, underline);
+		GConsole.instance.monitor.setFont(font, embed, size, bold, italic, underline);
 	}
 	
 	/**
@@ -99,14 +94,14 @@ class GameConsole
 	 */
 	public static function showConsole() {
 		checkInstance();
-		GConsole.instance.showConsole();
+		GConsole.instance.show();
 	}
 	/**
 	 * Hides console.
 	 */
 	public static function hideConsole() {
 		checkInstance();
-		GConsole.instance.hideConsole();
+		GConsole.instance.hide();
 	}
 	/**
 	 * Shows monitor and starts to follow registered fiedls in real time.
@@ -114,7 +109,7 @@ class GameConsole
 	 */
 	public static function showMonitor() {
 		checkInstance();
-		GConsole.instance.showMonitor();
+		GConsole.instance.monitor.show();
 	}
 	/**
 	 * Stops monitoring.
@@ -122,7 +117,7 @@ class GameConsole
 	public static function hideMonitor()
 	{
 		checkInstance();
-		GConsole.instance.hideMonitor();
+		GConsole.instance.monitor.hide();
 	}
 	/**
 	 * Enables console and its listeners.
@@ -144,7 +139,7 @@ class GameConsole
 	 */
 	public static function setShortcutKeyCode(key:Int) {
 		checkInstance();
-		GConsole.instance.setShortcutKeyCode(key);
+		GConsole.instance.setToggleKey(key);
 	}
 	/**
 	 * Logs a message to the console.
@@ -161,7 +156,7 @@ class GameConsole
 	 */
 	static public function logWarning(data:Dynamic) {
 		checkInstance();
-		GConsole.instance.log(data, GConsole.instance._interface.theme.LOG_WAR);
+		GConsole.instance.log(data, GCThemes.current.LOG_WAR);
 	}
 	/**
 	 * Logs a error message to the console.
@@ -169,7 +164,7 @@ class GameConsole
 	 */
 	static public function logError(data:Dynamic) {
 		checkInstance();
-		GConsole.instance.log(data, GConsole.instance._interface.theme.LOG_ERR);
+		GConsole.instance.log(data, GCThemes.current.LOG_ERR);
 	}
 	/**
 	 * Logs a confirmation message to the console.
@@ -177,7 +172,7 @@ class GameConsole
 	 */
 	static public function logConfirmation(data:Dynamic) {
 		checkInstance();
-		GConsole.instance.log(data, GConsole.instance._interface.theme.LOG_CON);
+		GConsole.instance.log(data, GCThemes.current.LOG_CON);
 	}
 	/**
 	 * Logs a info message to the console.
@@ -185,8 +180,32 @@ class GameConsole
 	 */
 	static public function logInfo(data:Dynamic) {
 		checkInstance();
-		GConsole.instance.log(data, GConsole.instance._interface.theme.LOG_INF);
+		GConsole.instance.log(data, GCThemes.current.LOG_INF);
 	}
+	
+	/**
+	 * Adds this field to be monitored. 
+	 * When monitor is visibile, the value will be visible and updated in realtime.
+	 * Private fields or fields with getter/setter are also supported.
+	 * 
+	 * @param	object			object containing the field
+	 * @param	fieldName		field name, eg: "x" or "rotation"
+	 * @param	alias			name to be displayed
+	 */
+	static public function monitorField(object:Dynamic, fieldName:String, alias:String) {
+		checkInstance();
+		GConsole.instance.monitorField(object, fieldName, alias);
+	}
+	
+	/**
+	 * Sets the refresh rate of the monitor.
+	 * @param	refreshRate		Time (in milliseconds) between monitor values update.
+	 */
+	static public function setMonitorRefreshRate(refreshRate:Int = 100) {
+		checkInstance();
+		GConsole.instance.monitor.setRefreshRate(refreshRate);
+	}
+	
 	/**
 	 * Registers an object to be used in the console.
 	 * @param	object		The object to register.
@@ -200,12 +219,10 @@ class GameConsole
 	 * Registers a function to be called from the console.
 	 * If monitor argument is set, this function will be displayed on monitor window.
 	 * 
-	 * @param	object		A Reference to object containing the function.
-	 * @param	Function	The name of the function inside the object.
-	 * @param	alias		The display name that shows on screen console. (optional) - if no alias is given, an automatic alias will be created.
-	 * @param	monitor 	If true, the function will be called every n frames and output printed. Be careful with this one.
+	 * @param	Function	The function to be registered.
+	 * @param	alias		The alias displayed in the console.
 	 */
-	public static function registerFunction(Function:Dynamic, alias:String="") {
+	public static function registerFunction(Function:Dynamic, alias:String) {
 		checkInstance();
 		GConsole.instance.registerFunction(Function, alias);
 	}
@@ -240,10 +257,22 @@ class GameConsole
 		Lib.current.stage.swapChildren(GConsole.instance, Lib.current.stage.getChildAt(Lib.current.stage.numChildren - 1));
 	}
 	
+	public static function pfBegin(sampleName:String) {
+		checkInstance();
+		GConsole.instance.profiler.begin(sampleName);
+	}
+	
+	public static function pfEnd(sampleName:String) {
+		checkInstance();
+		GConsole.instance.profiler.end(sampleName);
+	}
+	
 	//---------------------------------------------------------------------------------
 	//  PRIVATE / AUX
 	//---------------------------------------------------------------------------------
 	private static function checkInstance() {
-		if (GConsole.instance == null) init();
+		if (GConsole.instance == null) {
+			init();
+		}
 	}
 }

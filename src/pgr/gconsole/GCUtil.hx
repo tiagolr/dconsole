@@ -17,7 +17,7 @@ class GCUtil
 		return output;
 	}
 	
-	static private function processInput(input:String, command:String):Array<String>
+	static function processInput(input:String, command:String):Array<String>
 	{
 		var listResults:Array<String> = null; // list of autocomplete results.
 		var object:Dynamic = null;
@@ -43,7 +43,7 @@ class GCUtil
 		
 		else if (command == "set" || command == "print")
 		{
-			listResults = listChildren(object);
+			listResults = listObjects(object);
 		}
 		
 		// filter results
@@ -57,8 +57,8 @@ class GCUtil
 	/**
 	 * Recursivelly searches for an object following a list of object names.
 	 * Example: 
-	 *	 	Having registered object1 that contains object2 that contains object3
-	 * 		Calling lookForObject( [ "object1", "object2", "object3"] ) returns object3 object.
+	 *	 Having registered object1 that contains object2 that contains object3
+	 *   Calling lookForObject( [ "object1", "object2", "object3"] ) returns object3.
 	 * 
 	 * @param	args 	A list of words to search the object.
 	 * @return			The object found or null.
@@ -99,7 +99,7 @@ class GCUtil
 	 * Filters results not suitable for autocomplete.
 	 * Entires with different characters on the matching input positions are rejected.
 	 */
-	static private function filterResults(input:String, listOptions:Array<String>) 
+	static function filterResults(input:String, listOptions:Array<String>) 
 	{
 		var i:Int = 0;
 		var entry:String;
@@ -129,7 +129,12 @@ class GCUtil
 		}
 	}
 
-	static public function listFunctions(object:Dynamic):Array<String> {
+	/**
+	 * Lists objects inside object passed
+	 * @param	object
+	 * @return
+	 */
+	static function listFunctions(object:Dynamic):Array<String> {
 		var results:Array<String> = new Array<String>();
 		
 		if (object == null) {
@@ -150,7 +155,11 @@ class GCUtil
 		return results;
 	}
 	
-	static public function listChildren(object:Dynamic):Array<String> {
+	
+	/**
+	 *  Lists other objects inside object passed.
+	 */
+	static function listObjects(object:Dynamic):Array<String> {
 		var results:Array<String> = new Array<String>(); 
 		
 		if (object == null) {
@@ -167,11 +176,9 @@ class GCUtil
 	}
 	
 	/**
-	 * Lists object functions, children objects or variables.
-	 * 
-	 * @param includeFunction
+	 * Lists fields inside object, fields are optionaly functions, objects, or variables.
 	 */
-	static public function listFields(object:Dynamic, functions:Bool, objects:Bool, variables:Bool):Array<String> {
+	static function listFields(object:Dynamic, functions:Bool, objects:Bool, variables:Bool):Array<String> {
 		var results:Array<String> = new Array<String>();
 			
 		var fields = Type.getInstanceFields(Type.getClass(object));
@@ -218,41 +225,18 @@ class GCUtil
 		
 		return promptTxt;
 	}
-
-	static public function generateFunctionAlias(Function:Dynamic):String {
-		return "tmpAlias";
-	}
 	
-	static public function generateAlias(type:String, object:Dynamic, name:String="", alias:String):String
-	{
-		var map:Map<String,Dynamic>;
-		var autoAlias:String;
-		switch (type) {
-			case "function" : 
-							map = GCCommands.functionsMap;
-							autoAlias = Type.getClassName(Type.getClass(object)).toLowerCase() + "_" + name;
-			case "object"	: 
-							map = GCCommands.objectsMap;
-							autoAlias = Type.getClassName(Type.getClass(object)).toLowerCase();
-							
-			default 		: throw "Unknown alias type: " + type;
-		}
-		
-		
+	
+	static public function generateObjectAlias(object:Dynamic):String {
+		var alias = Type.getClassName(Type.getClass(object)).toLowerCase();
 		var i:Int = 1;
-		while (true) {
-			if (map.exists(autoAlias)) {
-				if (i > 1)
-					autoAlias = autoAlias.substring(0, autoAlias.length - Std.string(i).length - 1); // removes added number
-				autoAlias += "_" + Std.string(i);
-				i++;
-			}
-			else {
-				break;
-			}
+		
+		while (GCCommands.getObject(alias) != null) {
+			alias = Type.getClassName(Type.getClass(object)).toLowerCase() + Std.string(i);
+			i++;
 		}
 		
-		return autoAlias;
+		return alias;
 	}
 	
 }

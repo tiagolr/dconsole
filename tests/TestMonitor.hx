@@ -8,11 +8,11 @@ import pgr.gconsole.GameConsole;
 import pgr.gconsole.GConsole;
 
 /**
- * Tests console runtime commands.
+ * Tests console object and function register.
  * 
  * @author TiagoLr ( ~~~ProG4mr~~~ )
  */
-class TestCommands extends TestCase
+class TestMonitor extends TestCase
 {	 
 	var interfc:GCInterface;
 	var console:GConsole;
@@ -38,21 +38,29 @@ class TestCommands extends TestCase
 		GameConsole.disable();
 		GConsole.instance = null;
 	}
-	
-	/** */
-	public function testSet() {
-		// test set command
+
+	// test response with console disabled
+	public function testDisable() {
 		assertTrue(true);
 	}
 	
-	public function testCall() {
-		// test call command
+	public function testVisibility() {
 		assertTrue(true);
+		
+		// test monitor show and hide
+		// test profiler must not be visible at same time
+		// test shortcut key
 	}
 	
-	public function testPrint() {
-		// test print command
-		assertTrue(true);
+	public function testAddField() {
+		
+		// test adding diferent kinds of fields
+	}
+	
+	public function testOutput() {
+		
+		// test monitoring fields, 
+		// manipulate those fields and see result in the output
 	}
 	
 }

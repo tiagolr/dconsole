@@ -13,7 +13,7 @@ typedef Register = {
 	var completion:String -> Array<String>;
 }
 /**
- * GCCommands contains the logic used by GameConsole to execute the commands
+ * GCCommands contains the logic used by GC to execute the commands
  * given by the user.
  *
  * @author TiagoLr ( ~~~ProG4mr~~~ )
@@ -30,16 +30,10 @@ class GCCommands
 	//---------------------------------------------------------------------------------
 	static public function registerFunction(Function:Dynamic, alias:String) {
 		
-		// generate new alias
-		if (alias == "") {
-			alias = GCUtil.generateFunctionAlias(Function); 
-		}
-		
 		// override existing function
 		if (functionsMap.exists(alias)) {
-			GameConsole.logWarning("function " + alias + " overriden");
+			GC.logWarning("function " + alias + " overriden");
 		}
-		
 		
 		functionsMap.set(alias, Function);
 	}
@@ -47,12 +41,11 @@ class GCCommands
 	
 	static public function registerObject(object:Dynamic, alias:String) {
 		if (alias == "") {
-			alias = GCUtil.generateAlias("object", object, "", alias);
+			alias = GCUtil.generateObjectAlias(object);
 		}
-		
 
 		if (objectsMap.exists(alias)) {
-			GameConsole.logWarning("object " + alias + " overriden.");
+			GC.logWarning("object " + alias + " overriden.");
 		}
 
 		objectsMap.set(alias, object);
@@ -93,7 +86,7 @@ class GCCommands
 		output.add("Use 'PAGEUP' or 'PAGEDOWN' to scroll this console text.\n");
 		output.add("Use 'UP' or 'DOWN' keys to view recent commands history.\n");
 		output.add("Use 'CTRL' + 'SPACE' for AUTOCOMPLETE.\n");
-		GameConsole.logInfo(output);
+		GC.logInfo(output);
 	}
 
 	
@@ -108,7 +101,7 @@ class GCCommands
 		output.add("SET [variable] [value]      assigns value to variable.\n");
 		output.add("CALL [function] [args]*     calls function.\n");
 		
-		GameConsole.logInfo(output);
+		GC.logInfo(output);
 	}
 
 	/**
@@ -124,7 +117,7 @@ class GCCommands
 		var funcName:String = "";
 		
 		if (Args.length == 0) {
-			GameConsole.logError("incorrect number of arguments");
+			GC.logError("incorrect number of arguments");
 			return;
 		}
 
@@ -138,11 +131,11 @@ class GCCommands
 				funcName = objArgs.pop(); // remove function call
 				object = GCUtil.lookForObject(objArgs);
 				if (object == null) {
-					GameConsole.logError("function not found");
+					GC.logError("function not found");
 					return;
 				}
 			} else {
-				GameConsole.logError("function not found");
+				GC.logError("function not found");
 				return;
 			}
 		}
@@ -155,7 +148,7 @@ class GCCommands
 			} else {
 				Reflect.callMethod(object, Reflect.getProperty(object, funcName), Args);
 			}
-			GameConsole.logConfirmation("done");
+			GC.logConfirmation("done");
 		}
 		catch (e:ArgumentError) {
 			if (e.errorID == 1063) {
@@ -173,12 +166,12 @@ class GCCommands
 				}
 				// ...but not with too few
 				else {
-					GameConsole.logError("invalid number or parameters: " + expected + " expected, " + Args.length + " passed");
+					GC.logError("invalid number or parameters: " + expected + " expected, " + Args.length + " passed");
 				}
 			}
 		}
 		catch (e:Error) {
-			GameConsole.logError("function not found");
+			GC.logError("function not found");
 		}
 	}
 	
@@ -198,7 +191,7 @@ class GCCommands
 		var varName:String = "";
 		
 		if (args.length < 2) {
-			GameConsole.logError("incorrect number of arguments");
+			GC.logError("incorrect number of arguments");
 			return;
 		}
 		
@@ -208,11 +201,11 @@ class GCCommands
 			varName = objArgs.pop(); // remove function call
 			object = GCUtil.lookForObject(objArgs);
 			if (object == null) {
-				GameConsole.logError("object not found");
+				GC.logError("object not found");
 				return;
 			}
 		} else {
-			GameConsole.logError("property not found");
+			GC.logError("property not found");
 			return;
 		}
 		
@@ -224,13 +217,13 @@ class GCCommands
 			
 			if (print) {
 				var p = Reflect.getProperty(object, varName);
-				GameConsole.log(p);
+				GC.log(p);
 			} else {
-				GameConsole.logConfirmation("done");
+				GC.logConfirmation("done");
 			}
 			
 		} catch (e:Error) {
-			GameConsole.logError("failed to set property");
+			GC.logError("failed to set property");
 			return;
 		} 
 	}
@@ -243,9 +236,9 @@ class GCCommands
 		}
 
 		if (list.toString() == "") {
-			GameConsole.logInfo("no functions registered.");
+			GC.logInfo("no functions registered.");
 		} else {
-			GameConsole.logConfirmation(list);
+			GC.logConfirmation(list);
 		}
 	}
 
@@ -258,27 +251,12 @@ class GCCommands
 		}
 
 		if (list.toString() == '') {
-			GameConsole.logInfo("no objects registered.");
+			GC.logInfo("no objects registered.");
 		} else 
-			GameConsole.logConfirmation(list);
+			GC.logConfirmation(list);
 	}
 
 	
-	public static function getMonitorOutput():String {
-		/*var output:StringBuf = new StringBuf();
-		for (v in propertiesMap.iterator())
-			if (v.monitor)
-				output.add(v.alias + ':' + Reflect.getProperty(v.object, v.name) + '\n');
-
-		for (f in functionsMap.iterator())
-			if (f.monitor)
-				output.add(f.alias + ':' + Reflect.callMethod(null, Reflect.getProperty(f.object, f.name), null) + '\n');
-
-		return Std.string(output);*/
-		return "";
-	}
-	
-
 	static public function getFunction(alias:String):Register {
 		if (functionsMap.exists(alias))
 			return functionsMap.get(alias);

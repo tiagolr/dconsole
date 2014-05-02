@@ -1,4 +1,5 @@
 package pgr.gconsole;
+import pgr.gconsole.GCThemes.Theme;
 
 
 // alpha values are shared by console and prompt
@@ -31,6 +32,8 @@ package pgr.gconsole;
   */
 class GCThemes 
 {
+	static public var current:Theme;
+	
 	static public var LIGHT:Theme = {
 		CON_C 		: 0xc5c5c5, 
 		CON_TXT_C 	: 0x0,
