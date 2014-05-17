@@ -180,12 +180,12 @@ class GCInterface extends Sprite
 	}
 	
 	
-	public function clearInputText() {
+	public function clearInput() {
 		txtPrompt.text = "";
 	}
 	
 	
-	public function clearConsoleText() {
+	public function clearConsole() {
 		txtConsole.text = "";
 	}
 

@@ -234,12 +234,17 @@ class GC
 		checkInstance();
 		GConsole.instance.unregisterFunction(alias);
 	}
+	
+	public static function unregisterObject(alias:String) {
+		checkInstance();
+		GConsole.instance.unregisterObject(alias);
+	}
 	/**
 	 * Clears console logs.
 	 */
 	public static function clearConsole() {
 		checkInstance();
-		GConsole.instance.clearConsoleText();
+		GConsole.instance.clearConsole();
 	}
 	/**
 	 * Removes all entrys from registry.
@@ -247,6 +252,24 @@ class GC
 	public static function clearRegistry() {
 		checkInstance();
 		GCCommands.clearRegistry();
+	}
+	
+	/**
+	 *  Resets profiler history and samples.
+	 *  If any samples are running, clear will be canceled and a warning will be logged on the
+	 *  console.
+	 */
+	static public function clearProfiler() {
+		checkInstance();
+		GConsole.instance.profiler.clear();
+	}
+	
+	/**
+	 * Removes all registered fields from monitor
+	 */
+	public static function clearMonitor() {
+		checkInstance();
+		GConsole.instance.monitor.clear();
 	}
 	/**
 	 * Brings console to front in stage. 
@@ -257,12 +280,19 @@ class GC
 		Lib.current.stage.swapChildren(GConsole.instance, Lib.current.stage.getChildAt(Lib.current.stage.numChildren - 1));
 	}
 	
-	public static function pfBegin(sampleName:String) {
+	/**
+	 * Begins profiling sample, use endProfile(sampleName) to display
+	 * time elapsed statistics between the two calls inside console profiler.
+	 */
+	public static function beginProfile(sampleName:String) {
 		checkInstance();
 		GConsole.instance.profiler.begin(sampleName);
 	}
-	
-	public static function pfEnd(sampleName:String) {
+	/**
+	 * Ends the sample and dumps output to the profiler if this sample has no
+	 * other parent samples.
+	 */
+	public static function endProfile(sampleName:String) {
 		checkInstance();
 		GConsole.instance.profiler.end(sampleName);
 	}

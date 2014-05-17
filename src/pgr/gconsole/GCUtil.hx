@@ -67,6 +67,10 @@ class GCUtil
 		var object:Dynamic = null;
 		var objectName = args.shift();
 		
+		if (objectName == null) {
+			return null; // bug fix
+		}
+		
 		if (parent == null) {
 			
 			// first entry, fetch object from registered objects

@@ -3,8 +3,9 @@ import flash.ui.Keyboard;
 import haxe.unit.TestCase;
 import flash.events.KeyboardEvent;
 import flash.Lib;
+import pgr.gconsole.GCCommands;
 import pgr.gconsole.GCInterface;
-import pgr.gconsole.GameConsole;
+import pgr.gconsole.GC;
 import pgr.gconsole.GConsole;
 
 /**
@@ -22,54 +23,89 @@ class TestRegister extends TestCase
 	
 	override public function setup() {
 		if (console == null) {
-			GameConsole.init();
+			GC.init();
 			console = GConsole.instance;
-			interfc = console._interface;
+			interfc = console.interfc;
 		}
 		
-		console.setShortcutKeyCode(Keyboard.TAB);
-		interfc.clearInputText();
-		console.clearConsoleText();
-		console.enable();
-		console.showConsole();
+		GC.clearRegistry();
 	}
-	
-	override public function tearDown() {
-		GameConsole.disable();
-		GConsole.instance = null;
-	}
-
 	
 	public function testRegisterMethods() {
 		
-		// register existing method
-		// register null
-		// register varied types (non functions)
-		// register methods with same alias
-		// register methods with wierd alias
+		// test registering non functions		
+		GC.registerFunction(null, " "); 
+		GC.registerFunction(this, " ");
+		GC.registerFunction("", " ");
+		// test registering bad alias
+		GC.registerFunction(TestRegister.testF1(), "");
 		
-		// unregister method that exists
-		// unregister method that does not exist
-		// unregister method with wierd alias
-		// unregister null
+		assertTrue(Lambda.array(GCCommands.functionsMap).length == 0);
 		
-		assertTrue(true);
+		// test registering methods with same alias 
+		GC.registerFunction(testF2, "f1");
+		GC.registerFunction(testF1, "f1");
+		
+		assertTrue(Lambda.array(GCCommands.functionsMap).length == 1);
+		
+		// test unregister
+		GC.unregisterFunction("test alias");
+		GC.unregisterFunction("f1");
+		
+		assertTrue(Lambda.array(GCCommands.functionsMap).length == 0);
 	}
 	
 	public function testRegisterObjects() {
 		
-		// register existing object
-		// register null
-		// register varied types (non object)
-		// register object with same alias
-		// register object with wierd alias
+		// test register non objects
+		GC.registerObject(null);
+		GC.registerObject(testF1);
+		GC.registerObject(1234);
+		GC.registerObject(true);
 		
-		// unregister object that exists
-		// unregister object that does not exist
-		// unregister object with wierd alias
-		// unregister null
+		assertTrue(Lambda.array(GCCommands.objectsMap).length == 0);
 		
-		assertTrue(true);
+		// duplicate register.
+		GC.registerObject(this, "this");
+		GC.registerObject(this, "this");
+		
+		assertTrue(Lambda.array(GCCommands.objectsMap).length == 1);
+		
+		// test unique alias generation
+		GC.registerObject(this);
+		GC.registerObject(this);
+		
+		assertTrue(Lambda.array(GCCommands.objectsMap).length == 3);
+		
+		// test unregister object
+		GC.unregisterObject("test alias");
+		GC.unregisterObject("this");
+		
+		assertTrue(Lambda.array(GCCommands.objectsMap).length == 2);
 	}
 	
+	public function testClear() {
+		
+		GC.registerFunction(testF1, "testF1");
+		GC.registerObject(this, "this");
+		
+		assertTrue(Lambda.array(GCCommands.functionsMap).length == 1);
+		assertTrue(Lambda.array(GCCommands.objectsMap).length == 1);
+		
+		GC.clearRegistry();
+		
+		assertTrue(Lambda.array(GCCommands.functionsMap).length == 0);
+		assertTrue(Lambda.array(GCCommands.objectsMap).length == 0);
+	}
+	
+	//---------------------------------------------------------------------------------
+	//  AUX
+	//---------------------------------------------------------------------------------
+	public static function testF1():String {
+		return "F1";
+	}
+	
+	public static function testF2():String {
+		return "F2";
+	}
 }

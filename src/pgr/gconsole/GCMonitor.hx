@@ -33,6 +33,7 @@ class GCMonitor extends Sprite {
 	public function new() {
 		super();
 		
+		startTime = 0;
 		refreshRate = 100;
 		output = new Array<String>();
 		
@@ -56,19 +57,21 @@ class GCMonitor extends Sprite {
 		txtMonitorLeft = new TextField();
 		txtMonitorLeft.selectable = false;
 		txtMonitorLeft.multiline = true;
+		txtMonitorLeft.wordWrap = true;
 		txtMonitorLeft.alpha = GCThemes.current.MON_TXT_A;
 		txtMonitorLeft.x = 0;
-		txtMonitorLeft.width = Lib.current.stage.width / 2;
-		txtMonitorLeft.height = Lib.current.stage.height;
+		txtMonitorLeft.width = Lib.current.stage.stageWidth / 2;
+		txtMonitorLeft.height = Lib.current.stage.stageHeight;
 		addChild(txtMonitorLeft);
 		
 		txtMonitorRight = new TextField();
 		txtMonitorRight.selectable = false;
 		txtMonitorRight.multiline = true;
+		txtMonitorRight.wordWrap = true;
 		txtMonitorRight.alpha = GCThemes.current.MON_TXT_A;
-		txtMonitorRight.x = Lib.current.stage.width / 2;
-		txtMonitorRight.width = Lib.current.stage.width / 2;
-		txtMonitorRight.height = Lib.current.stage.height;
+		txtMonitorRight.x = Lib.current.stage.stageWidth / 2;
+		txtMonitorRight.width = Lib.current.stage.stageWidth / 2;
+		txtMonitorRight.height = Lib.current.stage.stageHeight;
 		addChild(txtMonitorRight);
 		
 		// loads default font.
@@ -97,7 +100,7 @@ class GCMonitor extends Sprite {
 		
 		graphics.lineStyle(1, GCThemes.current.MON_TXT_C);
 		graphics.moveTo(0, txtMonitorLeft.textHeight);
-		graphics.lineTo(Lib.current.stage.width, txtMonitorLeft.textHeight);
+		graphics.lineTo(Lib.current.stage.stageWidth, txtMonitorLeft.textHeight);
 		
 		txtMonitorLeft.text += "\n";
 		txtMonitorRight.text += "\n";
@@ -110,7 +113,6 @@ class GCMonitor extends Sprite {
 			} else {
 				txtMonitorRight.text += output.shift();
 			}
-			
 			i++;
 		}
 	}
@@ -143,6 +145,10 @@ class GCMonitor extends Sprite {
 		fields.push(mfield);
 	}
 	
+	public function clear() {
+		fields = new Array<MonitorField>();
+	}
+	
 	
 	public function setRefreshRate(refreshRate:Int) {
 		this.refreshRate = refreshRate;
@@ -157,7 +163,7 @@ class GCMonitor extends Sprite {
 	}
 	
 	
-	private function refresh(e:Event):Void {
+	public function refresh(e:Event):Void {
 		var elapsed = Lib.getTimer() - startTime;
 		
 		if (elapsed > refreshRate || e == null) {
@@ -177,5 +183,4 @@ class GCMonitor extends Sprite {
 		}
 	}
 	
-
 }

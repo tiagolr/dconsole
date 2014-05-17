@@ -4,7 +4,7 @@ import haxe.unit.TestCase;
 import flash.events.KeyboardEvent;
 import flash.Lib;
 import pgr.gconsole.GCInterface;
-import pgr.gconsole.GameConsole;
+import pgr.gconsole.GC;
 import pgr.gconsole.GConsole;
 
 /**
@@ -22,42 +22,38 @@ class TestInput extends TestCase
 	
 	override public function setup() {
 		if (console == null) {
-			GameConsole.init();
+			GC.init();
 			console = GConsole.instance;
-			interfc = console._interface;
+			interfc = console.interfc;
 		}
 		
-		console.setShortcutKeyCode(Keyboard.TAB);
-		interfc.clearInputText();
-		console.clearConsoleText();
+		console.setToggleKey(Keyboard.TAB);
+		interfc.clearInput();
+		interfc.clearConsole();
 		console.enable();
-		console.showConsole();
-	}
-	
-	override public function tearDown() {
-		GameConsole.disable();
-		GConsole.instance = null;
+		console.show();
 	}
 	
 	/**
 	 * Tests show/hide commands.
 	 */
 	public function testVisibility() {
-		console.hideConsole();
-		assertFalse(console.visible);
-		console.showConsole();
-		assertTrue(console.visible);
+		console.hide();
+		assertTrue(console.hidden);
+		console.show();
+		assertFalse(console.hidden);
 	}
 	
 	/**
 	 * Tests opening/closing console with shortcut key
 	 */
 	public function testConsoleToggleKey() {
-		console.hideConsole();
-		console.stage.dispatchEvent(new KeyboardEvent(KeyboardEvent.KEY_UP, true, false, 0, Keyboard.TAB));
-		assertTrue(console.visible);
-		console.stage.dispatchEvent(new KeyboardEvent(KeyboardEvent.KEY_UP, true, false, 0, Keyboard.TAB));
-		assertFalse(console.visible);
+		console.hide();
+		assertTrue(console.hidden);
+		pressKey(console.toggleKey);
+		assertFalse(console.hidden);
+		pressKey(console.toggleKey);
+		assertTrue(console.hidden);
 	}
 	
 	/**
@@ -65,27 +61,27 @@ class TestInput extends TestCase
 	 */
 	public function testDisable() {
 		console.disable();
-		console.stage.dispatchEvent(new KeyboardEvent(KeyboardEvent.KEY_UP, true, false, 0, Keyboard.TAB));
-		assertFalse(console.visible);
-		console.showConsole();
-		assertFalse(console.visible);
+		pressKey(console.toggleKey);
+		assertFalse(interfc.visible);
+		console.show();
+		assertFalse(interfc.visible);
 		console.enable();
-		assertTrue(console.visible);
+		assertTrue(interfc.visible);
 	}
 	
 	/**
 	 * Tests hidden console behaviour to keystrokes.
 	 */
 	public function testHiddenConsole() {
-		console.hideConsole();
+		console.hide();
 		
 		interfc.setInputTxt("SomeText");
-		console.stage.dispatchEvent(new KeyboardEvent(KeyboardEvent.KEY_UP, true, false, 0, Keyboard.ENTER)); 
+		pressKey(Keyboard.ENTER); 
 		assertTrue(interfc.getConsoleText() == "");
 		
-		console.stage.dispatchEvent(new KeyboardEvent(KeyboardEvent.KEY_UP, true, false, 0, Keyboard.TAB));
-		assertTrue(console.visible);
-		console.stage.dispatchEvent(new KeyboardEvent(KeyboardEvent.KEY_UP, true, false, 0, Keyboard.ENTER)); 
+		pressKey(console.toggleKey);
+		assertFalse(console.hidden);
+		pressKey(Keyboard.ENTER); 
 		assertFalse(interfc.getConsoleText() == "");
 	}
 	
@@ -93,24 +89,44 @@ class TestInput extends TestCase
 	public function testLogging() {
 		
 		// test clearconsole()
-		assertTrue(interfc.getConsoleText() == "");
+		assertTrue(consoleIsEmpty());
 		
 		// test simple text logging
 		console.log("testlog");
-		assertTrue(interfc.getConsoleText().lastIndexOf("testlog") != -1);
+		assertTrue(consoleHasText("testlog"));
 		
 		// test clearconsole()
-		console.clearConsoleText();
-		assertTrue(interfc.getConsoleText() == "");
-		
-		// test complex input
-		
-		// test null logging
+		console.clearConsole();
+		assertTrue(consoleIsEmpty());
 		
 		// test different data types logging - object, function, float, bool.
+		// checks results and detects if console crashes
+		console.log(null);
+		assertTrue(consoleHasText("null"));
+		
+		console.clearConsole();
+		console.log([ "1" => 1, "2" => 2, "3" => 3 ]);
+		assertFalse(consoleIsEmpty());
+		
+		console.log(this);
+		assertFalse(consoleIsEmpty());
+		
+		console.log(1234);
+		assertTrue(consoleHasText("1234"));
+		
+		console.log(1234.1234);
+		assertTrue(consoleHasText("1234.1234"));
+		
+		console.log(12 * 12);
+		assertTrue(consoleHasText("144"));
+		
+		console.log(testLogging);
+		assertTrue(consoleHasText("function"));
+		
+		console.log(true);
+		assertTrue(consoleHasText("true"));
 		
 	}
-	
 	
 	/**
 	 * Test history
@@ -118,18 +134,44 @@ class TestInput extends TestCase
 	public function testHistory() {
 		
 		// no history, try next history, previous history, prompt text remains the same.
+		console.clearHistory();
+		assertTrue(inputIsEmpty());
+		pressKey(Keyboard.UP); 
+		assertTrue(inputIsEmpty());
+		pressKey(Keyboard.DOWN); 
+		assertTrue(inputIsEmpty());
 		
 		// enter some commands.
+		interfc.setInputTxt("1");
+		pressKey(Keyboard.ENTER);
+		interfc.setInputTxt("2");
+		pressKey(Keyboard.ENTER);
+		interfc.setInputTxt("3");
+		pressKey(Keyboard.ENTER);
+		assertTrue(inputIsEmpty());
 		
 		// test previousHistory
-		
+		pressKey(Keyboard.UP);
+		assertTrue(inputHasText("3"));
+		pressKey(Keyboard.UP);
+		assertTrue(inputHasText("2"));
+		pressKey(Keyboard.UP);
+		assertTrue(inputHasText("1"));
+		pressKey(Keyboard.UP);
+		assertTrue(inputHasText("1"));
 		// test nextHistory
+		pressKey(Keyboard.DOWN);
+		assertTrue(inputHasText("2"));
+		pressKey(Keyboard.DOWN);
+		assertTrue(inputHasText("3"));
+		pressKey(Keyboard.DOWN);
+		assertTrue(inputHasText("3"));
 		
-		// test cycling history
+		pressKey(Keyboard.ENTER);
+		pressKey(Keyboard.UP);
+		pressKey(Keyboard.UP);
+		assertTrue(inputHasText("3"));
 		
-		
-		
-		assertTrue(true);
 	}
 	
 	public function testScroll() {
@@ -138,8 +180,39 @@ class TestInput extends TestCase
 		// test pageUp, see if scroll changes.
 		// test pageDown, see if scroll returns back.
 		
-		assertTrue(true);
+		for (i in 0...20) {
+			console.log("...");
+		}
 		
+		assertTrue(interfc.txtConsole.scrollV == interfc.txtConsole.maxScrollV);
+		pressKey(Keyboard.PAGE_UP);
+		assertTrue(interfc.txtConsole.scrollV < interfc.txtConsole.maxScrollV);
+		pressKey(Keyboard.PAGE_DOWN);
+		assertTrue(interfc.txtConsole.scrollV == interfc.txtConsole.maxScrollV);
+		
+	}
+	
+	//---------------------------------------------------------------------------------
+	//  AUX
+	//---------------------------------------------------------------------------------
+	private function consoleHasText(txt:String):Bool {
+		return interfc.getConsoleText().lastIndexOf(txt) != -1;
+	}
+	
+	private function consoleIsEmpty():Bool {
+		return interfc.getConsoleText() == "";
+	}
+	
+	private function inputHasText(txt:String):Bool {
+		return interfc.getInputTxt().lastIndexOf(txt) != -1;
+	}
+	
+	private function inputIsEmpty():Bool {
+		return interfc.getInputTxt() == "";
+	}
+	
+	private function pressKey(key:UInt) {
+		console.stage.dispatchEvent(new KeyboardEvent(KeyboardEvent.KEY_UP, true, false, 0, key)); 
 	}
 	
 }

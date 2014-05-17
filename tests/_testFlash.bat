@@ -6,7 +6,7 @@ set TARGET=flash
 @echo off
 :yes
 cls
-call lime test compile.xml %TARGET%
+call lime test %TARGET%
 
 SET /P ANSWER=Run tests again? (Y/N)?
 if /i {%ANSWER%}=={y} (goto :yes)

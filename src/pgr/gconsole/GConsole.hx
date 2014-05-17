@@ -43,6 +43,7 @@ class GConsole extends Sprite {
 	
 	
 	public function new(height:Float = 0.33, align:String = "DOWN", theme:GCThemes.Theme = null, monitorRate:Int = 10) {
+		
 		if (instance != null) {
 			return;
 		}
@@ -85,22 +86,22 @@ class GConsole extends Sprite {
 	
 	
 	public function show() {
+		hidden = false;
 		if (!enabled) {
 			return;
 		}
 		
-		hidden = false;
 		interfc.visible = true;
 		
 		Lib.current.stage.focus = interfc.txtPrompt;
 	}
 
 	public function hide() {
+		hidden = true;
 		if (!enabled) {
 			return;
 		}
 		
-		hidden = true;
 		interfc.visible = false;
 	}
 
@@ -110,7 +111,7 @@ class GConsole extends Sprite {
 		enabled = true;
 		
 		if (!hidden) {
-			this.visible = true;
+			show();
 		}
 		
 		// prevents duplicating events
@@ -125,7 +126,8 @@ class GConsole extends Sprite {
 	public function disable() {
 		
 		enabled = false;
-		this.visible = false;
+		interfc.visible = false;
+		
 		
 		Lib.current.stage.removeEventListener(KeyboardEvent.KEY_UP, onKeyUp, false);
 		Lib.current.stage.removeEventListener(KeyboardEvent.KEY_DOWN, onKeyDown, false);
@@ -164,10 +166,10 @@ class GConsole extends Sprite {
 	public function registerFunction(Function:Dynamic, alias:String = "") {
 
 		if (!Reflect.isFunction(Function)) {
-			throw "Function " + Std.string(Function) + " is not valid.";
+			GC.logError("Function " + Std.string(Function) + " is not valid.");
 			return;
 		}
-
+		
 		GCCommands.registerFunction(Function, alias);
 	}
 
@@ -181,21 +183,28 @@ class GConsole extends Sprite {
 	}
 	
 	
-	public function registerObject(object:Dynamic, alias:String) 
-	{
+	public function registerObject(object:Dynamic, alias:String) {
 		if (!Reflect.isObject(object)) {
-			trace("dynamic passed is not an object.");
+			GC.logError("dynamic passed is not an object.");
 			return;
 		}
 
 		GCCommands.registerObject(object, alias);
 	}
+	
+	public function unregisterObject(alias:String) {
+		if (GCCommands.unregisterObject(alias)) {
+			GC.logInfo(alias + " unregistered.");
+		} else {
+			GC.logError(alias + " not found.");
+		}
+	}
 
 	/**
 	 * Clears input text;
 	 */
-	public function clearConsoleText() {
-		interfc.clearConsoleText();
+	public function clearConsole() {
+		interfc.clearConsole();
 	}
 
 	
@@ -209,21 +218,48 @@ class GConsole extends Sprite {
 	}
 	
 	public function monitorField(object:Dynamic, fieldName:String, alias:String) {
-		if (!Reflect.isObject(object)) {
-			trace("dynamic passed is not an object.");
+		
+		
+		if (fieldName == null || fieldName == "") {
+			GC.logError("invalid fieldName");
+			return;
+		}
+		
+		if (alias == null || alias == "") {
+			GC.logError("invalid alias");
+			return;
+		}
+		
+		if (object == null || !Reflect.isObject(object)) {
+			GC.logError("invalid object.");
 			return;
 		}
 		
 		try {
 			Reflect.getProperty(object, fieldName);
 		} catch (e:Error) {
-			trace("could not find field: " + fieldName);
+			GC.logError("could not find field: " + fieldName);
 			return;
 		}
 		
 		monitor.addField(object, fieldName, alias);
 	}
-
+	
+	public function toggleMonitor() {
+		monitor.toggle(); 
+		if (monitor.visible) {
+			profiler.hide();
+		}
+	}
+	
+	public function toggleProfiler() {
+		profiler.toggle();
+		if (profiler.visible) {
+			monitor.hide();
+		}
+	}
+	
+	
 	//---------------------------------------------------------------------------------
 	//  INPUT HANDLING
 	//---------------------------------------------------------------------------------
@@ -236,15 +272,18 @@ class GConsole extends Sprite {
 	
 	private function onKeyUp(e:KeyboardEvent):Void {
 		// SHOW/HIDE MONITOR.
-		if (e.ctrlKey && !e.shiftKey && cast(e.keyCode, Int) == toggleKey) {
-			monitor.toggle();
+		if (e.ctrlKey && cast(e.keyCode, Int) == toggleKey) {
+			
+			toggleMonitor();
 			return;
 		}
 		
-		if (e.ctrlKey && e.shiftKey && cast(e.keyCode, Int) == toggleKey) {
-			profiler.toggle();
+		if (e.shiftKey && cast(e.keyCode, Int) == toggleKey) {
+			
+			toggleProfiler();
 			return;
 		}
+		
 		// SHOW/HIDE CONSOLE.
 		if (cast(e.keyCode, Int) == toggleKey) {
 			if (!hidden) {
@@ -254,6 +293,7 @@ class GConsole extends Sprite {
 			}
 			return;
 		}
+		
 		// IGNORE INPUT IF CONSOLE HIDDEN.
 		if (hidden) 
 			return;
@@ -362,9 +402,9 @@ class GConsole extends Sprite {
 		args.shift();
 		
 		switch (commandName) {
-			case "clear"	: clearConsoleText();
-			case "monitor"	: monitor.toggle();
-			case "profiler" : profiler.toggle();
+			case "clear"	: clearConsole();
+			case "monitor"	: toggleMonitor();
+			case "profiler" : toggleProfiler();
 			case "help"		: GCCommands.showHelp();
 			case "commands" : GCCommands.showCommands();
 			case "funcs"	: GCCommands.listFunctions();

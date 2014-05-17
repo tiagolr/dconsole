@@ -4,7 +4,7 @@ import haxe.unit.TestCase;
 import flash.events.KeyboardEvent;
 import flash.Lib;
 import pgr.gconsole.GCInterface;
-import pgr.gconsole.GameConsole;
+import pgr.gconsole.GC;
 import pgr.gconsole.GConsole;
 
 /**
@@ -22,24 +22,23 @@ class TestUtils extends TestCase
 	
 	override public function setup() {
 		if (console == null) {
-			GameConsole.init();
+			GC.init();
 			console = GConsole.instance;
-			interfc = console._interface;
+			interfc = console.interfc;
 		}
 		
-		console.setShortcutKeyCode(Keyboard.TAB);
-		interfc.clearInputText();
-		console.clearConsoleText();
+		console.setToggleKey(Keyboard.TAB);
+		interfc.clearInput();
+		interfc.clearConsole();
 		console.enable();
-		console.showConsole();
+		console.show();
 	}
-	
-	override public function tearDown() {
-		GameConsole.disable();
-		GConsole.instance = null;
-	}
-	
+
 	public function testAutoComplete() {
+		assertTrue(true);
+	}
+	
+	public function testAutoAlias() {
 		assertTrue(true);
 	}
 	

@@ -120,13 +120,13 @@ class GCCommands
 			GC.logError("incorrect number of arguments");
 			return;
 		}
-
+		
 		// search registry for existing function.
 		var Function = getFunction(Args[0]);
 		if (Function == null) {
 			
 			// function not found, get function name from input.
-			if (Args[0].split('.').length > 0) {
+			if (Args[0].split('.').length > 1) {
 				var objArgs = Args[0].split('.');
 				funcName = objArgs.pop(); // remove function call
 				object = GCUtil.lookForObject(objArgs);
@@ -152,26 +152,13 @@ class GCCommands
 		}
 		catch (e:ArgumentError) {
 			if (e.errorID == 1063) {
-				/* Retrieve the number of expected arguments from the error message
-				The first 4 digits in the message are the error-type (1063), 5th is 
-				the one we are looking for */
-				var expected:Int = Std.parseInt(filterDigits(e.message).charAt(4));
-				
-				// We can deal with too many parameters...
-				if (expected < Args.length) {
-					// Shorten args accordingly
-					var shortenedArgs:Array<Dynamic> = Args.slice(0, expected);
-					// Try again
-					Reflect.callMethod(null, Function, shortenedArgs);
-				}
-				// ...but not with too few
-				else {
-					GC.logError("invalid number or parameters: " + expected + " expected, " + Args.length + " passed");
-				}
+				GC.logError("incorrect number of arguments");
 			}
 		}
 		catch (e:Error) {
 			GC.logError("function not found");
+		} catch (e:String) {
+			GC.logError("failed to call function");
 		}
 	}
 	
@@ -212,7 +199,28 @@ class GCCommands
 		try {
 			
 			if (args[1] != null) {
-				Reflect.setProperty(object, varName, args[1]);
+				
+				var value:Dynamic;
+				if (args[1] == "true") // bool
+					value = true;
+				else 
+				if (args[1] == "false") // bool
+					value = false;
+				else 
+				if (Std.parseInt(args[1]) != null) { // float or int
+					var asInt = Std.parseInt(args[1]);
+					var asFloat = Std.parseFloat(args[1]);
+					
+					if (asInt == asFloat && !Math.isNaN(asFloat)) {
+						value = asInt;
+					} else {
+						value = asFloat;
+					}
+				} else {
+					value = args[1]; // string
+				}
+				
+				Reflect.setProperty(object, varName, value);
 			}
 			
 			if (print) {
@@ -225,7 +233,10 @@ class GCCommands
 		} catch (e:Error) {
 			GC.logError("failed to set property");
 			return;
-		} 
+		} catch (e:String) {
+			GC.logError("failed to set property");
+			return;
+		}
 	}
 	
 
@@ -267,7 +278,7 @@ class GCCommands
 	static public function getObject(alias:String) {
 		if (objectsMap.exists(alias)) {
 			return objectsMap.get(alias);
-		}  
+		}
 		return null;
 	}
 	
