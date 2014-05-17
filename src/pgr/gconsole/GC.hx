@@ -256,8 +256,7 @@ class GC
 	
 	/**
 	 *  Resets profiler history and samples.
-	 *  If any samples are running, clear will be canceled and a warning will be logged on the
-	 *  console.
+	 *  If any samples are running, clearProfiler will fail.
 	 */
 	static public function clearProfiler() {
 		checkInstance();
@@ -271,6 +270,7 @@ class GC
 		checkInstance();
 		GConsole.instance.monitor.clear();
 	}
+	
 	/**
 	 * Brings console to front in stage. 
 	 * Useful when other ojects are added directly to stage, hiding the console.

@@ -79,27 +79,29 @@ class GCCommands
 	//  RUNTIME COMMANDS
 	//---------------------------------------------------------------------------------
 	public static function showHelp() {
-		var output : StringBuf = new StringBuf();
-		output.add('\n');
-		output.add("Type \"COMMANDS\" to view availible commands.\n");
-		output.add("Use 'CTRL' + 'SPACE' for AUTO-COMPLETE .\n");
-		output.add("Use 'PAGEUP' or 'PAGEDOWN' to scroll this console text.\n");
-		output.add("Use 'UP' or 'DOWN' keys to view recent commands history.\n");
-		output.add("Use 'CTRL' + 'SPACE' for AUTOCOMPLETE.\n");
+		var output : String = "";
+		output += '\n';
+		output += "Type \"COMMANDS\" to view availible commands.\n";
+		output += "Use 'CTRL' + 'SPACE' for AUTO-COMPLETE .\n";
+		output += "Use 'PAGEUP' or 'PAGEDOWN' to scroll this console text.\n";
+		output += "Use 'UP' or 'DOWN' keys to view recent commands history.\n";
+		output += "Use 'CTRL' + 'SPACE' for AUTOCOMPLETE.\n";
 		GC.logInfo(output);
 	}
 
 	
 	public static function showCommands() {
-		var output : StringBuf = new StringBuf();
-		output.add('\n');
-		output.add("CLEAR                       clears console view.\n");
-		output.add("HELP                        shows help menu.\n");
-		output.add("MONITOR                     toggles monitor on or off.\n");
-		output.add("VARS                        lists availible variables.\n");
-		output.add("FUNCS                       lists availible functions.\n");
-		output.add("SET [variable] [value]      assigns value to variable.\n");
-		output.add("CALL [function] [args]*     calls function.\n");
+		var output : String = "";
+		output += '\n';
+		output += "CLEAR                       clears console view.\n";
+		output += "HELP                        shows help menu.\n";
+		output += "MONITOR                     toggles monitor on or off.\n";
+		output += "PROFILER                    toggles profiler on or off.\n";
+		output += "FUNCS                       lists availible functions.\n";
+		output += "OBJS                        lists availible objects.\n";
+		output += "SET [field] [value]     assigns value to variable.\n";
+		output += "PRINT [field]    	   prints field.\n";
+		output += "CALL [function] [args]*     calls function.\n";
 		
 		GC.logInfo(output);
 	}
