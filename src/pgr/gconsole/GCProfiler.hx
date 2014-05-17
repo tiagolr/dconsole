@@ -155,7 +155,7 @@ class GCProfiler extends Sprite {
 		
 		var sample:PFSample = samples.get(sampleName);
 		var parent:String = "";
-		
+		var elapsed = Lib.getTimer() - sample.startTime;
 		
 		if (sample.openInstances < 1) {
 			throw sampleName + " is not started";
@@ -184,7 +184,6 @@ class GCProfiler extends Sprite {
 		}
 		
 		// accumulate elapsed time
-		var elapsed = Lib.getTimer() - sample.startTime;
 		sample.elapsed += elapsed;
 		
 		// accumulate parent.childrenElapsed with sample elapsed time
@@ -207,6 +206,7 @@ class GCProfiler extends Sprite {
 		// creates new entry for this sample
 		if (history.exists(sample.name)) {
 		 	entry = history[sample.name];
+			entry.clearBranchSamples();
 			entry.update(sample);
 		} else {
 			entry = new SampleHistory(sample);
@@ -291,7 +291,7 @@ class GCProfiler extends Sprite {
 			addFormatedDisplay(entry.getRelAverage());
 			addFormatedDisplay(entry.getPercentElapsed(entry.elapsed));
 			addFormatedDisplay(entry.getPercentAverage(entry.totalElapsed));
-			addFormatedDisplay(Std.string(entry.instances));
+			addFormatedDisplay(Std.string(entry.branchInstances));
 			txtOutput.text += " " + entry.getFormattedName();
 			txtOutput.text += "\n";
 			
@@ -300,7 +300,7 @@ class GCProfiler extends Sprite {
 				addFormatedDisplay(child.getRelAverage());
 				addFormatedDisplay(child.getPercentElapsed(entry.elapsed));
 				addFormatedDisplay(child.getPercentAverage(entry.totalElapsed));
-				addFormatedDisplay(Std.string(child.instances));
+				addFormatedDisplay(Std.string(child.branchInstances));
 				txtOutput.text += " " + child.getFormattedName();
 				txtOutput.text += "\n";
 			}
@@ -320,6 +320,7 @@ class SampleHistory {
 	public var avgElapsed:Int = 0;
 	public var childrenElapsed:Int = 0;
 	public var totalChildrenElapsed:Int = 0;
+	public var branchInstances:Int = 0;
 	public var instances:Int = 0;
 	public var numParents:Int = 0;
 	
@@ -336,12 +337,14 @@ class SampleHistory {
 		minElapsed = elapsed;
 		maxElapsed = elapsed;
 		
-		this.childrenElapsed = s.childrenElapsed;
-		this.instances = s.instances;
-		this.numParents = s.numParents;
-		
-		this.totalElapsed += elapsed;
-		this.totalChildrenElapsed += childrenElapsed;
+		update(s);
+	}
+	
+	public function clearBranchSamples() {
+		branchInstances = 0;
+		for (child in childHistory) {
+			child.branchInstances = 0;
+		}
 	}
 	
 	public function update(s:PFSample) {
@@ -361,6 +364,7 @@ class SampleHistory {
 		}
 		
 		this.instances += s.instances;
+		this.branchInstances += s.instances;
 		this.numParents = s.numParents;
 		
 		this.totalElapsed += elapsed;
