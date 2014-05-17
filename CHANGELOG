@@ -1,0 +1,32 @@
+V 3.0.0
+
+* Reverted main api to GC instead of GameConsole, easier to use.
+* Function registering changed, it now registers a pointer to the function instead of the function name + object
+* Field registering removed (use object instead).
+* Added print command to print field values in runtime.
+* Added unit tests.
+* Lots of internal fixes and improvements.
+
+Monitor
+* Monitor fields are now registered using GC.MonitorField()	
+* Monitor no longer supports functions, only fields
+
+Profiler
+* Added profiler 
+
+
+V 2.00
+
+* AutoAlias - If no alias is passed, an alias is generated based on the class name.
+* Message logging can now be colored.
+* Can now register objects and access its methods and functions(eg: set registeredMC.x 20)
+* AutoComplete works for one level of depth (does not work yet for object.object.field).
+* Arguments autocomplete by A.Pecheney. (toggle arguments key = "F1" atm)
+
+
+V 1.10
+
+* Gconsole works with flash and neko targets without nme lib.
+* Flash, cpp and neko targets have been tested and working fine.
+* If you're not using Windows, default font may look bad, use GameConsole.setConsoleFont() in that case.
+* The main interface has been renamed from GC to GameConsole.
