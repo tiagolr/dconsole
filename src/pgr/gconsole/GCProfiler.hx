@@ -124,7 +124,7 @@ class GCProfiler extends Sprite {
 			sample.openInstances++;
 			sample.instances++;
 			sample.startTime = Lib.getTimer();
-			sample.childrenElapsed = 0;
+			//sample.childrenElapsed = 0;
 			
 			if (sample.openInstances > 1) {
 				throw sampleName + " already started.";
@@ -165,11 +165,11 @@ class GCProfiler extends Sprite {
 		
 		// find sample most direct parent (if any)
 		sample.numParents = 0;
+		
 		for (s in samples.iterator()) {
 			if (s.openInstances > 0 && s.name != sample.name) { // any other opened samples are parents.
 				
 				sample.numParents++;
-				
 				// set newly found parent.
 				if (parent == "") {
 					parent = s.name; 
@@ -213,7 +213,6 @@ class GCProfiler extends Sprite {
 			history.set(entry.name, entry);
 		}
 		
-		// clears all samples after top tree sample has finished.
 		for (s in samples.iterator()) {
 			
 			// updates children entries for the sample.
@@ -221,6 +220,7 @@ class GCProfiler extends Sprite {
 				entry.addChildEntry(samples[s.name]);
 			}
 			
+			// clears all samples after top tree sample has finished.
 			s.numParents = 0;
 			s.elapsed = 0;
 			s.openInstances = 0;
