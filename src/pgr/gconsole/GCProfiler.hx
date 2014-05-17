@@ -155,7 +155,6 @@ class GCProfiler extends Sprite {
 		
 		var sample:PFSample = samples.get(sampleName);
 		var parent:String = "";
-		var elapsed:Int;
 		
 		
 		if (sample.openInstances < 1) {
@@ -214,14 +213,14 @@ class GCProfiler extends Sprite {
 			history.set(entry.name, entry);
 		}
 		
-		// updates children entries for the sample.
+		// clears all samples after top tree sample has finished.
 		for (s in samples.iterator()) {
 			
+			// updates children entries for the sample.
 			if (s.numParents > 0 && s.name != sample.name) {
 				entry.addChildEntry(samples[s.name]);
 			}
 			
-			// clear sample after registering history.
 			s.numParents = 0;
 			s.elapsed = 0;
 			s.openInstances = 0;
@@ -250,7 +249,7 @@ class GCProfiler extends Sprite {
 		
 		if (elapsed > refreshRate || e == null) {
 			
-			// refreshes monitor screen
+			 //refreshes monitor screen
 			writeOutput();
 			startTime = Lib.getTimer();
 		}
@@ -290,7 +289,7 @@ class GCProfiler extends Sprite {
 			
 			addFormatedDisplay(entry.getRelElapsed());
 			addFormatedDisplay(entry.getRelAverage());
-			addFormatedDisplay(entry.getPercentElapsed(entry.totalElapsed));
+			addFormatedDisplay(entry.getPercentElapsed(entry.elapsed));
 			addFormatedDisplay(entry.getPercentAverage(entry.totalElapsed));
 			addFormatedDisplay(Std.string(entry.instances));
 			txtOutput.text += " " + entry.getFormattedName();
@@ -299,7 +298,7 @@ class GCProfiler extends Sprite {
 			for (child in entry.childHistory.iterator()) {
 				addFormatedDisplay(child.getRelElapsed());
 				addFormatedDisplay(child.getRelAverage());
-				addFormatedDisplay(child.getPercentElapsed(entry.totalElapsed));
+				addFormatedDisplay(child.getPercentElapsed(entry.elapsed));
 				addFormatedDisplay(child.getPercentAverage(entry.totalElapsed));
 				addFormatedDisplay(Std.string(child.instances));
 				txtOutput.text += " " + child.getFormattedName();
@@ -347,7 +346,7 @@ class SampleHistory {
 	
 	public function update(s:PFSample) {
 		if (s.name != name) {
-			throw "updateing history from different sample.";
+			throw "updating history from different sample.";
 		}
 		
 		this.childrenElapsed = s.childrenElapsed;
@@ -427,14 +426,14 @@ class SampleHistory {
 	/**
 	 * Gets relative time usage percentage 
 	 */
-	public function getPercentElapsed(totalTime:Int):String {
-		return Std.string(Std.int((elapsed - childrenElapsed) * 100 / totalTime * 10) / 10);
+	public function getPercentElapsed(parentElapsed:Int):String {
+		return Std.string(Std.int((elapsed - childrenElapsed) * 100 / parentElapsed * 10) / 10);
 	}
 	/**
 	 * 
 	 */
 	public function getPercentAverage(totalTime:Int):String {
-		return Std.string(Std.int((totalElapsed - totalChildrenElapsed) / nLogs * 100 / totalTime * 10) / 10);
+		return Std.string(Std.int((totalElapsed - totalChildrenElapsed) * 100 / totalTime * 10) / 10);
 	}
 	/**
 	 * Returns idented name.
