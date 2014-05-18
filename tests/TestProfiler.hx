@@ -240,27 +240,19 @@ class TestProfiler extends TestCase
 	}
 	
 	function existsSample(s:String):Bool {
-		return profiler.samples.exists(s);
+		return (profiler.getSample(s) != null);
 	}
 	
 	function getSample(s:String):PFSample {
-		if (!profiler.samples.exists(s)) {
-			return null;
-		}
-		
-		return profiler.samples.get(s);
+		return profiler.getSample(s);
 	}
 	
 	function existsHistory(s:String):Bool {
-		return profiler.history.exists(s);
+		return (profiler.getHistory(s) != null);
 	}
 	
 	function getHistory(s:String):SampleHistory {
-		if (!profiler.history.exists(s)) {
-			return null;
-		}
-		
-		return profiler.history.get(s);
+		return profiler.getHistory(s);
 	}
 	
 	function delaySample(sampleName:String, delay:Int) {
@@ -276,18 +268,8 @@ class TestProfiler extends TestCase
 		}
 	}
 	
-	function hasChild(sampleName:String, childName:String):Bool {
-		var sampleH = getHistory(sampleName);
-		
-		return sampleH.childHistory.exists(childName);
-	}
-	
 	function getChild(sampleName:String, childName:String):SampleHistory {
-		if (!hasChild(sampleName, childName)) {
-			return null;
-		}
-		
-		return getHistory(sampleName).childHistory.get(childName);
+		return getHistory(sampleName).getChild(childName);
 	}
 	
 }

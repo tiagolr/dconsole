@@ -316,7 +316,7 @@ class GCProfiler extends Sprite {
 		}
 	}
 	
-	function getSample(sampleName):PFSample {
+	public function getSample(sampleName):PFSample {
 		for (sample in samples) {
 			if (sample.name == sampleName) {
 				return sample;
@@ -325,7 +325,7 @@ class GCProfiler extends Sprite {
 		return null;
 	}
 	
-	function getHistory(entryName):SampleHistory {
+	public function getHistory(entryName):SampleHistory {
 		for (entry in history) {
 			if (entry.name == entryName) {
 				return entry;
@@ -475,7 +475,7 @@ class SampleHistory {
 		return s;
 	}
 	
-	function getChild(childName):SampleHistory {
+	public function getChild(childName):SampleHistory {
 		for (child in childHistory) {
 			if (child.name == childName) {
 				return child;
