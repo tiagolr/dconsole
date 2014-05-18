@@ -45,15 +45,56 @@ For more help and check the [Wiki](https://github.com/ProG4mr/gconsole/wiki) (ma
 
 ### Screenshots<br />
 
-comming soon
+A screen shot of gconsole running on Adam's Atomic Mode game.<br />
 
-### Profiler<br />
-
+![ss](http://i1148.photobucket.com/albums/o562/ProG4mr/gameconsole_zpsca86ae2d.jpg "ss")
+<br /> <br />
 comming soon
 
 ### Monitor<br />
 
-comming soon.
+Allows to follow the values of registered fields, (including private fields and with getter methods)<br />
+
+For example, to monitor player x position:
+```js
+CG.monitorField(player, "x", "playerX")  
+```
+
+Thats it! Press **CTRL + TAB** to bring the monitor up inside the game <br />
+![monitor](http://i1148.photobucket.com/albums/o562/ProG4mr/monitor_zps1cba1388.jpg "monitor")
+<br /> <br />
+
+
+### Profiler<br />
+
+GCProfiler is lightweight and portable, it allows to know in runtime:
+
+* What code is taking more cpu
+* How many times is some code executed inside other code block.
+* How much time code takes to execute (benchmark)
+* Other statistics not displayed (absolute elapsed, min, max, totalInstances etc..)
+
+To profile a block simply do:
+```js
+GC.beginProfile("SampleName");
+GC.endProfile("SampleName");
+```
+To toggle the profiler use **SHIFT + TAB**. <br />
+The screenshot below shows multiple nested samples, idents are used to show the samples hierarchy.<br />
+
+![profiler](http://i1148.photobucket.com/albums/o562/ProG4mr/profiler_zps30be5bb6.jpg "profiler")
+<br /> 
+* **EL** elapsed milliseconds)
+* **AVG** average elapsed milliseconds)
+* **EL(%)** elapsed percentage
+* **AVG(%)** average elapsed percentage
+* **#** Occurrences of sample inside root sample
+* **Name** Sample name
+<br />
+
+More documentation and examples comming soon.
+
+
 
 ### Suggestions / Comments / Bugs 
 
