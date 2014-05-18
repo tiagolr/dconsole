@@ -33,17 +33,17 @@ class GCProfiler extends Sprite {
 	public var refreshTimer(default, null):Int;
 	public var refreshRate(default, null):Int;
 	
-	public var samples:Map<String,PFSample>;
+	public var samples:Array<PFSample>;
+	public var history:Array<SampleHistory>;
 	public var txtOutput:TextField;
-	public var history:Map<String, SampleHistory>;
 	
 	public function new() {
 		super();
 		
 		refreshRate = 100;
-		history = new Map<String, SampleHistory>();
+		history = new Array<SampleHistory>();
 		
-		samples = new Map<String, PFSample>();
+		samples = new Array<PFSample>();
 		create();
 		
 	}
@@ -55,8 +55,8 @@ class GCProfiler extends Sprite {
 			}
 		}
 		
-		history = new Map<String, SampleHistory>();
-		samples = new Map<String, PFSample>();
+		history = new Array<SampleHistory>();
+		samples = new Array<PFSample>();
 	}
 	//---------------------------------------------------------------------------------
 	//  VISUAL
@@ -118,11 +118,11 @@ class GCProfiler extends Sprite {
 	
 	public function begin(sampleName:String) {
 		
-		var sample:PFSample;
+		var sample:PFSample = getSample(sampleName);
 		
-		if (samples.exists(sampleName)) {
+		if (sample != null) {
 			
-			sample = samples.get(sampleName);
+			// reset some stats and relaunch sample.
 			sample.openInstances++;
 			sample.instances++;
 			sample.startTime = Lib.getTimer();
@@ -146,18 +146,20 @@ class GCProfiler extends Sprite {
 				childrenElapsed:0
 			};
 			
-			samples.set(sampleName, sample);
+			samples.push(sample);
 		}
 		
 		setSampleParent(sample);
 	}
 	
 	public function end(sampleName:String) {
-		if (!samples.exists(sampleName)) {
+		var sample:PFSample = getSample(sampleName);
+		
+		if (sample == null) {
 			throw sampleName + "not found";
 		}
 		
-		var sample:PFSample = samples.get(sampleName);
+		
 		var endTime = Lib.getTimer();
 		var elapsed = endTime - sample.startTime;
 		
@@ -172,7 +174,7 @@ class GCProfiler extends Sprite {
 		
 		// accumulate parent.childrenElapsed with sample elapsed time
 		if (sample.parentName != "") {		
-			samples[sample.parentName].childrenElapsed += elapsed;
+			getSample(sample.parentName).childrenElapsed += elapsed;
 		}
 		
 		// if this sample is not nested, create (or update) output for sample and its children
@@ -184,24 +186,23 @@ class GCProfiler extends Sprite {
 	
 	
 	private function createHistory(sample:PFSample) {	
-		var entry:SampleHistory;
+		var entry:SampleHistory = getHistory(sample.name);
 		
-		// updates history existing entry or 
-		// creates new entry for this sample
-		if (history.exists(sample.name)) {
-		 	entry = history[sample.name];
+		// updates history entry
+		if (entry != null) {
 			entry.clearBranchSamples();
 			entry.update(sample);
 		} else {
+			// creates new entry
 			entry = new SampleHistory(sample);
-			history.set(entry.name, entry);
+			history.push(entry);
 		}
 		
-		for (s in samples.iterator()) {
+		for (s in samples) {
 			//
 			// updates children entries for the sample.
 			if (s.numParents > 0 && s.name != sample.name) {
-				entry.addChildEntry(samples[s.name]);
+				entry.addChildEntry(s);
 			}
 			
 			// clears all samples after top tree sample has finished.
@@ -271,7 +272,7 @@ class GCProfiler extends Sprite {
 		txtOutput.text += "\n";
 		
 		
-		for (entry in history.iterator()) {
+		for (entry in history) {
 			
 			addFormatedDisplay(entry.getRelElapsed());
 			addFormatedDisplay(entry.getRelAverage());
@@ -298,7 +299,7 @@ class GCProfiler extends Sprite {
 	public function setSampleParent(sample:PFSample) {
 		sample.numParents = 0;
 		
-		for (s in samples.iterator()) {
+		for (s in samples) {
 			if (s.openInstances > 0 && s.name != sample.name) { // any other opened samples are parents.
 				
 				sample.numParents++;
@@ -307,7 +308,7 @@ class GCProfiler extends Sprite {
 					sample.parentName = s.name;
 				} else {
 					// set open sample with most parents as this sample parent
-					if (s.numParents > samples[sample.parentName].numParents) {
+					if (s.numParents > getSample(sample.parentName).numParents) {
 						sample.parentName = s.name;
 					}
 				}
@@ -315,6 +316,23 @@ class GCProfiler extends Sprite {
 		}
 	}
 	
+	function getSample(sampleName):PFSample {
+		for (sample in samples) {
+			if (sample.name == sampleName) {
+				return sample;
+			}
+		}
+		return null;
+	}
+	
+	function getHistory(entryName):SampleHistory {
+		for (entry in history) {
+			if (entry.name == entryName) {
+				return entry;
+			}
+		}
+		return null;
+	}
 	
 }
 
@@ -392,7 +410,7 @@ class SampleHistory {
 		
 		if (child == null) {
 			child = new SampleHistory(s);
-			insertChild(child, s.parentName);
+			childHistory.push(child);
 		} else {
 			child.update(s);
 		}
@@ -464,16 +482,6 @@ class SampleHistory {
 			}
 		}
 		return null;
-	}
-	
-	function insertChild(s:SampleHistory, parentName:String) {
-		var parent = getChild(parentName);
-		
-		if (parent == null || parentName == this.name) {
-			childHistory.insert(0, s);
-		} else {
-			childHistory.insert(childHistory.indexOf(parent) + 1, s);
-		}
 	}
 	
 }
