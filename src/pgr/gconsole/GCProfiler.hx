@@ -6,6 +6,7 @@ import flash.text.TextField;
 import flash.text.TextFormat;
 import flash.text.TextFormatAlign;
 import pgr.gconsole.GCProfiler.PFSample;
+import pgr.gconsole.GCProfiler.SampleHistory;
 
 typedef PFSample = {
 	name:String,			
@@ -14,6 +15,7 @@ typedef PFSample = {
 	instances:Int, 		// number of begin() 
 	openInstances:Int, 	// number of begin() without end()
 	numParents:Int, 	// number of parents
+	parentName:String,
 	childrenElapsed:Int	// time elapsed for all children
 }
 
@@ -28,7 +30,7 @@ class GCProfiler extends Sprite {
 	/** Number of spaces between each display field (Elapsed, average, etc..) */
 	static public inline var NUM_SPACES:Int = 8;
 	
-	public var startTime(default, null):Int;
+	public var refreshTimer(default, null):Int;
 	public var refreshRate(default, null):Int;
 	
 	public var samples:Map<String,PFSample>;
@@ -38,7 +40,7 @@ class GCProfiler extends Sprite {
 	public function new() {
 		super();
 		
-		refreshRate = 1;
+		refreshRate = 100;
 		history = new Map<String, SampleHistory>();
 		
 		samples = new Map<String, PFSample>();
@@ -103,7 +105,7 @@ class GCProfiler extends Sprite {
 		removeEventListener(Event.ENTER_FRAME, refresh);  // prevent duplicate listeners
 		addEventListener(Event.ENTER_FRAME, refresh);
 
-		startTime = Lib.getTimer();
+		refreshTimer = Lib.getTimer();
 		refresh(null);	// renders first frame.
 	}
 
@@ -124,7 +126,7 @@ class GCProfiler extends Sprite {
 			sample.openInstances++;
 			sample.instances++;
 			sample.startTime = Lib.getTimer();
-			//sample.childrenElapsed = 0;
+			sample.parentName = "";
 			
 			if (sample.openInstances > 1) {
 				throw sampleName + " already started.";
@@ -140,12 +142,14 @@ class GCProfiler extends Sprite {
 				instances:1,
 				openInstances:1,
 				numParents:0,
+				parentName:"",
 				childrenElapsed:0
 			};
 			
 			samples.set(sampleName, sample);
 		}
 		
+		setSampleParent(sample);
 	}
 	
 	public function end(sampleName:String) {
@@ -154,8 +158,8 @@ class GCProfiler extends Sprite {
 		}
 		
 		var sample:PFSample = samples.get(sampleName);
-		var parent:String = "";
-		var elapsed = Lib.getTimer() - sample.startTime;
+		var endTime = Lib.getTimer();
+		var elapsed = endTime - sample.startTime;
 		
 		if (sample.openInstances < 1) {
 			throw sampleName + " is not started";
@@ -163,32 +167,12 @@ class GCProfiler extends Sprite {
 		
 		sample.openInstances--;
 		
-		// find sample most direct parent (if any)
-		sample.numParents = 0;
-		
-		for (s in samples.iterator()) {
-			if (s.openInstances > 0 && s.name != sample.name) { // any other opened samples are parents.
-				
-				sample.numParents++;
-				// set newly found parent.
-				if (parent == "") {
-					parent = s.name; 
-					
-				} else {
-					// update to more immediate parent.
-					if (s.startTime >= samples.get(parent).startTime) {
-						parent = s.name;
-					}
-				}
-			}
-		}
-		
 		// accumulate elapsed time
 		sample.elapsed += elapsed;
 		
 		// accumulate parent.childrenElapsed with sample elapsed time
-		if (parent != "") {
-			samples[parent].childrenElapsed += elapsed;
+		if (sample.parentName != "") {		
+			samples[sample.parentName].childrenElapsed += elapsed;
 		}
 		
 		// if this sample is not nested, create (or update) output for sample and its children
@@ -214,7 +198,7 @@ class GCProfiler extends Sprite {
 		}
 		
 		for (s in samples.iterator()) {
-			
+			//
 			// updates children entries for the sample.
 			if (s.numParents > 0 && s.name != sample.name) {
 				entry.addChildEntry(samples[s.name]);
@@ -222,18 +206,19 @@ class GCProfiler extends Sprite {
 			
 			// clears all samples after top tree sample has finished.
 			s.numParents = 0;
+			s.parentName = "";
 			s.elapsed = 0;
 			s.openInstances = 0;
 			s.instances = 0;
 			s.childrenElapsed = 0;
 		}
-			
 	}
 	
 	
 	public function setRefreshRate(refreshRate:Int) {
 		this.refreshRate = refreshRate;
 	}
+	
 	
 	public function toggle() {
 		if (visible) {
@@ -245,13 +230,13 @@ class GCProfiler extends Sprite {
 	
 	
 	private function refresh(e:Event):Void {
-		var elapsed = Lib.getTimer() - startTime;
+		var elapsed = Lib.getTimer() - refreshTimer;
 		
 		if (elapsed > refreshRate || e == null) {
 			
 			 //refreshes monitor screen
 			writeOutput();
-			startTime = Lib.getTimer();
+			refreshTimer = Lib.getTimer();
 		}
 	}
 	
@@ -285,6 +270,7 @@ class GCProfiler extends Sprite {
 		txtOutput.text += StringTools.rpad("-", "-", (NUM_SPACES + 1) * 7);
 		txtOutput.text += "\n";
 		
+		
 		for (entry in history.iterator()) {
 			
 			addFormatedDisplay(entry.getRelElapsed());
@@ -295,7 +281,8 @@ class GCProfiler extends Sprite {
 			txtOutput.text += " " + entry.getFormattedName();
 			txtOutput.text += "\n";
 			
-			for (child in entry.childHistory.iterator()) {
+			
+			for (child in entry.childHistory) {
 				addFormatedDisplay(child.getRelElapsed());
 				addFormatedDisplay(child.getRelAverage());
 				addFormatedDisplay(child.getPercentElapsed(entry.elapsed));
@@ -307,6 +294,27 @@ class GCProfiler extends Sprite {
 		}
 		
 	}
+	
+	public function setSampleParent(sample:PFSample) {
+		sample.numParents = 0;
+		
+		for (s in samples.iterator()) {
+			if (s.openInstances > 0 && s.name != sample.name) { // any other opened samples are parents.
+				
+				sample.numParents++;
+				// set newly found parent.
+				if (sample.parentName == "") {
+					sample.parentName = s.name;
+				} else {
+					// set open sample with most parents as this sample parent
+					if (s.numParents > samples[sample.parentName].numParents) {
+						sample.parentName = s.name;
+					}
+				}
+			}
+		}
+	}
+	
 	
 }
 
@@ -323,14 +331,14 @@ class SampleHistory {
 	public var branchInstances:Int = 0;
 	public var instances:Int = 0;
 	public var numParents:Int = 0;
+	public var startTime:Int; // used to sort history arrays
 	
 	public var nLogs:Int = 0;
 	
-	public var childHistory:Map<String, SampleHistory>;
+	public var childHistory:Array<SampleHistory>;
 	
 	public function new (s:PFSample) {
-		childHistory = new Map<String, SampleHistory>();
-		nLogs = 1;
+		childHistory = new Array<SampleHistory>();
 		
 		this.name = s.name;
 		this.elapsed = s.elapsed;
@@ -362,7 +370,7 @@ class SampleHistory {
 		if (elapsed < minElapsed) {
 			minElapsed = elapsed;
 		}
-		
+		this.startTime = s.startTime;
 		this.instances += s.instances;
 		this.branchInstances += s.instances;
 		this.numParents = s.numParents;
@@ -371,7 +379,6 @@ class SampleHistory {
 		this.totalChildrenElapsed += childrenElapsed;
 		
 		nLogs++;
-		
 	}
 	/**
 	 * Adds child history sample.
@@ -381,13 +388,12 @@ class SampleHistory {
 			throw "adding " + s.name + " to " + name + " as child sample.";
 		}
 		
-		var child:SampleHistory;
+		var child:SampleHistory = getChild(s.name);
 		
-		if (!childHistory.exists(s.name)) {
+		if (child == null) {
 			child = new SampleHistory(s);
-			childHistory.set(child.name, child);
+			insertChild(child, s.parentName);
 		} else {
-			child = childHistory[s.name];
 			child.update(s);
 		}
 	}
@@ -449,6 +455,25 @@ class SampleHistory {
 		}
 		s += name;
 		return s;
+	}
+	
+	function getChild(childName):SampleHistory {
+		for (child in childHistory) {
+			if (child.name == childName) {
+				return child;
+			}
+		}
+		return null;
+	}
+	
+	function insertChild(s:SampleHistory, parentName:String) {
+		var parent = getChild(parentName);
+		
+		if (parent == null || parentName == this.name) {
+			childHistory.insert(0, s);
+		} else {
+			childHistory.insert(childHistory.indexOf(parent) + 1, s);
+		}
 	}
 	
 }
