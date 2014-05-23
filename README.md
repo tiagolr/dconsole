@@ -113,7 +113,7 @@ Thanks to:
 
 * Artem Pecheny
 * Jesse Talavera
-* Samuel Baptista
+* Samuel Batista
 * Alexander Hohlov
 
 And others submiting issues/feedback so far.
