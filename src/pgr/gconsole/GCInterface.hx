@@ -80,7 +80,11 @@ class GCInterface extends Sprite
 	
 	
 	public function setConsoleFont(font:String = null, embed:Bool = false, size:Int = 14, bold:Bool = false, italic:Bool = false, underline:Bool = false ){
+		#if (flash || html5)
 		if (font == null) {
+		#else
+		if (font == null && Sys.systemName() == "Windows") {
+		#end
 			font = "Consolas";
 		}
 		embed ? txtConsole.embedFonts = true : txtConsole.embedFonts = false;
@@ -93,7 +97,11 @@ class GCInterface extends Sprite
 	
 	
 	public function setPromptFont(font:String = null, embed:Bool = false, size:Int = 16, bold:Bool = false, ?italic:Bool = false, underline:Bool = false ){
+		#if (flash || html5)
 		if (font == null) {
+		#else
+		if (font == null && Sys.systemName() == "Windows") {
+		#end
 			font = "Consolas";
 		}
 		embed ? txtPrompt.embedFonts = true : txtPrompt.embedFonts = false;

@@ -21,7 +21,7 @@ import pgr.gconsole.GCThemes.Theme;
  */
 class GConsole extends Sprite {
 
-	inline static public var VERSION = "3.0.1";
+	inline static public var VERSION = "3.0.2";
 	
 	/** Aligns console to bottom */
 	static public var ALIGN_DOWN:String = "DOWN";

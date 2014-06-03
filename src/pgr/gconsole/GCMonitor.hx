@@ -79,7 +79,11 @@ class GCMonitor extends Sprite {
 	}
 	
 	public function setFont(font:String = null, embed:Bool = false, size:Int = 14, bold:Bool = false, ?italic:Bool = false, underline:Bool = false ){
+		#if (flash || html5)
 		if (font == null) {
+		#else
+		if (font == null && Sys.systemName() == "Windows") {
+		#end
 			font = "Consolas";
 		}
 		
