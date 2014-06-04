@@ -41,6 +41,8 @@ class GConsole extends Sprite {
 	public var enabled(default, null):Bool;
 	public var hidden(default, null):Bool;
 	
+	var input:GCInput;
+	
 	
 	public function new(height:Float = 0.33, align:String = "DOWN", theme:GCThemes.Theme = null, monitorRate:Int = 10) {
 		
@@ -58,6 +60,9 @@ class GConsole extends Sprite {
 
 		if (height > 1) height = 1;
 		if (height < 0.1) height = 0.1;
+		
+		// create input
+		input = new GCInput(this);
 		
 		// create monitor
 		monitor = new GCMonitor();
@@ -114,23 +119,15 @@ class GConsole extends Sprite {
 			show();
 		}
 		
-		// prevents duplicating events
-		Lib.current.stage.removeEventListener(KeyboardEvent.KEY_UP, onKeyUp, false);
-		Lib.current.stage.removeEventListener(KeyboardEvent.KEY_DOWN, onKeyDown, false);
-		
-		Lib.current.stage.addEventListener(KeyboardEvent.KEY_UP, onKeyUp, false);
-		Lib.current.stage.addEventListener(KeyboardEvent.KEY_DOWN, onKeyDown, false);
+		input.enable();
 	}
 
 	
 	public function disable() {
-		
 		enabled = false;
 		interfc.visible = false;
 		
-		
-		Lib.current.stage.removeEventListener(KeyboardEvent.KEY_UP, onKeyUp, false);
-		Lib.current.stage.removeEventListener(KeyboardEvent.KEY_DOWN, onKeyDown, false);
+		input.disable();
 	}
 
 	
@@ -258,100 +255,8 @@ class GConsole extends Sprite {
 			monitor.hide();
 		}
 	}
-	
-	
-	//---------------------------------------------------------------------------------
-	//  INPUT HANDLING
-	//---------------------------------------------------------------------------------
-	private function onKeyDown(e:KeyboardEvent):Void {
-		#if !(cpp || neko) // BUGFIX
-		if (enabled && !hidden)
-			e.stopImmediatePropagation();
-		#end
-	}
-	
-	private function onKeyUp(e:KeyboardEvent):Void {
-		// SHOW/HIDE MONITOR.
-		if (e.ctrlKey && cast(e.keyCode, Int) == toggleKey) {
-			
-			toggleMonitor();
-			return;
-		}
-		
-		if (e.shiftKey && cast(e.keyCode, Int) == toggleKey) {
-			
-			toggleProfiler();
-			return;
-		}
-		
-		// SHOW/HIDE CONSOLE.
-		if (cast(e.keyCode, Int) == toggleKey) {
-			if (!hidden) {
-				hide();
-			} else {
-				show();
-			}
-			return;
-		}
-		
-		// IGNORE INPUT IF CONSOLE HIDDEN.
-		if (hidden) 
-			return;
 
-		// ENTER KEY
-		if (e.keyCode == 13) {
-			processInputLine();
-		}
-		else if (e.keyCode == 33) {
-			interfc.txtConsole.scrollV -= interfc.txtConsole.bottomScrollV - interfc.txtConsole.scrollV +1;
-			if (interfc.txtConsole.scrollV < 0)
-				interfc.txtConsole.scrollV = 0;
-		}
-		if (e.keyCode == 34) { // PAGE UP
-			interfc.txtConsole.scrollV += interfc.txtConsole.bottomScrollV - interfc.txtConsole.scrollV +1;
-			if (interfc.txtConsole.scrollV > interfc.txtConsole.maxScrollV)
-				interfc.txtConsole.scrollV = interfc.txtConsole.maxScrollV;
-		}
-		else
-		if (e.keyCode == 38) { // DOWN KEY
-			nextHistory();
-		}
-		else if (e.keyCode == 40) { // UP KEY
-			prevHistory();
-		} else if (e.keyCode == 32 && e.ctrlKey)   // CONTROL + SPACE = AUTOCOMPLETE
-		{   
-			// remove white space added pressing CTRL + SPACE.
-			interfc.inputRemoveLastChar();
-			
-			var autoC:Array<String> = GCUtil.autoComplete(interfc.getInputTxt());
-			if (autoC != null)
-			{
-				if (autoC.length == 1) // only one entry in autocomplete - replace user entry.
-				{
-					interfc.txtPrompt.text = GCUtil.joinResult(interfc.txtPrompt.text, autoC[0]);
-					interfc.txtPrompt.setSelection(interfc.txtPrompt.text.length, interfc.txtPrompt.text.length);
-				}
-				else	// many entries in autocomplete, list them all.
-				{
-					GC.log(" "); // new line.
-					for (entry in autoC)
-					{
-						GC.logInfo(entry);
-					}
-				}
-			}
-		}
-		else 
-		{
-			_historyIndex = -1; 
-		}
-
-		#if !(cpp || neko) // BUGFIX
-		e.stopImmediatePropagation(); // BUG - cpp issues.
-		#end
-	}
-
-	private function prevHistory() {
+	public function prevHistory() {
 		_historyIndex--;
 		if (_historyIndex < 0) _historyIndex = 0;
 		if (_historyIndex > _historyArray.length - 1) return;
@@ -362,7 +267,7 @@ class GConsole extends Sprite {
 		#end
 	}
 
-	private function nextHistory() {
+	public function nextHistory() {
 		
 		if (_historyIndex + 1 > _historyArray.length - 1) {
 			return;
@@ -377,7 +282,7 @@ class GConsole extends Sprite {
 	}
 
 
-	private function processInputLine() {
+	public function processInputLine() {
 		
 		// no input to process
 		if (interfc.txtPrompt.text == '') {
@@ -387,12 +292,52 @@ class GConsole extends Sprite {
 		var temp:String = interfc.txtPrompt.text;
 		// HISTORY
 		_historyArray.insert(0, interfc.txtPrompt.text);
-		_historyIndex = -1;
+		resetHistoryIndex();
 		// LOG AND CLEAN PROMPT
 		log("> " + interfc.txtPrompt.text);
 		interfc.txtPrompt.text = '';
 		
 		parseInput(temp);
+	}
+	
+	// returns history index to beggining.
+	public function resetHistoryIndex() {
+		_historyIndex = -1;
+	}
+	
+	public function scrollDown() {
+		interfc.txtConsole.scrollV -= interfc.txtConsole.bottomScrollV - interfc.txtConsole.scrollV +1;
+		if (interfc.txtConsole.scrollV < 0)
+			interfc.txtConsole.scrollV = 0;
+	}
+	
+	public function scrollUp() {
+		interfc.txtConsole.scrollV += interfc.txtConsole.bottomScrollV - interfc.txtConsole.scrollV +1;
+		if (interfc.txtConsole.scrollV > interfc.txtConsole.maxScrollV)
+			interfc.txtConsole.scrollV = interfc.txtConsole.maxScrollV;
+	}
+	
+	public function autoComplete() {
+		// remove white space added pressing CTRL + SPACE.
+		interfc.inputRemoveLastChar();
+		
+		var autoC:Array<String> = GCUtil.autoComplete(interfc.getInputTxt());
+		if (autoC != null)
+		{
+			if (autoC.length == 1) // only one entry in autocomplete - replace user entry.
+			{
+				interfc.txtPrompt.text = GCUtil.joinResult(interfc.txtPrompt.text, autoC[0]);
+				interfc.txtPrompt.setSelection(interfc.txtPrompt.text.length, interfc.txtPrompt.text.length);
+			}
+			else	// many entries in autocomplete, list them all.
+			{
+				GC.log(" "); // new line.
+				for (entry in autoC)
+				{
+					GC.logInfo(entry);
+				}
+			}
+		}
 	}
 
 
