@@ -1,14 +1,5 @@
 package pgr.gconsole;
 
-import flash.errors.Error;
-import pgr.gconsole.GCCommands.Register;
-import flash.ui.Keyboard;
-import flash.display.Sprite;
-import flash.events.Event;
-import flash.events.KeyboardEvent;
-import flash.Lib;
-import flash.text.TextField;
-import flash.text.TextFormat;
 import pgr.gconsole.GCThemes.Theme;
 
 /**
@@ -19,9 +10,9 @@ import pgr.gconsole.GCThemes.Theme;
  * 
  * @author TiagoLr ( ~~~ProG4mr~~~ )
  */
-class GConsole extends Sprite {
+class GConsole {
 
-	inline static public var VERSION = "3.0.2";
+	inline static public var VERSION = "3.1.0";
 	
 	/** Aligns console to bottom */
 	static public var ALIGN_DOWN:String = "DOWN";
@@ -35,11 +26,11 @@ class GConsole extends Sprite {
 	public var profiler:GCProfiler;
 
 	/** shortcutkey to show/hide console. */ 
-	public var toggleKey:Int; 
+	public var toggleKey:Int = 9; 
 	public static var instance:GConsole;
 	
 	public var enabled(default, null):Bool;
-	public var hidden(default, null):Bool;
+	public var consoleVisible(default, null):Bool;
 	
 	var input:GCInput;
 	
@@ -49,84 +40,77 @@ class GConsole extends Sprite {
 		if (instance != null) {
 			return;
 		}
+		instance = this;
 		
 		if (theme == null) {
 			GCThemes.current = GCThemes.DARK;
 		} else {
 			GCThemes.current = theme;
 		}
-		
-		super();
 
 		if (height > 1) height = 1;
 		if (height < 0.1) height = 0.1;
 		
 		// create input
-		input = new GCInput(this);
+		input = new GCInput();
 		
 		// create monitor
 		monitor = new GCMonitor();
-		addChild(monitor);
 		
+		// create profiler
 		profiler = new GCProfiler();
-		addChild(profiler);
 		
 		// create console interface
 		interfc = new GCInterface(height, align);
-		addChild(interfc);
-		
-		
-		toggleKey = Keyboard.TAB;
+
 		clearHistory();
 		
-		
 		enable();
-		hide();
-		monitor.hide();
-		profiler.hide();
-		instance = this;
+		hideConsole();
+		hideMonitor();
+		hideProfiler();
 
 		GC.logInfo("~~~~~~~~~~ GAME CONSOLE ~~~~~~~~~~ (v" + VERSION + ")");
 	}
 	
 	
-	public function show() {
-		hidden = false;
+	public function showConsole() {
+		consoleVisible = true;
 		if (!enabled) {
 			return;
 		}
-		
-		interfc.visible = true;
-		
-		Lib.current.stage.focus = interfc.txtPrompt;
+		interfc.showConsole();
 	}
 
-	public function hide() {
-		hidden = true;
+	public function hideConsole() {
+		consoleVisible = false;
 		if (!enabled) {
 			return;
 		}
-		
-		interfc.visible = false;
+		interfc.hideConsole();
 	}
 
 	
 	public function enable() {
-		
 		enabled = true;
-		
-		if (!hidden) {
-			show();
+		if (consoleVisible) {
+			interfc.showConsole();
 		}
-		
+		if (monitor.visible) {
+			interfc.showMonitor();
+		} 
+		if (profiler.visible) {
+			interfc.showProfiler();
+		}
 		input.enable();
 	}
 
 	
 	public function disable() {
 		enabled = false;
-		interfc.visible = false;
-		
+		interfc.hideConsole();
+		interfc.hideMonitor();
+		interfc.hideProfiler();
 		input.disable();
 	}
 
@@ -142,21 +126,7 @@ class GConsole extends Sprite {
 			return;
 		}
 		
-		// Adds text to console interface
-		var tf:TextField = interfc.txtConsole; 
-		tf.appendText(Std.string(data) + '\n');
-		tf.scrollV = tf.maxScrollV;
-		
-		// Applies color - is always applied to avoid bug.
-		if (color == -1) {
-			color = GCThemes.current.CON_TXT_C;
-		}
-		
-		// Applies text formatting
-		var format:TextFormat = new TextFormat();
-		format.color = color;
-		var l = Std.string(data).length;
-		tf.setTextFormat(format, tf.text.length - l - 1, tf.text.length - 1);
+		interfc.log(data, color);
 	}
 	
 	
@@ -196,7 +166,7 @@ class GConsole extends Sprite {
 			GC.logError(alias + " not found.");
 		}
 	}
-
+	
 	/**
 	 * Clears input text;
 	 */
@@ -214,8 +184,8 @@ class GConsole extends Sprite {
 		_historyIndex = -1;
 	}
 	
+	
 	public function monitorField(object:Dynamic, fieldName:String, alias:String) {
-		
 		
 		if (fieldName == null || fieldName == "") {
 			GC.logError("invalid fieldName");
@@ -234,7 +204,7 @@ class GConsole extends Sprite {
 		
 		try {
 			Reflect.getProperty(object, fieldName);
-		} catch (e:Error) {
+		} catch (e:Dynamic) {
 			GC.logError("could not find field: " + fieldName);
 			return;
 		}
@@ -242,28 +212,61 @@ class GConsole extends Sprite {
 		monitor.addField(object, fieldName, alias);
 	}
 	
+	
 	public function toggleMonitor() {
-		monitor.toggle(); 
 		if (monitor.visible) {
-			profiler.hide();
+			hideMonitor();
+		} else {
+			showMonitor();
 		}
 	}
 	
+	public function showMonitor() {
+		hideProfiler();
+		monitor.show();
+		interfc.showMonitor();
+	}
+	
+	public function hideMonitor() {
+		monitor.hide();
+		interfc.hideMonitor();
+	}
+	
+	
 	public function toggleProfiler() {
-		profiler.toggle();
 		if (profiler.visible) {
-			monitor.hide();
+			hideProfiler();
+		} else {
+			showProfiler();
 		}
 	}
+	
+	public function showProfiler() {
+		hideMonitor();
+		profiler.show();
+		interfc.showProfiler();
+	}
+	
+	public function hideProfiler() {
+		profiler.hide();
+		interfc.hideProfiler();
+	}
 
+	
 	public function prevHistory() {
 		_historyIndex--;
-		if (_historyIndex < 0) _historyIndex = 0;
-		if (_historyIndex > _historyArray.length - 1) return;
+		
+		if (_historyIndex < 0) {
+			_historyIndex = 0;
+		}
+		
+		if (_historyIndex > _historyArray.length - 1) {
+			return;
+		}
 
-		interfc.txtPrompt.text = _historyArray[_historyIndex];
+		interfc.setInputTxt(_historyArray[_historyIndex]);
 		#if !(cpp || neko)
-		interfc.txtPrompt.setSelection(interfc.txtPrompt.length, interfc.txtPrompt.length);
+		interfc.moveCarretToEnd();
 		#end
 	}
 
@@ -275,29 +278,30 @@ class GConsole extends Sprite {
 		
 		_historyIndex++;
 
-		interfc.txtPrompt.text = _historyArray[_historyIndex];
+		interfc.setInputTxt(_historyArray[_historyIndex]);
 		#if !(cpp || neko)
-		interfc.txtPrompt.setSelection(interfc.txtPrompt.length, interfc.txtPrompt.length);
+		interfc.moveCarretToEnd();
 		#end
 	}
 
 
 	public function processInputLine() {
 		
+		var currText = interfc.getInputTxt();
 		// no input to process
-		if (interfc.txtPrompt.text == '') {
+		if (currText == '' || currText == null) {
 			return;
 		}
-			
-		var temp:String = interfc.txtPrompt.text;
-		// HISTORY
-		_historyArray.insert(0, interfc.txtPrompt.text);
-		resetHistoryIndex();
-		// LOG AND CLEAN PROMPT
-		log("> " + interfc.txtPrompt.text);
-		interfc.txtPrompt.text = '';
 		
-		parseInput(temp);
+		// HISTORY
+		_historyArray.insert(0, currText);
+		resetHistoryIndex();
+		
+		// LOG AND CLEAN PROMPT
+		log("> " + currText);
+		interfc.clearInput();
+		
+		parseInput(currText);
 	}
 	
 	// returns history index to beggining.
@@ -306,15 +310,11 @@ class GConsole extends Sprite {
 	}
 	
 	public function scrollDown() {
-		interfc.txtConsole.scrollV -= interfc.txtConsole.bottomScrollV - interfc.txtConsole.scrollV +1;
-		if (interfc.txtConsole.scrollV < 0)
-			interfc.txtConsole.scrollV = 0;
+		interfc.scrollConsoleDown();
 	}
 	
 	public function scrollUp() {
-		interfc.txtConsole.scrollV += interfc.txtConsole.bottomScrollV - interfc.txtConsole.scrollV +1;
-		if (interfc.txtConsole.scrollV > interfc.txtConsole.maxScrollV)
-			interfc.txtConsole.scrollV = interfc.txtConsole.maxScrollV;
+		interfc.scrollConsoleUp();
 	}
 	
 	public function autoComplete() {
@@ -326,8 +326,8 @@ class GConsole extends Sprite {
 		{
 			if (autoC.length == 1) // only one entry in autocomplete - replace user entry.
 			{
-				interfc.txtPrompt.text = GCUtil.joinResult(interfc.txtPrompt.text, autoC[0]);
-				interfc.txtPrompt.setSelection(interfc.txtPrompt.text.length, interfc.txtPrompt.text.length);
+				interfc.setInputTxt(GCUtil.joinResult(interfc.getInputTxt(), autoC[0]));
+				interfc.moveCarretToEnd();
 			}
 			else	// many entries in autocomplete, list them all.
 			{

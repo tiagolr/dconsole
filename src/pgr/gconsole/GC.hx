@@ -27,7 +27,7 @@ class GC
 			return; // GConsole has been initialized already.
 		}
 		
-		Lib.current.stage.addChild(new GConsole(height, align, theme, monitorRate));
+		new GConsole(height, align, theme, monitorRate);
 	}
 	/**
 	 * Sets the console font.
@@ -68,7 +68,7 @@ class GC
 	 */
 	public static function setMonitorFont(font:String = null, embed:Bool = true, size:Int = 14, bold:Bool = false, ?italic:Bool = false, underline:Bool = false ){
 		checkInstance();
-		GConsole.instance.monitor.setFont(font, embed, size, bold, italic, underline);
+		GConsole.instance.interfc.setConsoleFont(font, embed, size, bold, italic, underline);
 	}
 	
 	/**
@@ -86,7 +86,8 @@ class GC
 		checkInstance();
 		GConsole.instance.interfc.setConsoleFont(font, embed, size, bold, italic, underline);
 		GConsole.instance.interfc.setPromptFont(font, embed, size, bold, italic, underline);
-		GConsole.instance.monitor.setFont(font, embed, size, bold, italic, underline);
+		GConsole.instance.interfc.setConsoleFont(font, embed, size, bold, italic, underline);
+		GConsole.instance.interfc.setProfilerFont(font, embed, size, bold, italic, underline);
 	}
 	
 	/**
@@ -94,22 +95,21 @@ class GC
 	 */
 	public static function showConsole() {
 		checkInstance();
-		GConsole.instance.show();
+		GConsole.instance.showConsole();
 	}
 	/**
 	 * Hides console.
 	 */
 	public static function hideConsole() {
 		checkInstance();
-		GConsole.instance.hide();
+		GConsole.instance.hideConsole();
 	}
 	/**
-	 * Shows monitor and starts to follow registered fiedls in real time.
-	 * Only fields with 'monitor' flag set to true will be followed. 
+	 * Shows monitor and refreshes displayed info according to refreshRate.
 	 */
 	public static function showMonitor() {
 		checkInstance();
-		GConsole.instance.monitor.show();
+		GConsole.instance.showMonitor();
 	}
 	/**
 	 * Stops monitoring.
@@ -117,7 +117,22 @@ class GC
 	public static function hideMonitor()
 	{
 		checkInstance();
-		GConsole.instance.monitor.hide();
+		GConsole.instance.hideMonitor();
+	}
+	/**
+	 * Shows profiler and refreshes statistics according to refreshRate.
+	 */
+	public static function showProfiler() {
+		checkInstance();
+		GConsole.instance.showProfiler();
+	}
+	/**
+	 * Stops showing and refreshing profiler.
+	 */
+	public static function hideProfiler()
+	{
+		checkInstance();
+		GConsole.instance.hideProfiler();
 	}
 	/**
 	 * Enables console and its listeners.
@@ -277,7 +292,7 @@ class GC
 	 */
 	public static function toFront() {
 		checkInstance();
-		Lib.current.stage.swapChildren(GConsole.instance, Lib.current.stage.getChildAt(Lib.current.stage.numChildren - 1));
+		Lib.current.stage.swapChildren(GConsole.instance.interfc, Lib.current.stage.getChildAt(Lib.current.stage.numChildren - 1));
 	}
 	
 	/**

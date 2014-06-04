@@ -1,6 +1,7 @@
 package pgr.gconsole;
 import flash.events.KeyboardEvent;
 import flash.Lib;
+import flash.ui.Keyboard;
 import pgr.gconsole.GConsole;
 
 /**
@@ -9,11 +10,12 @@ import pgr.gconsole.GConsole;
  */
 class GCInput{
 
-	var _console:GConsole;
+	var console:GConsole;
 	
-	public function new(console:GConsole) {
+	public function new() {
 		
-		_console = console;
+		console = GConsole.instance;
+		console.setToggleKey(Keyboard.TAB); // ensures TAB key using openfl
 		
 		enable();
 	}
@@ -36,82 +38,83 @@ class GCInput{
 	
 	private function onKeyDown(e:KeyboardEvent):Void {
 		#if !(cpp || neko) // BUGFIX
-		if (_console.enabled && !_console.hidden)
+		if (console.enabled && console.consoleVisible) {
 			e.stopImmediatePropagation();
+		}
 		#end
 	}
 	
 	
 	private function onKeyUp(e:KeyboardEvent):Void {
 		// TOGGLE MONITOR
-		if (e.ctrlKey && cast(e.keyCode, Int) == _console.toggleKey) {
-			_console.toggleMonitor();
+		if (e.ctrlKey && cast(e.keyCode, Int) == console.toggleKey) {
+			console.toggleMonitor();
 			return;
 		}
 		
 		// TOGGLE PROFILER
 		else 
-		if (e.shiftKey && cast(e.keyCode, Int) == _console.toggleKey) {
-			_console.toggleProfiler();
+		if (e.shiftKey && cast(e.keyCode, Int) == console.toggleKey) {
+			console.toggleProfiler();
 			return;
 		}
 		
 		// SHOW/HIDE CONSOLE
 		else 
-		if (cast(e.keyCode, Int) == _console.toggleKey) {
-			if (!_console.hidden) {
-				_console.hide();
+		if (cast(e.keyCode, Int) == console.toggleKey) {
+			if (console.consoleVisible) {
+				console.hideConsole();
 			} else {
-				_console.show();
+				console.showConsole();
 			}
 			return;
 		}
 		
 		// IGNORE INPUT IF CONSOLE HIDDEN
 		else 
-		if (_console.hidden) {
+		if (!console.consoleVisible) {
 			return;
 		}
 
 		// ENTER KEY
 		else 
 		if (e.keyCode == 13) {
-			_console.processInputLine();
+			console.processInputLine();
 		}
 		
 		// PAGE DOWN
 		else if (e.keyCode == 33) {
-			_console.scrollDown();
+			console.scrollDown();
 		}
 		
 		// PAGE UP
 		else 
 		if (e.keyCode == 34) { 
-			_console.scrollUp();
+			console.scrollUp();
 		}
 		
 		// DOWN KEY
 		else
 		if (e.keyCode == 38) {
-			_console.nextHistory();
+			console.nextHistory();
 		}
 		
 		// UP KEY
 		else 
 		if (e.keyCode == 40) { 
-			_console.prevHistory();
+			console.prevHistory();
 		}
 		
 		// CONTROL + SPACE = AUTOCOMPLETE
 		else 
 		if (e.keyCode == 32 && e.ctrlKey)  
 		{   
-			_console.autoComplete();
+			console.autoComplete();
 		}
 		
 		else 
 		{
-			_console.resetHistoryIndex();
+			console.resetHistoryIndex();
 		}
 
 		#if !(cpp || neko) // BUGFIX

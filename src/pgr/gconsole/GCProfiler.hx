@@ -1,10 +1,5 @@
 package pgr.gconsole;
-import flash.display.Sprite;
-import flash.events.Event;
-import flash.Lib;
-import flash.text.TextField;
-import flash.text.TextFormat;
-import flash.text.TextFormatAlign;
+import haxe.Timer;
 import pgr.gconsole.GCProfiler.PFSample;
 import pgr.gconsole.GCProfiler.SampleHistory;
 
@@ -25,27 +20,21 @@ typedef PFSample = {
  * 
  * @author TiagoLr ( ~~~ProG4mr~~~ )
  */
-class GCProfiler extends Sprite {
+class GCProfiler {
 	
 	/** Number of spaces between each display field (Elapsed, average, etc..) */
 	static public inline var NUM_SPACES:Int = 8;
 	
-	public var refreshTimer(default, null):Int;
 	public var refreshRate(default, null):Int;
-	
+	public var visible(default, null):Bool;
 	public var samples:Array<PFSample>;
 	public var history:Array<SampleHistory>;
-	public var txtOutput:TextField;
+	
+	var refreshTimer:Timer;
 	
 	public function new() {
-		super();
-		
-		refreshRate = 100;
 		history = new Array<SampleHistory>();
-		
 		samples = new Array<PFSample>();
-		create();
-		
 	}
 	
 	public function clear() {
@@ -58,65 +47,21 @@ class GCProfiler extends Sprite {
 		history = new Array<SampleHistory>();
 		samples = new Array<PFSample>();
 	}
-	//---------------------------------------------------------------------------------
-	//  VISUAL
-	//---------------------------------------------------------------------------------
-	/**
-	 * Creates visual monitor.
-	 */
-	private function create() {
-		
-		graphics.beginFill(GCThemes.current.MON_C, GCThemes.current.MON_A);
-		graphics.drawRect(0, 0, Lib.current.stage.stageWidth, Lib.current.stage.stageHeight);
-		graphics.endFill();
-		
-		txtOutput = new TextField();
-		txtOutput.selectable = false;
-		txtOutput.multiline = true;
-		txtOutput.wordWrap = true;
-		txtOutput.alpha = GCThemes.current.MON_TXT_A;
-		txtOutput.x = 0;
-		txtOutput.y = 0;
-		txtOutput.width = Lib.current.stage.stageWidth;
-		txtOutput.height = Lib.current.stage.stageHeight;
-		addChild(txtOutput);
-		
-		// loads default font.
-		setFont();
-	}
-	
-	public function setFont(font:String = null, embed:Bool = false, size:Int = 14, bold:Bool = false, ?italic:Bool = false, underline:Bool = false ){
-		#if (flash || html5)
-		if (font == null) {
-		#else
-		if (font == null && Sys.systemName() == "Windows") {
-		#end
-			font = "Consolas";
-		}
-		
-		embed ? txtOutput.embedFonts = true : txtOutput.embedFonts = false;
-		txtOutput.defaultTextFormat = new TextFormat(font, size, GCThemes.current.MON_TXT_C, bold, italic, underline, '', '', TextFormatAlign.LEFT, 10,10);
-	}
 	
 	//---------------------------------------------------------------------------------
 	//  LOGIC
 	//---------------------------------------------------------------------------------
-	public function show() {
-		this.visible = true;
-		
-		GConsole.instance.monitor.hide();
-		
-		removeEventListener(Event.ENTER_FRAME, refresh);  // prevent duplicate listeners
-		addEventListener(Event.ENTER_FRAME, refresh);
-
-		refreshTimer = Lib.getTimer();
-		refresh(null);	// renders first frame.
+	@:allow(pgr.gconsole.GConsole)
+	function show() {
+		visible = true;
+		startTimer();
+		writeOutput();	// renders first frame.
 	}
 
-	
-	public function hide() {
-		this.visible = false;		
-		removeEventListener(Event.ENTER_FRAME, refresh);
+	@:allow(pgr.gconsole.GConsole)
+	function hide() {
+		visible = false;
+		stopTimer();
 	}
 		
 	
@@ -129,7 +74,7 @@ class GCProfiler extends Sprite {
 			// reset some stats and relaunch sample.
 			sample.openInstances++;
 			sample.instances++;
-			sample.startTime = Lib.getTimer();
+			sample.startTime = getTimeMS();
 			sample.parentName = "";
 			
 			if (sample.openInstances > 1) {
@@ -141,7 +86,7 @@ class GCProfiler extends Sprite {
 			sample = 
 			{
 				name:sampleName,
-				startTime:Lib.getTimer(),
+				startTime: getTimeMS(),
 				elapsed:0,
 				instances:1,
 				openInstances:1,
@@ -149,10 +94,8 @@ class GCProfiler extends Sprite {
 				parentName:"",
 				childrenElapsed:0
 			};
-			
 			samples.push(sample);
 		}
-		
 		setSampleParent(sample);
 	}
 	
@@ -162,9 +105,7 @@ class GCProfiler extends Sprite {
 		if (sample == null) {
 			throw sampleName + "not found";
 		}
-		
-		
-		var endTime = Lib.getTimer();
+		var endTime = getTimeMS();
 		var elapsed = endTime - sample.startTime;
 		
 		if (sample.openInstances < 1) {
@@ -185,7 +126,6 @@ class GCProfiler extends Sprite {
 		if (sample.numParents == 0) {
 			createHistory(sample);
 		}
-		
 	}
 	
 	
@@ -225,78 +165,55 @@ class GCProfiler extends Sprite {
 	}
 	
 	
-	public function toggle() {
-		if (visible) {
-			hide();
-		} else {
-			show();
-		}
-	}
-	
-	
-	private function refresh(e:Event):Void {
-		var elapsed = Lib.getTimer() - refreshTimer;
+	function getFormatedDisplay(data:String, addSeparator = true):String {
+		var formatted:String = "";
 		
-		if (elapsed > refreshRate || e == null) {
-			
-			 //refreshes monitor screen
-			writeOutput();
-			refreshTimer = Lib.getTimer();
-		}
-	}
-	
-	function addFormatedDisplay(data:String, addSeparator = true) {
-		txtOutput.text += StringTools.lpad(data, " ", NUM_SPACES);
-		txtOutput.text += " ";
+		formatted += StringTools.lpad(data, " ", NUM_SPACES);
+		formatted += " ";
 		if (addSeparator) {
-			txtOutput.text += "|";
+			formatted += "|";
 		}
+		
+		return formatted;
 	}
 	
 	
 	public function writeOutput() {
 		
-		txtOutput.text = "";
-		txtOutput.text += "GC Profiler\n";
+		var output:String = "";
 		
-		graphics.lineStyle(1, GCThemes.current.MON_TXT_C);
-		graphics.moveTo(0, txtOutput.textHeight);
-		graphics.lineTo(Lib.current.stage.stageWidth, txtOutput.textHeight);
-		
-		txtOutput.text += "\n";
-		addFormatedDisplay("EL");
-		addFormatedDisplay("AVG");
-		addFormatedDisplay("EL(%)");
-		addFormatedDisplay("AVG(%)");
-		addFormatedDisplay("#");
-		addFormatedDisplay("NAME", false);
-		
-		txtOutput.text += "\n";
-		txtOutput.text += StringTools.rpad("-", "-", (NUM_SPACES + 1) * 7);
-		txtOutput.text += "\n";
-		
+		output += getFormatedDisplay("EL");
+		output += getFormatedDisplay("AVG");
+		output += getFormatedDisplay("EL(%)");
+		output += getFormatedDisplay("AVG(%)");
+		output += getFormatedDisplay("#");
+		output += getFormatedDisplay("NAME", false);
+		output += "\n";
+		output += StringTools.rpad("-", "-", (NUM_SPACES + 1) * 7);
+		output += "\n";
 		
 		for (entry in history) {
 			
-			addFormatedDisplay(entry.getRelElapsed());
-			addFormatedDisplay(entry.getRelAverage());
-			addFormatedDisplay(entry.getPercentElapsed(entry.elapsed));
-			addFormatedDisplay(entry.getPercentAverage(entry.totalElapsed));
-			addFormatedDisplay(Std.string(entry.branchInstances));
-			txtOutput.text += " " + entry.getFormattedName();
-			txtOutput.text += "\n";
-			
+			output += getFormatedDisplay(entry.getRelElapsed());
+			output += getFormatedDisplay(entry.getRelAverage());
+			output += getFormatedDisplay(entry.getPercentElapsed(entry.elapsed));
+			output += getFormatedDisplay(entry.getPercentAverage(entry.totalElapsed));
+			output += getFormatedDisplay(Std.string(entry.branchInstances));
+			output += " " + entry.getFormattedName();
+			output += "\n";
 			
 			for (child in entry.childHistory) {
-				addFormatedDisplay(child.getRelElapsed());
-				addFormatedDisplay(child.getRelAverage());
-				addFormatedDisplay(child.getPercentElapsed(entry.elapsed));
-				addFormatedDisplay(child.getPercentAverage(entry.totalElapsed));
-				addFormatedDisplay(Std.string(child.branchInstances));
-				txtOutput.text += " " + child.getFormattedName();
-				txtOutput.text += "\n";
+				output += getFormatedDisplay(child.getRelElapsed());
+				output += getFormatedDisplay(child.getRelAverage());
+				output += getFormatedDisplay(child.getPercentElapsed(entry.elapsed));
+				output += getFormatedDisplay(child.getPercentAverage(entry.totalElapsed));
+				output += getFormatedDisplay(Std.string(child.branchInstances));
+				output += " " + child.getFormattedName();
+				output += "\n";
 			}
 		}
+		
+		GConsole.instance.interfc.writeProfilerOutput(output);
 		
 	}
 	
@@ -338,6 +255,25 @@ class GCProfiler extends Sprite {
 		return null;
 	}
 	
+	
+	function stopTimer() {
+		if (refreshTimer != null) {
+			refreshTimer.stop();
+			refreshTimer = null;
+		}
+	}
+	
+	function startTimer() {
+		if (refreshTimer != null) {
+			stopTimer();
+		}
+		refreshTimer = new Timer(refreshRate);
+		refreshTimer.run = writeOutput;
+	}
+	
+	function getTimeMS():Int {
+		return Std.int(Timer.stamp() * 1000);
+	}
 }
 
 class SampleHistory {
