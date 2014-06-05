@@ -31,7 +31,7 @@ class TestUtils extends TestCase
 		interfc.clearInput();
 		interfc.clearConsole();
 		console.enable();
-		console.show();
+		console.showConsole();
 	}
 
 	public function testAutoComplete() {

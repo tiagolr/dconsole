@@ -114,7 +114,6 @@ class TestCommands extends TestCase
 	}
 	
 	public function testCall() {
-		
 		GC.registerFunction(F1, "F1");
 		GC.registerFunction(TestCommands.F2, "F2");
 		GC.registerFunction(testObject.F, "F3");
@@ -170,7 +169,6 @@ class TestCommands extends TestCase
 	
 	
 	public function testPrint() {
-		
 		GC.registerObject(this, "o1");
 		
 		// test print this object int
@@ -212,7 +210,7 @@ class TestCommands extends TestCase
 		interfc.clearConsole();
 		interfc.clearInput();
 		interfc.setInputTxt(command);
-		console.stage.dispatchEvent(new KeyboardEvent(KeyboardEvent.KEY_UP, true, false, 0, Keyboard.ENTER)); 
+		interfc.stage.dispatchEvent(new KeyboardEvent(KeyboardEvent.KEY_UP, true, false, 0, Keyboard.ENTER)); 
 	}
 	
 	function consoleHasText(txt:String):Bool {

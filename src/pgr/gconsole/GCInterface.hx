@@ -268,7 +268,9 @@ class GCInterface extends Sprite
 	}
 	
 	public function moveCarretToEnd() {
+		#if !(cpp || neko)
 		txtPrompt.setSelection(txtPrompt.length, txtPrompt.length);
+		#end
 	}
 	
 	public function scrollConsoleUp() {
@@ -281,6 +283,13 @@ class GCInterface extends Sprite
 		txtConsole.scrollV -= txtConsole.bottomScrollV - txtConsole.scrollV +1;
 		if (txtConsole.scrollV < 0)
 			txtConsole.scrollV = 0;
+	}
+	
+	/**
+	 * Brings this display object to the front of display list.
+	 */
+	public function toFront() {
+		Lib.current.stage.swapChildren(this, Lib.current.stage.getChildAt(Lib.current.stage.numChildren - 1));
 	}
 	
 	public function setConsoleFont(font:String = null, embed:Bool = false, size:Int = 14, bold:Bool = false, italic:Bool = false, underline:Bool = false ){

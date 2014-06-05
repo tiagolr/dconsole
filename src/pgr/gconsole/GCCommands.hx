@@ -1,8 +1,5 @@
 package pgr.gconsole;
 
-import flash.errors.ArgumentError;
-import flash.errors.Error;
-import flash.Lib;
 import pgr.gconsole.GCCommands.Register;
 
 typedef Register = {
@@ -152,14 +149,7 @@ class GCCommands
 			}
 			GC.logConfirmation("done");
 		}
-		catch (e:ArgumentError) {
-			if (e.errorID == 1063) {
-				GC.logError("incorrect number of arguments");
-			}
-		}
-		catch (e:Error) {
-			GC.logError("function not found");
-		} catch (e:String) {
+		catch (e:Dynamic) {
 			GC.logError("failed to call function");
 		}
 	}
@@ -232,10 +222,7 @@ class GCCommands
 				GC.logConfirmation("done");
 			}
 			
-		} catch (e:Error) {
-			GC.logError("failed to set property");
-			return;
-		} catch (e:String) {
+		} catch (e:Dynamic) {
 			GC.logError("failed to set property");
 			return;
 		}

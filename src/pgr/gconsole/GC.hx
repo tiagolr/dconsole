@@ -1,7 +1,5 @@
 package pgr.gconsole;
 
-import flash.Lib;
-
  /**
   * GC class provides user API to Game Console.
   * 
@@ -292,7 +290,7 @@ class GC
 	 */
 	public static function toFront() {
 		checkInstance();
-		Lib.current.stage.swapChildren(GConsole.instance.interfc, Lib.current.stage.getChildAt(Lib.current.stage.numChildren - 1));
+		GConsole.instance.interfc.toFront();
 	}
 	
 	/**

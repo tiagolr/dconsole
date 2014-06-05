@@ -35,6 +35,7 @@ class GCProfiler {
 	public function new() {
 		history = new Array<SampleHistory>();
 		samples = new Array<PFSample>();
+		setRefreshRate();
 	}
 	
 	public function clear() {
@@ -160,7 +161,7 @@ class GCProfiler {
 	}
 	
 	
-	public function setRefreshRate(refreshRate:Int) {
+	public function setRefreshRate(refreshRate:Int = 100) {
 		this.refreshRate = refreshRate;
 	}
 	

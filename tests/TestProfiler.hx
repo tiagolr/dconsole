@@ -34,16 +34,17 @@ class TestProfiler extends TestCase
 		interfc.clearInput();
 		interfc.clearConsole();
 		console.enable();
-		console.show();
-		monitor.hide();
-		profiler.hide();
+		console.showConsole();
+		console.hideMonitor();
+		console.hideProfiler();
 		GC.clearProfiler();
 	}
 	
 	override public function tearDown():Void {
 		// clear profiler
-		profiler.hide();
-		monitor.hide();
+		GC.clearProfiler();
+		console.hideProfiler();
+		console.hideMonitor();
 	}
 
 	// test response with console disabled
@@ -51,7 +52,7 @@ class TestProfiler extends TestCase
 		console.disable();
 		pressKey(console.toggleKey, false, true);
 		assertFalse(profiler.visible);
-		profiler.show();
+		console.showProfiler();
 		//assertFalse(monitor.visible);
 		//console.enable();
 		assertTrue(profiler.visible);
@@ -61,26 +62,28 @@ class TestProfiler extends TestCase
 	}
 	
 	public function testVisibility() {
-		profiler.hide();
+		console.hideProfiler();
 		assertFalse(profiler.visible);
 		
-		profiler.show();
+		console.showProfiler();
 		assertTrue(profiler.visible);
 		
+		// SHIFT + console key
 		pressKey(console.toggleKey, false, true);
 		assertFalse(profiler.visible);
 		
+		// SHIFT + Console key
 		pressKey(console.toggleKey, false, true);
 		assertTrue(profiler.visible);
 		
 		// tests profiler and monitor not be visible at the same time.
-		monitor.show();
-		profiler.show();
+		console.showMonitor();
+		console.showProfiler();
 		assertTrue(profiler.visible);
 		assertFalse(monitor.visible);
 		
-		profiler.show();
-		monitor.show();
+		console.showProfiler();
+		console.showMonitor();
 		assertTrue(monitor.visible);
 		assertFalse(profiler.visible);
 	}
@@ -233,9 +236,9 @@ class TestProfiler extends TestCase
 	//---------------------------------------------------------------------------------
 	function pressKey(key:Int, ctrl:Bool = false, shift:Bool = false) {
 		#if flash
-		console.stage.dispatchEvent(new KeyboardEvent(KeyboardEvent.KEY_UP, true, false, 0, key, null, ctrl, false, shift));
+		interfc.dispatchEvent(new KeyboardEvent(KeyboardEvent.KEY_UP, true, false, 0, key, null, ctrl, false, shift));
 		#else 
-		console.stage.dispatchEvent(new KeyboardEvent(KeyboardEvent.KEY_UP, true, false, 0, key, 0, ctrl, false, shift));
+		interfc.stage.dispatchEvent(new KeyboardEvent(KeyboardEvent.KEY_UP, true, false, 0, key, 0, ctrl, false, shift));
 		#end
 	}
 	

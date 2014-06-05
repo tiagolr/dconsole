@@ -1,5 +1,4 @@
 package pgr.gconsole;
-import flash.errors.Error;
 import pgr.gconsole.GCCommands.Register;
 
 class GCUtil
@@ -80,7 +79,7 @@ class GCUtil
 				
 				// search nested object using reflect
 				object = Reflect.getProperty(parent, objectName);
-			} catch (e:Error) {
+			} catch (e:Dynamic) {
 				
 				// object not found
 				return null; 
@@ -198,7 +197,7 @@ class GCUtil
 				{
 					results.push(field);
 				}
-			} catch (e:Error) {}
+			} catch (e:Dynamic) {}
 		}
 			
 		return results;

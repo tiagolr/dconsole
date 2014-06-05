@@ -30,9 +30,9 @@ class GConsole {
 	public static var instance:GConsole;
 	
 	public var enabled(default, null):Bool;
-	public var consoleVisible(default, null):Bool;
+	public var visible(default, null):Bool;
 	
-	var input:GCInput;
+	public var input:GCInput;
 	
 	
 	public function new(height:Float = 0.33, align:String = "DOWN", theme:GCThemes.Theme = null, monitorRate:Int = 10) {
@@ -75,7 +75,7 @@ class GConsole {
 	
 	
 	public function showConsole() {
-		consoleVisible = true;
+		visible = true;
 		if (!enabled) {
 			return;
 		}
@@ -83,7 +83,7 @@ class GConsole {
 	}
 
 	public function hideConsole() {
-		consoleVisible = false;
+		visible = false;
 		if (!enabled) {
 			return;
 		}
@@ -93,7 +93,7 @@ class GConsole {
 	
 	public function enable() {
 		enabled = true;
-		if (consoleVisible) {
+		if (visible) {
 			interfc.showConsole();
 		}
 		if (monitor.visible) {
@@ -265,9 +265,7 @@ class GConsole {
 		}
 
 		interfc.setInputTxt(_historyArray[_historyIndex]);
-		#if !(cpp || neko)
 		interfc.moveCarretToEnd();
-		#end
 	}
 
 	public function nextHistory() {
@@ -279,9 +277,7 @@ class GConsole {
 		_historyIndex++;
 
 		interfc.setInputTxt(_historyArray[_historyIndex]);
-		#if !(cpp || neko)
 		interfc.moveCarretToEnd();
-		#end
 	}
 
 

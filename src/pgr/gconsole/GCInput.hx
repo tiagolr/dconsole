@@ -38,7 +38,7 @@ class GCInput{
 	
 	private function onKeyDown(e:KeyboardEvent):Void {
 		#if !(cpp || neko) // BUGFIX
-		if (console.enabled && console.consoleVisible) {
+		if (console.enabled && console.visible) {
 			e.stopImmediatePropagation();
 		}
 		#end
@@ -62,7 +62,7 @@ class GCInput{
 		// SHOW/HIDE CONSOLE
 		else 
 		if (cast(e.keyCode, Int) == console.toggleKey) {
-			if (console.consoleVisible) {
+			if (console.visible) {
 				console.hideConsole();
 			} else {
 				console.showConsole();
@@ -72,7 +72,7 @@ class GCInput{
 		
 		// IGNORE INPUT IF CONSOLE HIDDEN
 		else 
-		if (!console.consoleVisible) {
+		if (!console.visible) {
 			return;
 		}
 

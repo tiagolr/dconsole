@@ -1,4 +1,5 @@
 package ;
+import flash.text.TextField;
 import flash.ui.Keyboard;
 import haxe.unit.TestCase;
 import flash.events.KeyboardEvent;
@@ -45,9 +46,9 @@ class TestMonitor extends TestCase
 		interfc.clearInput();
 		interfc.clearConsole();
 		console.enable();
-		console.show();
-		monitor.hide();
-		profiler.hide();
+		console.showConsole();
+		console.hideMonitor();
+		console.hideProfiler();
 		GC.clearMonitor();
 		refreshMonitor();
 		i = 0;
@@ -57,18 +58,17 @@ class TestMonitor extends TestCase
 	
 	
 	override public function tearDown():Void {
-		profiler.hide();
-		monitor.hide();
+		console.hideProfiler();
+		console.hideMonitor();
 		GC.clearMonitor();
 		refreshMonitor();
 	}
-	
 	
 	public function testClearMonitor() {
 		i = 999;
 		
 		GC.monitorField(this, "i", "i");
-		monitor.refresh(null);
+		refreshMonitor();
 		
 		assertTrue(monitorHasField("i"));
 		assertTrue(monitorHasText("999"));
@@ -84,9 +84,10 @@ class TestMonitor extends TestCase
 	// test response with console disabled
 	public function testDisable() {
 		console.disable();
+		// CTRL + console key
 		pressKey(console.toggleKey, true);
 		assertFalse(monitor.visible);
-		monitor.show();
+		console.showMonitor();
 		//assertFalse(monitor.visible);
 		//console.enable();
 		assertTrue(monitor.visible);
@@ -98,10 +99,10 @@ class TestMonitor extends TestCase
 	
 	
 	public function testVisibility() {
-		monitor.hide();
+		console.hideMonitor();
 		assertFalse(monitor.visible);
 		
-		monitor.show();
+		console.showMonitor();
 		assertTrue(monitor.visible);
 		
 		pressKey(console.toggleKey, true);
@@ -111,13 +112,13 @@ class TestMonitor extends TestCase
 		assertTrue(monitor.visible);
 		
 		// tests profiler and monitor not be visible at the same time.
-		monitor.show();
-		profiler.show();
+		console.showMonitor();
+		console.showProfiler();
 		assertTrue(profiler.visible);
 		assertFalse(monitor.visible);
 		
-		profiler.show();
-		monitor.show();
+		console.showProfiler();
+		console.showMonitor();
 		assertTrue(monitor.visible);
 		assertFalse(profiler.visible);
 	}
@@ -186,21 +187,22 @@ class TestMonitor extends TestCase
 	
 	function pressKey(key:Int, ctrl:Bool = false, shift:Bool = false) {
 		#if flash
-		console.stage.dispatchEvent(new KeyboardEvent(KeyboardEvent.KEY_UP, true, false, 0, key, null, ctrl, false, shift));
+		interfc.stage.dispatchEvent(new KeyboardEvent(KeyboardEvent.KEY_UP, true, false, 0, key, null, ctrl, false, shift));
 		#else 
-		console.stage.dispatchEvent(new KeyboardEvent(KeyboardEvent.KEY_UP, true, false, 0, key, 0, ctrl, false, shift));
+		interfc.stage.dispatchEvent(new KeyboardEvent(KeyboardEvent.KEY_UP, true, false, 0, key, 0, ctrl, false, shift));
 		#end
 	}
 	
 	
 	function refreshMonitor() {
-		monitor.refreshOutput();
 		monitor.writeOutput();
 	}
 	
 	
 	function monitorHasText(txt:String):Bool {
-		return (monitor.txtMonitorLeft.text.lastIndexOf(txt) != -1 || monitor.txtMonitorRight.text.lastIndexOf(txt) != -1);
+		var txtMonitorLeft:TextField = Reflect.getProperty(interfc, "txtMonitorLeft");
+		var txtMonitorRight:TextField = Reflect.getProperty(interfc, "txtMonitorRight");
+		return (txtMonitorLeft.text.lastIndexOf(txt) != -1 || txtMonitorRight.text.lastIndexOf(txt) != -1);
 	}
 	
 	
@@ -212,4 +214,5 @@ class TestMonitor extends TestCase
 		}
 		return false;
 	}
+	
 }

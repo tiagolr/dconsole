@@ -1,8 +1,10 @@
 package ;
+import flash.text.TextField;
 import flash.ui.Keyboard;
 import haxe.unit.TestCase;
 import flash.events.KeyboardEvent;
 import flash.Lib;
+import pgr.gconsole.GCInput;
 import pgr.gconsole.GCInterface;
 import pgr.gconsole.GC;
 import pgr.gconsole.GConsole;
@@ -16,6 +18,7 @@ class TestInput extends TestCase
 {	 
 	var interfc:GCInterface;
 	var console:GConsole;
+	var input:GCInput;
 	var i:Int;
 	var f:Float;
 	var s:String;
@@ -25,62 +28,66 @@ class TestInput extends TestCase
 			GC.init();
 			console = GConsole.instance;
 			interfc = console.interfc;
+			input = console.input;
 		}
 		
 		console.setToggleKey(Keyboard.TAB);
 		interfc.clearInput();
 		interfc.clearConsole();
 		console.enable();
-		console.show();
+		console.showConsole();
 	}
 	
 	/**
 	 * Tests show/hide commands.
 	 */
 	public function testVisibility() {
-		console.hide();
-		assertTrue(console.hidden);
-		console.show();
-		assertFalse(console.hidden);
+		console.hideConsole();
+		assertFalse(console.visible);
+		console.showConsole();
+		assertTrue(console.visible);
 	}
 	
 	/**
 	 * Tests opening/closing console with shortcut key
 	 */
 	public function testConsoleToggleKey() {
-		console.hide();
-		assertTrue(console.hidden);
+		console.hideConsole();
+		assertFalse(console.visible);
 		pressKey(console.toggleKey);
-		assertFalse(console.hidden);
+		assertTrue(console.visible);
 		pressKey(console.toggleKey);
-		assertTrue(console.hidden);
+		assertFalse(console.visible);
 	}
 	
 	/**
 	 * Tests disabled console behaviour to keystrokes.
 	 */
 	public function testDisable() {
+		
+		var consoleDisplay = Reflect.getProperty(interfc, "consoleDisplay");
+		
 		console.disable();
 		pressKey(console.toggleKey);
-		assertFalse(interfc.visible);
-		console.show();
-		assertFalse(interfc.visible);
+		assertFalse(consoleDisplay.visible);
+		console.showConsole();
+		assertFalse(consoleDisplay.visible);
 		console.enable();
-		assertTrue(interfc.visible);
+		assertTrue(consoleDisplay.visible);
 	}
 	
 	/**
 	 * Tests hidden console behaviour to keystrokes.
 	 */
 	public function testHiddenConsole() {
-		console.hide();
+		console.hideConsole();
 		
 		interfc.setInputTxt("SomeText");
 		pressKey(Keyboard.ENTER); 
 		assertTrue(interfc.getConsoleText() == "");
 		
 		pressKey(console.toggleKey);
-		assertFalse(console.hidden);
+		assertTrue(console.visible);
 		pressKey(Keyboard.ENTER); 
 		assertFalse(interfc.getConsoleText() == "");
 	}
@@ -180,15 +187,17 @@ class TestInput extends TestCase
 		// test pageUp, see if scroll changes.
 		// test pageDown, see if scroll returns back.
 		
-		for (i in 0...20) {
+		for (i in 0...30) {
 			console.log("...");
 		}
 		
-		assertTrue(interfc.txtConsole.scrollV == interfc.txtConsole.maxScrollV);
+		var txtConsole:TextField = Reflect.getProperty(interfc, "txtConsole");
+		
+		assertTrue(txtConsole.scrollV == txtConsole.maxScrollV);
 		pressKey(Keyboard.PAGE_UP);
-		assertTrue(interfc.txtConsole.scrollV < interfc.txtConsole.maxScrollV);
+		assertTrue(txtConsole.scrollV < txtConsole.maxScrollV);
 		pressKey(Keyboard.PAGE_DOWN);
-		assertTrue(interfc.txtConsole.scrollV == interfc.txtConsole.maxScrollV);
+		assertTrue(txtConsole.scrollV == txtConsole.maxScrollV);
 		
 	}
 	
@@ -212,7 +221,8 @@ class TestInput extends TestCase
 	}
 	
 	private function pressKey(key:UInt) {
-		console.stage.dispatchEvent(new KeyboardEvent(KeyboardEvent.KEY_UP, true, false, 0, key)); 
+		
+		interfc.stage.dispatchEvent(new KeyboardEvent(KeyboardEvent.KEY_UP, true, false, 0, key)); 
 	}
 	
 }
