@@ -137,8 +137,14 @@ class TestProfiler extends TestCase
 	
 	
 	public function testCrossProfile() {
-		// todo - prevent cross profile samples
-		assertTrue(true);
+		try {
+			GC.beginProfile("s1");
+			GC.beginProfile("s2");
+			GC.endProfile("s1");
+			assertTrue(false); // code not supposed to be reached.
+		} catch (s:Dynamic) {}
+		
+		assertTrue(true); // cross profile exception catched.
 	}
 	
 	// test samples statistics

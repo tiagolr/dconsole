@@ -1,7 +1,16 @@
 package pgr.gconsole;
 
+
+enum ALIAS_TYPE {
+	COMMAND;
+	OBJECT;
+	FUNCTION;
+}
+
 class GCUtil
 {
+	
+	
 	static public function autoComplete(input:String):Array<String>
 	{
 		var args:Array<String> = input.split(' ');
@@ -229,13 +238,43 @@ class GCUtil
 	}
 	
 	
-	static public function generateObjectAlias(object:Dynamic):String {
-		var alias = Type.getClassName(Type.getClass(object)).toLowerCase();
+	static public function formatAlias(alias:String, type:ALIAS_TYPE):String {
 		var i:Int = 1;
 		
-		while (GCCommands.getObject(alias) != null) {
-			alias = Type.getClassName(Type.getClass(object)).toLowerCase() + Std.string(i);
-			i++;
+		// make sure alias is valid
+		if (alias == null || alias == "") {
+			return null;
+		}
+		
+		//Variable names are case sensitive in Haxe. A valid variable name starts with a letter or underscore,
+		//followed by any number of letters, numbers, or underscores.
+		var r = ~/^[a-zA-Z_\x7f-\xff][a-zA-Z0-9_\x7f-\xff]*/;
+		if (!r.match(alias)) {
+			return null;
+		}
+		
+		if (type == ALIAS_TYPE.COMMAND) {
+			alias = alias.toLowerCase();
+		}
+		
+		var aux = alias;
+		// make alias unique
+		while (GCCommands.getCommand(alias) != null 
+			   || GCCommands.getObject(alias) != null 
+			   || GCCommands.getFunction(alias) != null) 
+		{
+			switch (type) {
+				case COMMAND:
+					//concatenate c
+					alias = 'c' + alias;
+				case FUNCTION:
+					// concatenate f
+					alias = 'f' + alias;
+				case OBJECT:
+					// append i
+					alias = aux + Std.string(i);
+					i++;
+			}
 		}
 		
 		return alias;

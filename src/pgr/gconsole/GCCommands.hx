@@ -3,6 +3,7 @@ package pgr.gconsole;
 import hscript.Expr.Error;
 import hscript.Interp;
 import hscript.Parser;
+import pgr.gconsole.GCUtil.ALIAS_TYPE;
 
 
 typedef Command = {
@@ -37,30 +38,29 @@ class GCCommands
 		hScriptInterp.variables.set("Math", Math);
 	}
 	
-	
+	/**
+	 * Evaluates input: 
+	 * If the first word is a registered command,
+	 * call that command and send rest of input as arguments (tokens)
+	 * Otherwise let the interpreter handle the input.
+	 */
 	static public function evaluate(input:String) {
 		
-		/** 
-		 * If the first word is a registered command, 
-		 * send the input (as tokens) to the command and let it 
-		 * process the input
-		 */
 		var args:Array<String> = input.split(' ');
 		var commandName = args[0].toLowerCase();
-		
-		if (commandName == null || commandName == '') {
-			return; 
+		if (commandName != null && commandName != '') {
+			for (command in commandsMap.iterator()) {
+				if (commandName == command.alias || commandName == command.shortcut) {
+					
+					// Command found, execute command instead of using hscrit interp
+					args.shift();
+					command.callback(args);
+					return;
+				}
+			} 
 		}
 		
-		for (command in commandsMap.iterator()) {
-			if (commandName == command.alias || commandName == command.shortcut) {
-				args.shift();
-				command.callback(args);
-				return;
-			}
-		}
-		
-		/** Else the input is processed by hscript interpreter */
+		// hscript interp handle input
 		try {
 			var program = hScriptParser.parseString(input + ";");
 			
@@ -82,7 +82,25 @@ class GCCommands
 										   description:String = "",
 										   help:String = "") 
 	{
-		// TODO - sanitize shortcut and alias
+		if (!Reflect.isFunction(Function)) {
+			GC.logError("Command function " + Std.string(Function) + " is not valid.");
+			return;
+		}
+		
+		alias = GCUtil.formatAlias(alias, ALIAS_TYPE.COMMAND);
+		if (alias == null) {
+			GC.log("Failed to register command, make sure alias or shortcut is correct");
+			return;
+		}
+		
+		if (shortcut != "") {
+			shortcut = GCUtil.formatAlias(shortcut, ALIAS_TYPE.COMMAND);
+			// failed to validade this
+			if (shortcut == null) {
+				shortcut = ""; // no shortcut
+			}
+		}
+		
 		var command:Command = { 
 			callback:Function,
 			alias:alias,
@@ -98,15 +116,15 @@ class GCCommands
 	
 	static public function registerFunction(Function:Dynamic, alias:String) {
 		
-		
 		if (!Reflect.isFunction(Function)) {
 			GC.logError("Function " + Std.string(Function) + " is not valid.");
 			return;
 		}
 		
-		// override existing function
-		if (functionsMap.exists(alias)) {
-			GC.logWarning("function " + alias + " overriden");
+		alias = GCUtil.formatAlias(alias, ALIAS_TYPE.FUNCTION);
+		if (alias == null) {
+			GC.logError("Function " + Std.string(Function) + " alias not valid");
+			return;
 		}
 		
 		functionsMap.set(alias, Function);
@@ -122,11 +140,14 @@ class GCCommands
 		}
 		
 		if (alias == "") {
-			alias = GCUtil.generateObjectAlias(object);
+			alias = GCUtil.formatAlias(Type.getClassName(Type.getClass(object)).toLowerCase(), ALIAS_TYPE.OBJECT);
+		} else {
+			alias = GCUtil.formatAlias(alias, ALIAS_TYPE.OBJECT);
 		}
-
-		if (objectsMap.exists(alias)) {
-			GC.logWarning("object " + alias + " overriden.");
+		
+		if (alias == null) {
+			GC.logError("failed to register object " + Type.getClassName(Type.getClass(object)) + " make sure object alias is correct");
+			return;
 		}
 		
 		objectsMap.set(alias, object);
@@ -254,19 +275,22 @@ class GCCommands
 	//  AUX
 	//---------------------------------------------------------------------------------
 	public static function getFunction(alias:String):Dynamic {
-		if (functionsMap.exists(alias))
-			return functionsMap.get(alias);
-		return null;
+		return functionsMap[alias];
 	}
 
 	
 	public static function getObject(alias:String) {
-		if (objectsMap.exists(alias)) {
-			return objectsMap.get(alias);
+		return objectsMap[alias];
+	}
+	
+	public static function getCommand(alias:String):Command {
+		alias = alias.toLowerCase();
+		for (command in commandsMap.iterator()) {
+			if (command.alias == alias || command.shortcut == alias) {
+				return command;
+			}
 		}
 		return null;
 	}
-	
-	
 	
 }

@@ -220,6 +220,26 @@ class GC
 	}
 	
 	/**
+	 * Registers a command to be invoked from the console.
+	 * For examples check GCCommands, all runtime commands are registered during console init().
+	 * 
+	 * @param	Function		The method called when the command is invoked.
+	 * @param	alias			The command name used to invoke it from the console.
+	 * @param	shortcut		Alternative name used to invoke it.
+	 * @param	description		Short description shown in commands list.
+	 * @param	help			Long description shown in help.
+	 */
+	static public function registerCommand(Function:Array<String>->Void,
+										   alias:String, 
+										   shortcut:String = "",
+										   description:String = "",
+										   help:String = "") 
+	{
+		checkInstance();
+		GCCommands.registerCommand(Function, alias, shortcut, description, help);
+	}
+	
+	/**
 	 * Registers an object to be used in the console.
 	 * @param	object		The object to register.
 	 * @param	alias		The alias displayed in the console. (optional) - if no alias is given, an automatic alias will be created.

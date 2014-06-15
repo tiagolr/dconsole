@@ -150,6 +150,10 @@ class GCProfiler {
 				entry.addChildEntry(s);
 			}
 			
+			if (s.openInstances > 0) {
+				throw "cross sampling detected: " + s.name + " is still open inside " + sample.name; 
+			}
+			
 			// clears all samples after top tree sample has finished.
 			s.numParents = 0;
 			s.parentName = "";
