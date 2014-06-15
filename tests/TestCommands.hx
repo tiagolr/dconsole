@@ -61,56 +61,54 @@ class TestCommands extends TestCase
 		GC.registerObject(this, "o1");
 		
 		// set this object string
-		consoleDo("set o1.s haha");
+		consoleDo("o1.s = 'haha'");
 		assertTrue(s == "haha");
 		
 		// set this object int
-		consoleDo("set o1.i 32");
+		consoleDo("o1.i = 32");
 		assertTrue(i == 32);
 		
 		// set this object bool
 		b = false;
-		consoleDo("set o1.b true");
+		consoleDo("o1.b = true");
 		assertTrue(b == true);
 		
 		// set this object float
-		consoleDo("set o1.f 0.0001");
+		consoleDo("o1.f = 0.0001");
 		assertTrue(f == 0.0001);
 		
 		// set nested object int
-		consoleDo("set o1.testObject.i 32");
+		consoleDo("o1.testObject.i = 32");
 		assertTrue(testObject.i == 32);
 		
 		// set multiple values
-		consoleDo("set o1.i -1 -2 -3");
-		assertTrue(i == -1);
+		consoleDo("o1.i = -1 -2 -3");
+		assertTrue(i == -6);
 		
 		// set object setter
-		consoleDo("set o1.setter 99");
+		consoleDo("o1.setter = 99");
 		assertTrue(i == 99);
 		
 		
 		// special incorrect sets (see if program does not crash)
-		consoleDo("set _____________");
-		consoleDo("set _____________ ____________");
-		consoleDo("set null");
-		consoleDo("set null null");
-		consoleDo("set. . . . . . .");
-		consoleDo("set . . . . ");
-		consoleDo("set o1.");
-		consoleDo("set o1. null");
-		consoleDo("set o1");
-		consoleDo("set o1 null");
-		consoleDo("set o1 200000");
-		consoleDo("set o1.______ 1000");
-		assertFalse(consoleHasText("OF")); 
-		consoleDo("set o1.testObject. string");
-		consoleDo("set o1.testObject.. string");
-		consoleDo("set o1.testObject.null string");
-		consoleDo("set o1.testObject.string string");
-		consoleDo("set o1.i string");
-		consoleDo("set o1.b string"); 
-		
+		consoleDo("_____________ =");
+		consoleDo("_____________ = ____________");
+		consoleDo("= null");
+		consoleDo("null = null");
+		consoleDo(". = . = . = . = . = . = .");
+		consoleDo(". . . . ");
+		consoleDo("o1. = null");
+		consoleDo("o1.null = null");
+		consoleDo("o1 = ");
+		consoleDo("o1.null");
+		consoleDo("o1.200000");
+		consoleDo("o1.______ = 1000");
+		consoleDo("o1.testObject. = 'string'");
+		consoleDo("o1.testObject.. = 'string'");
+		consoleDo("o1.testObject.null = 'string'");
+		consoleDo("o1.testObject.string = 'string'");
+		consoleDo("o1.i = 'string'");
+		consoleDo("o1.b = 'string'"); 
 	}
 	
 	public function testCall() {
@@ -121,50 +119,54 @@ class TestCommands extends TestCase
 		GC.registerObject(this, "o1");
 		
 		// call this object function
-		consoleDo("call F1");
-		assertTrue(consoleHasText("F1"));
-		consoleDo("call o1.F1");
-		assertTrue(consoleHasText("F1"));
+		consoleDo("F1()");
+		assertTrue(consoleHasText("F1 LOGGED"));
+		consoleDo("o1.F1()");
+		assertTrue(consoleHasText("F1 LOGGED"));
 		
 		// call static function
-		consoleDo("call F2");
-		assertTrue(consoleHasText("F2"));
+		consoleDo("F2()");
+		assertTrue(consoleHasText("F2 LOGGED"));
 		
 		// call nested object function
-		consoleDo("call o1.testObject.F");
-		assertTrue(consoleHasText("OF"));
+		GC.clearConsole();
+		assertFalse(consoleHasText("OF LOGGED"));
+		consoleDo("o1.testObject.F()");
+		assertTrue(consoleHasText("OF LOGGED"));
 		
 		// call function with arguments
-		consoleDo("call F4 test 0 true");
-		assertTrue(consoleHasText("testF4"));
+		GC.clearConsole();
+		consoleDo("F4('test',0, true)");
+		assertTrue(consoleHasText("testF4 LOGGED"));
 		assertTrue(consoleHasText("1"));
 		assertTrue(consoleHasText("true"));
 		
 		// call nested object function with arguments
-		consoleDo("call o1.testObject.F2 test 0 true");
-		assertTrue(consoleHasText("testOF4"));
+		GC.clearConsole();
+		consoleDo("o1.testObject.F2('test',0,true)");
+		assertTrue(consoleHasText("testOF4 LOGGED"));
 		assertTrue(consoleHasText("2"));
 		assertTrue(consoleHasText("true"));
 		
-		// call with incorrect argument data type
-		consoleDo("call F4 1.0 true null");
 		
 		// special incorrect calls (see if program does not crash)
-		consoleDo("call _____________");
-		consoleDo("call null");
-		consoleDo("call .............");
-		consoleDo("call.............");
-		consoleDo("call o1.");
-		consoleDo("call o1");
-		consoleDo("call o1.null");
-		consoleDo("call o1.nothing");
-		consoleDo("call F1 1000000"); // too much arguments
-		consoleDo("call F4 1000"); // few arguments
-		consoleDo("call o1.testObject.F 1234"); // nested function, too much arguments
-		consoleDo("call o1.testObject.");
-		consoleDo("call o1.testObject..");
-		consoleDo("call o1.testObject.null");
-		consoleDo("call o1.testObject.string");
+		consoleDo("F4(1.0,true,null)"); // (incorrect data types)
+		consoleDo("F4(1.0,'str',1.3)"); // (incorrect data types)
+		consoleDo("(_____________)");
+		consoleDo("(null)");
+		consoleDo("(.............)");
+		consoleDo("(.............)");
+		consoleDo("o1.()");
+		consoleDo("o1()");
+		consoleDo("o1.(null)");
+		consoleDo("o1.(nothing)");
+		consoleDo("F1(1000000)"); // too much arguments
+		consoleDo("F4(1000)"); // few arguments
+		consoleDo("o1.testObject.F(1234)"); // nested function, too much arguments
+		consoleDo("o1.testObject.()");
+		consoleDo("o1.testObject.(.)");
+		consoleDo("o1.testObject.(null)");
+		consoleDo("o1.testObject.('string')");
 	}
 	
 	
@@ -173,34 +175,34 @@ class TestCommands extends TestCase
 		
 		// test print this object int
 		this.i = 100;
-		consoleDo("print o1.i");
+		consoleDo("o1.i");
 		assertTrue(consoleHasText("100"));
 		
 		// test print getter
-		consoleDo("print o1.setter");
+		consoleDo("o1.setter");
 		assertTrue(consoleHasText("12345"));
 		
 		// test print nested object value
 		testObject.i = 11111;
-		consoleDo("print o1.testObject.i");
+		consoleDo("o1.testObject.i");
 		assertTrue(consoleHasText("11111"));
 		
 		// special incorrect calls (see if program does not crash)
-		consoleDo("print _____________");
-		consoleDo("print null");
-		consoleDo("print .............");
-		consoleDo("print.............");
-		consoleDo("print o1.");
-		consoleDo("print o1");
-		consoleDo("print o1.null");
-		consoleDo("print o1.nothing");
-		consoleDo("print o1 1000000"); // too much arguments
-		consoleDo("print o1 1000"); // few arguments
-		consoleDo("print o1.testObject.i 12345"); // nested function, too much arguments
-		consoleDo("print o1.testObject.");
-		consoleDo("print o1.testObject..");
-		consoleDo("print o1.testObject.null");
-		consoleDo("print o1.testObject.string");
+		consoleDo("_____________");
+		consoleDo("null");
+		consoleDo(".............");
+		consoleDo(".............");
+		consoleDo("o1.");
+		consoleDo("o1");
+		consoleDo("o1.null");
+		consoleDo("o1.nothing");
+		consoleDo("o1 1000000"); // too much arguments
+		consoleDo("o1 1000"); // few arguments
+		consoleDo("o1.testObject.i 12345"); // nested function, too much arguments
+		consoleDo("o1.testObject.");
+		consoleDo("o1.testObject..");
+		consoleDo("o1.testObject.null");
+		consoleDo("o1.testObject.string");
 	}
 	
 	//---------------------------------------------------------------------------------
@@ -218,21 +220,20 @@ class TestCommands extends TestCase
 	}
 
 	function F1() {
-		GC.log("F1");
+		GC.log("F1 LOGGED");
 	}
 	
 	public static function F2() {
-		GC.log("F2");
+		GC.log("F2 LOGGED");
 	}
 	
 	function F4(s:String, i:Int, b:Bool) {
-		GC.log(s + "F4");
+		GC.log(s + "F4 LOGGED");
 		GC.log(i + 1);
 		GC.log(!b);
 	}
 
 }
-
 
 
 private class TestObject {
@@ -243,11 +244,11 @@ private class TestObject {
 	public function new() {}
 	
 	public function F() {
-		GC.log("OF");
+		GC.log("OF LOGGED");
 	}
 	
 	public function F2(s:String, i:Int, b:Bool) {
-		GC.log(s + "OF4");
+		GC.log(s + "OF4 LOGGED");
 		GC.log(i + 2);
 		GC.log(!b);
 	}

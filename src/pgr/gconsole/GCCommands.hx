@@ -70,9 +70,9 @@ class GCCommands
 				GC.logConfirmation(result);
 			}
 			
-		} catch (e:Error) {
+		} catch (e:Dynamic) {
 			GC.logError(Std.string(e));
-		}
+		} 
 		
 	}
 	
@@ -135,37 +135,25 @@ class GCCommands
 	}
 
 	
-	public static function unregisterFunction(alias:String):Bool {
-		
-		if (GCCommands.unregisterFunction(alias)) {
-			GC.logInfo(alias + " unregistered.");
-		} else {
-			GC.logError(alias + " not found.");
-		}
+	public static function unregisterFunction(alias:String) {
 		
 		if (functionsMap.exists(alias)) {
 			functionsMap.remove(alias);
 			hScriptInterp.variables.remove(alias);
-			return true;
+			GC.logInfo(alias + " unregistered.");
 		}
-		return false;
+		GC.logError(alias + " not found.");
 	}
 	
 	
-	public static function unregisterObject(alias:String):Bool {
-		
-		if (GCCommands.unregisterObject(alias)) {
-			GC.logInfo(alias + " unregistered.");
-		} else {
-			GC.logError(alias + " not found.");
-		}
+	public static function unregisterObject(alias:String) {
 		
 		if (objectsMap.exists(alias)) {
 			objectsMap.remove(alias);
 			hScriptInterp.variables.remove(alias); // registers var in hscript
-			return true;
+			GC.logInfo(alias + " unregistered.");
 		}
-		return false;
+		GC.logError(alias + " not found.");
 	}
 	
 	
