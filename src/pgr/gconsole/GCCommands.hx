@@ -66,7 +66,7 @@ class GCCommands
 			
 			// using exprReturn instead of execute to skip interp internal state reset.
 			var result = hScriptInterp.exprReturn(program); 
-			if (Std.is(result, Float) || result != null) {
+			if (Std.is(result, Float) || Std.is(result, Bool) || result != null) { 
 				GC.logConfirmation(result);
 			}
 			
@@ -196,13 +196,10 @@ class GCCommands
 			var commandName = args[0].toLowerCase();
 			if (commandName != null && commandName != '') {
 				for (command in commandsMap.iterator()) {
-					if (commandName == command.alias || commandName == command.shortcut) {
-						args.shift();
-						command.callback(args);
-						
-						output += command.alias.toUpperCase();
+					if (commandName == command.alias || commandName == command.shortcut) {	
+						output += "command: " + command.alias.toUpperCase() + '\n';
 						if (command.shortcut != "") 
-							output += ' ' + '(' + command.shortcut.toUpperCase() + ')\n';
+							output += "shortcut: " + '' + command.shortcut.toUpperCase() + '\n';
 						output += command.description + '\n\n';
 						output += command.help		  + '\n';
 						GC.logInfo(output);

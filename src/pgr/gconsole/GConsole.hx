@@ -132,7 +132,7 @@ class GConsole {
 	
 	public function log(data:Dynamic, color:Int = -1) {
 		
-		if (!Std.is(data,Float) && data == "") {
+		if (!Std.is(data,Float) && !Std.is(data,Bool) && data == "") {
 			return;
 		}
 		
