@@ -12,7 +12,7 @@ import pgr.gconsole.GCThemes.Theme;
  */
 class GConsole {
 
-	inline static public var VERSION = "3.1.0";
+	inline static public var VERSION = "4.0.0";
 	
 	/** Aligns console to bottom */
 	static public var ALIGN_DOWN:String = "DOWN";
@@ -62,6 +62,8 @@ class GConsole {
 		
 		// create console interface
 		interfc = new GCInterface(height, align);
+		
+		GCCommands.init();
 
 		clearHistory();
 		
@@ -70,6 +72,14 @@ class GConsole {
 		hideMonitor();
 		hideProfiler();
 
+		GCCommands.registerCommand(GCCommands.showHelp, "help", "", "Type HELP [command-name] for more info");
+		GCCommands.registerCommand(GCCommands.showCommands, "commands", "", "Shows availible commands", "Type HELP [command-name] for more info");
+		GCCommands.registerCommand(GCCommands.listFunctions, "functions", "funcs", "Lists registered functions", "To call a function type functionName( args ), make sure the args type and number are correct");
+		GCCommands.registerCommand(GCCommands.listObjects, "objects", "objs", "Lists registered objects", "To print an object field type object.field\nTo set and object field type object.field = value");
+		GCCommands.registerCommand(clearConsole, "clear", "", "Clears console view");
+		GCCommands.registerCommand(toggleMonitor, "monitor", "", "Toggles monitor on and off", "Monitor is used to track variable values in runtime\nCONTROL + CONSOLE_KEY (default TAB) also toggles monitor");
+		GCCommands.registerCommand(toggleProfiler, "profiler", "", "Toggles profiler on and off", "Profiler is used to profile app and view statistics like time elapsed and percentage in runtime\nSHIFT + CONSOLE_KEY (default TAB) also toggles profiler");
+		
 		GC.logInfo("~~~~~~~~~~ GAME CONSOLE ~~~~~~~~~~ (v" + VERSION + ")");
 	}
 	
@@ -122,61 +132,18 @@ class GConsole {
 	
 	public function log(data:Dynamic, color:Int = -1) {
 		
-		if (data == "") {
+		if (!Std.is(data,Float) && data == "") {
 			return;
 		}
 		
 		interfc.log(data, color);
 	}
 	
-	
-	public function registerFunction(Function:Dynamic, alias:String = "") {
-
-		if (!Reflect.isFunction(Function)) {
-			GC.logError("Function " + Std.string(Function) + " is not valid.");
-			return;
-		}
-		
-		GCCommands.registerFunction(Function, alias);
-	}
-
-	
-	public function unregisterFunction(alias:String) {
-		if (GCCommands.unregisterFunction(alias)) {
-			GC.logInfo(alias + " unregistered.");
-		} else {
-			GC.logError(alias + " not found.");
-		}
-	}
-	
-	
-	public function registerObject(object:Dynamic, alias:String) {
-		if (!Reflect.isObject(object)) {
-			GC.logError("dynamic passed is not an object.");
-			return;
-		}
-
-		GCCommands.registerObject(object, alias);
-	}
-	
-	public function unregisterObject(alias:String) {
-		if (GCCommands.unregisterObject(alias)) {
-			GC.logInfo(alias + " unregistered.");
-		} else {
-			GC.logError(alias + " not found.");
-		}
-	}
-	
 	/**
 	 * Clears input text;
 	 */
-	public function clearConsole() {
+	public function clearConsole(args:Array<String> = null) {
 		interfc.clearConsole();
-	}
-
-	
-	public function clearRegistry() {
-		GCCommands.clearRegistry();
 	}
 	
 	public function clearHistory() {
@@ -213,7 +180,7 @@ class GConsole {
 	}
 	
 	
-	public function toggleMonitor() {
+	public function toggleMonitor(args:Array<String> = null) {
 		if (monitor.visible) {
 			hideMonitor();
 		} else {
@@ -233,7 +200,7 @@ class GConsole {
 	}
 	
 	
-	public function toggleProfiler() {
+	public function toggleProfiler(args:Array<String> = null) {
 		if (profiler.visible) {
 			hideProfiler();
 		} else {
@@ -297,7 +264,7 @@ class GConsole {
 		log("> " + currText);
 		interfc.clearInput();
 		
-		parseInput(currText);
+		GCCommands.evaluate(currText);
 	}
 	
 	// returns history index to beggining.
@@ -333,29 +300,6 @@ class GConsole {
 					GC.logInfo(entry);
 				}
 			}
-		}
-	}
-
-
-	private function parseInput(input:String) {
-		var args:Array<String> = input.split(' ');
-		var commandName = args[0].toLowerCase();
-		args.shift();
-		
-		switch (commandName) {
-			case "clear"	: clearConsole();
-			case "monitor"	: toggleMonitor();
-			case "profiler" : toggleProfiler();
-			case "help"		: GCCommands.showHelp();
-			case "commands" : GCCommands.showCommands();
-			case "funcs"	: GCCommands.listFunctions();
-			case "objs"		: GCCommands.listObjects();
-			case "print"	: GCCommands.printProperty(args);
-			case "set"		: GCCommands.setVariable(args);
-			case "call"		: GCCommands.callFunction(args);
-				
-			default : 
-				GC.logInfo("unknown command");
 		}
 	}
 	

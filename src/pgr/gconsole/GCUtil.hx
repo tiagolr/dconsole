@@ -1,5 +1,4 @@
 package pgr.gconsole;
-import pgr.gconsole.GCCommands.Register;
 
 class GCUtil
 {

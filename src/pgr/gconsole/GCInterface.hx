@@ -110,7 +110,7 @@ class GCInterface extends Sprite
 		txtConsole.height = _height - txtPrompt.textHeight + 2;
 		
 		txtPrompt.y = - 2; // -2 just looks better.
-		txtPrompt.autoSize = TextFieldAutoSize.LEFT;
+		txtPrompt.width = _width;
 		txtPrompt.height = 32;
 		
 		#if (cpp || neko) // BUGFIX

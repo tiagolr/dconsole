@@ -226,7 +226,7 @@ class GC
 	 */
 	public static function registerObject(object:Dynamic, alias:String = "") {
 		checkInstance();
-		GConsole.instance.registerObject(object, alias);
+		GCCommands.registerObject(object, alias);
 	}
 	/**
 	 * Registers a function to be called from the console.
@@ -237,7 +237,7 @@ class GC
 	 */
 	public static function registerFunction(Function:Dynamic, alias:String) {
 		checkInstance();
-		GConsole.instance.registerFunction(Function, alias);
+		GCCommands.registerFunction(Function, alias);
 	}
 	/**
 	 * Deletes field from registry.
@@ -245,12 +245,12 @@ class GC
 	 */
 	public static function unregisterFunction(alias:String) {
 		checkInstance();
-		GConsole.instance.unregisterFunction(alias);
+		GCCommands.unregisterFunction(alias);
 	}
 	
 	public static function unregisterObject(alias:String) {
 		checkInstance();
-		GConsole.instance.unregisterObject(alias);
+		GCCommands.unregisterObject(alias);
 	}
 	/**
 	 * Clears console logs.
