@@ -4,10 +4,10 @@ import flash.ui.Keyboard;
 import haxe.unit.TestCase;
 import flash.events.KeyboardEvent;
 import flash.Lib;
-import pgr.gconsole.GCInput;
-import pgr.gconsole.GCInterface;
-import pgr.gconsole.GC;
-import pgr.gconsole.GConsole;
+import pgr.dconsole.DCInput;
+import pgr.dconsole.DCInterface;
+import pgr.dconsole.DC;
+import pgr.dconsole.DConsole;
 
 /**
  * Tests console reaction to keystrokes.
@@ -16,17 +16,17 @@ import pgr.gconsole.GConsole;
  */
 class TestInput extends TestCase
 {	 
-	var interfc:GCInterface;
-	var console:GConsole;
-	var input:GCInput;
+	var interfc:DCInterface;
+	var console:DConsole;
+	var input:DCInput;
 	var i:Int;
 	var f:Float;
 	var s:String;
 	
 	override public function setup() {
 		if (console == null) {
-			GC.init();
-			console = GConsole.instance;
+			DC.init();
+			console = DConsole.instance;
 			interfc = console.interfc;
 			input = console.input;
 		}

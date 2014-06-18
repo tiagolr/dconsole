@@ -1,20 +1,20 @@
-package pgr.gconsole;
+package pgr.dconsole ;
 import flash.events.KeyboardEvent;
 import flash.Lib;
 import flash.ui.Keyboard;
-import pgr.gconsole.GConsole;
+import pgr.dconsole.DConsole;
 
 /**
  * Handles input
  * @author TiagoLr
  */
-class GCInput{
+class DCInput{
 
-	var console:GConsole;
+	var console:DConsole;
 	
 	public function new() {
 		
-		console = GConsole.instance;
+		console = DConsole.instance;
 		console.setToggleKey(Keyboard.TAB); // ensures TAB key using openfl
 		
 		enable();

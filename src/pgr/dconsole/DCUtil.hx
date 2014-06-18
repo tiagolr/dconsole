@@ -1,4 +1,4 @@
-package pgr.gconsole;
+package pgr.dconsole ;
 
 
 enum ALIAS_TYPE {
@@ -7,7 +7,7 @@ enum ALIAS_TYPE {
 	FUNCTION;
 }
 
-class GCUtil
+class DCUtil
 {
 	
 	
@@ -81,7 +81,7 @@ class GCUtil
 		if (parent == null) {
 			
 			// first entry, fetch object from registered objects
-			object = GCCommands.getObject(objectName);
+			object = DCCommands.getObject(objectName);
 		} else {
 			try {
 				
@@ -151,11 +151,11 @@ class GCUtil
 		if (object == null) {
 			
 			// fetch registered functions.
-			for (key in GCCommands.functionsMap.keys()) {
+			for (key in DCCommands.functionsMap.keys()) {
 				results.push(key);
 			}
 			// also include registered objects
-			for (key in GCCommands.objectsMap.keys()) {
+			for (key in DCCommands.objectsMap.keys()) {
 				results.push(key);
 			}
 		} else 
@@ -175,7 +175,7 @@ class GCUtil
 		
 		if (object == null) {
 			
-			for (key in GCCommands.objectsMap.keys()) {
+			for (key in DCCommands.objectsMap.keys()) {
 				results.push(key);
 			}
 			
@@ -259,9 +259,9 @@ class GCUtil
 		
 		var aux = alias;
 		// make alias unique
-		while (GCCommands.getCommand(alias) != null 
-			   || GCCommands.getObject(alias) != null 
-			   || GCCommands.getFunction(alias) != null) 
+		while (DCCommands.getCommand(alias) != null 
+			   || DCCommands.getObject(alias) != null 
+			   || DCCommands.getFunction(alias) != null) 
 		{
 			switch (type) {
 				case COMMAND:

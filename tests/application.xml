@@ -8,5 +8,5 @@
 	
 	<source path="src" />
 	<haxelib name="openfl" />
-	<haxelib name="gameconsole" />
+	<haxelib name="dconsole" />
 </project>

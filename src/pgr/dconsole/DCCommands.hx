@@ -1,9 +1,9 @@
-package pgr.gconsole;
+package pgr.dconsole ;
 
 import hscript.Expr.Error;
 import hscript.Interp;
 import hscript.Parser;
-import pgr.gconsole.GCUtil.ALIAS_TYPE;
+import pgr.dconsole.DCUtil.ALIAS_TYPE;
 
 
 typedef Command = {
@@ -15,25 +15,25 @@ typedef Command = {
 }
 
 /**
- * GCCommands contains the logic used by GC to execute the commands
+ * DCCommands contains the logic used by GC to execute the commands
  * given by the user.
  *
  * @author TiagoLr ( ~~~ProG4mr~~~ )
  */
 @:access(hscript.Interp)
-class GCCommands
+class DCCommands
 {
 	public static var functionsMap:Map<String, Dynamic> = new Map<String, Dynamic>();
 	public static var objectsMap:Map<String, Dynamic> = new Map<String, Dynamic>();
 	public static var commandsMap:Map < String, Command > = new Map < String, Command > ();
 	
 	private static var hScriptParser:Parser;
-	private static var hScriptInterp:GCInterp;
+	private static var hScriptInterp:DCInterp;
 	
 
 	static public function init() {
 		hScriptParser = new Parser();
-		hScriptInterp = new GCInterp();
+		hScriptInterp = new DCInterp();
 		hScriptInterp.variables.set("objectsMap", objectsMap);
 		hScriptInterp.variables.set("Math", Math);
 	}
@@ -67,11 +67,11 @@ class GCCommands
 			// using exprReturn instead of execute to skip interp internal state reset.
 			var result = hScriptInterp.exprReturn(program); 
 			if (Std.is(result, Float) || Std.is(result, Bool) || result != null) { 
-				GC.logConfirmation(result);
+				DC.logConfirmation(result);
 			}
 			
 		} catch (e:Dynamic) {
-			GC.logError(Std.string(e));
+			DC.logError(Std.string(e));
 		} 
 		
 	}
@@ -83,18 +83,18 @@ class GCCommands
 										   help:String = "") 
 	{
 		if (!Reflect.isFunction(Function)) {
-			GC.logError("Command function " + Std.string(Function) + " is not valid.");
+			DC.logError("Command function " + Std.string(Function) + " is not valid.");
 			return;
 		}
 		
-		alias = GCUtil.formatAlias(alias, ALIAS_TYPE.COMMAND);
+		alias = DCUtil.formatAlias(alias, ALIAS_TYPE.COMMAND);
 		if (alias == null) {
-			GC.log("Failed to register command, make sure alias or shortcut is correct");
+			DC.log("Failed to register command, make sure alias or shortcut is correct");
 			return;
 		}
 		
 		if (shortcut != "") {
-			shortcut = GCUtil.formatAlias(shortcut, ALIAS_TYPE.COMMAND);
+			shortcut = DCUtil.formatAlias(shortcut, ALIAS_TYPE.COMMAND);
 			// failed to validade this
 			if (shortcut == null) {
 				shortcut = ""; // no shortcut
@@ -117,13 +117,13 @@ class GCCommands
 	static public function registerFunction(Function:Dynamic, alias:String) {
 		
 		if (!Reflect.isFunction(Function)) {
-			GC.logError("Function " + Std.string(Function) + " is not valid.");
+			DC.logError("Function " + Std.string(Function) + " is not valid.");
 			return;
 		}
 		
-		alias = GCUtil.formatAlias(alias, ALIAS_TYPE.FUNCTION);
+		alias = DCUtil.formatAlias(alias, ALIAS_TYPE.FUNCTION);
 		if (alias == null) {
-			GC.logError("Function " + Std.string(Function) + " alias not valid");
+			DC.logError("Function " + Std.string(Function) + " alias not valid");
 			return;
 		}
 		
@@ -135,18 +135,18 @@ class GCCommands
 	static public function registerObject(object:Dynamic, alias:String) {
 		
 		if (!Reflect.isObject(object)) {
-			GC.logError("dynamic passed is not an object.");
+			DC.logError("dynamic passed is not an object.");
 			return;
 		}
 		
 		if (alias == "") {
-			alias = GCUtil.formatAlias(Type.getClassName(Type.getClass(object)).toLowerCase(), ALIAS_TYPE.OBJECT);
+			alias = DCUtil.formatAlias(Type.getClassName(Type.getClass(object)).toLowerCase(), ALIAS_TYPE.OBJECT);
 		} else {
-			alias = GCUtil.formatAlias(alias, ALIAS_TYPE.OBJECT);
+			alias = DCUtil.formatAlias(alias, ALIAS_TYPE.OBJECT);
 		}
 		
 		if (alias == null) {
-			GC.logError("failed to register object " + Type.getClassName(Type.getClass(object)) + " make sure object alias is correct");
+			DC.logError("failed to register object " + Type.getClassName(Type.getClass(object)) + " make sure object alias is correct");
 			return;
 		}
 		
@@ -161,9 +161,9 @@ class GCCommands
 		if (functionsMap.exists(alias)) {
 			functionsMap.remove(alias);
 			hScriptInterp.variables.remove(alias);
-			GC.logInfo(alias + " unregistered.");
+			DC.logInfo(alias + " unregistered.");
 		}
-		GC.logError(alias + " not found.");
+		DC.logError(alias + " not found.");
 	}
 	
 	
@@ -172,9 +172,9 @@ class GCCommands
 		if (objectsMap.exists(alias)) {
 			objectsMap.remove(alias);
 			hScriptInterp.variables.remove(alias); // registers var in hscript
-			GC.logInfo(alias + " unregistered.");
+			DC.logInfo(alias + " unregistered.");
 		}
-		GC.logError(alias + " not found.");
+		DC.logError(alias + " not found.");
 	}
 	
 	
@@ -202,12 +202,12 @@ class GCCommands
 							output += "shortcut: " + '' + command.shortcut.toUpperCase() + '\n';
 						output += command.description + '\n\n';
 						output += command.help		  + '\n';
-						GC.logInfo(output);
+						DC.logInfo(output);
 						return;
 					}
 				}
 			} else {
-				GC.logWarning("Command name not found");
+				DC.logWarning("Command name not found");
 				return;
 			}
 			
@@ -216,7 +216,7 @@ class GCCommands
 			output += "Type COMMANDS to view availible commands\n"; 
 			output += "'PAGEUP' or 'PAGEDOWN' keys to scroll text\n";
 			output += "'UP' or 'DOWN' keys to navigate history\n";
-			GC.logInfo(output);
+			DC.logInfo(output);
 		}
 	}
 
@@ -233,7 +233,7 @@ class GCCommands
 			output += line;
 		}
 		
-		GC.logInfo(output);
+		DC.logInfo(output);
 	}
 	
 
@@ -244,11 +244,11 @@ class GCCommands
 		}
 
 		if (list.toString() == "") {
-			GC.logInfo("no functions registered.");
+			DC.logInfo("no functions registered.");
 			return;
 		} 
 		
-		GC.logConfirmation(list);
+		DC.logConfirmation(list);
 	}
 
 	
@@ -260,11 +260,11 @@ class GCCommands
 		}
 
 		if (list.toString() == '') {
-			GC.logInfo("no objects registered.");
+			DC.logInfo("no objects registered.");
 			return;
 		} 
 		
-		GC.logConfirmation(list);
+		DC.logConfirmation(list);
 	}
 
 	

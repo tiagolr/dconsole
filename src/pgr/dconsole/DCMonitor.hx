@@ -1,4 +1,4 @@
-package pgr.gconsole;
+package pgr.dconsole ;
 import haxe.Timer;
 
 typedef MonitorField = {
@@ -11,7 +11,7 @@ typedef MonitorField = {
  * ...
  * @author TiagoLr
  */
-class GCMonitor {
+class DCMonitor {
 
 	public var startTime(default, null):Int;
 	public var visible(default, null):Bool;
@@ -28,7 +28,7 @@ class GCMonitor {
 	//---------------------------------------------------------------------------------
 	//  LOGIC
 	//---------------------------------------------------------------------------------
-	@:allow(pgr.gconsole.GConsole)
+	@:allow(pgr.dconsole.DConsole)
 	function show() {
 		visible = true;
 		stopTimer();
@@ -36,7 +36,7 @@ class GCMonitor {
 		writeOutput(); // renders first frame.
 	}
 
-	@:allow(pgr.gconsole.GConsole)
+	@:allow(pgr.dconsole.DConsole)
 	function hide() {
 		visible = false;
 		stopTimer();
@@ -64,7 +64,7 @@ class GCMonitor {
 			output.push(v.alias + ':' + Reflect.getProperty(v.object, v.field) + '\n');
 		}
 		
-		GConsole.instance.interfc.writeMonitorOutput(output);
+		DConsole.instance.interfc.writeMonitorOutput(output);
 	}
 	
 	

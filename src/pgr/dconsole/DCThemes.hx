@@ -1,5 +1,5 @@
-package pgr.gconsole;
-import pgr.gconsole.GCThemes.Theme;
+package pgr.dconsole ;
+import pgr.dconsole.DCThemes.Theme;
 
 
 // alpha values are shared by console and prompt
@@ -30,7 +30,7 @@ import pgr.gconsole.GCThemes.Theme;
   * Static class that provides the themes for the console.
   * Create your own themes here.
   */
-class GCThemes 
+class DCThemes 
 {
 	static public var current:Theme;
 	

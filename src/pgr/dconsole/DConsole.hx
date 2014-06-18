@@ -1,16 +1,16 @@
-package pgr.gconsole;
+package pgr.dconsole ;
 
-import pgr.gconsole.GCThemes.Theme;
+import pgr.dconsole.DCThemes.Theme;
 
 /**
- * GConsole is the main class of this lib, it should be instantiated only once
+ * DConsole is the main class of this lib, it should be instantiated only once
  * and then use its instance to control the console.
  * 
  * Its recomended to use GC class as API for this lib.
  * 
  * @author TiagoLr ( ~~~ProG4mr~~~ )
  */
-class GConsole {
+class DConsole {
 
 	inline static public var VERSION = "4.0.0";
 	
@@ -21,21 +21,21 @@ class GConsole {
 
 	private var _historyArray:Array<String>;
 	private var _historyIndex:Int;
-	public var interfc:GCInterface;
-	public var monitor:GCMonitor;
-	public var profiler:GCProfiler;
+	public var interfc:DCInterface;
+	public var monitor:DCMonitor;
+	public var profiler:DCProfiler;
 
 	/** shortcutkey to show/hide console. */ 
 	public var toggleKey:Int = 9; 
-	public static var instance:GConsole;
+	public static var instance:DConsole;
 	
 	public var enabled(default, null):Bool;
 	public var visible(default, null):Bool;
 	
-	public var input:GCInput;
+	public var input:DCInput;
 	
 	
-	public function new(height:Float = 0.33, align:String = "DOWN", theme:GCThemes.Theme = null, monitorRate:Int = 10) {
+	public function new(height:Float = 0.33, align:String = "DOWN", theme:DCThemes.Theme = null, monitorRate:Int = 10) {
 		
 		if (instance != null) {
 			return;
@@ -43,27 +43,27 @@ class GConsole {
 		instance = this;
 		
 		if (theme == null) {
-			GCThemes.current = GCThemes.DARK;
+			DCThemes.current = DCThemes.DARK;
 		} else {
-			GCThemes.current = theme;
+			DCThemes.current = theme;
 		}
 
 		if (height > 1) height = 1;
 		if (height < 0.1) height = 0.1;
 		
 		// create input
-		input = new GCInput();
+		input = new DCInput();
 		
 		// create monitor
-		monitor = new GCMonitor();
+		monitor = new DCMonitor();
 		
 		// create profiler
-		profiler = new GCProfiler();
+		profiler = new DCProfiler();
 		
 		// create console interface
-		interfc = new GCInterface(height, align);
+		interfc = new DCInterface(height, align);
 		
-		GCCommands.init();
+		DCCommands.init();
 
 		clearHistory();
 		
@@ -72,15 +72,15 @@ class GConsole {
 		hideMonitor();
 		hideProfiler();
 
-		GCCommands.registerCommand(GCCommands.showHelp, "help", "", "Type HELP [command-name] for more info");
-		GCCommands.registerCommand(GCCommands.showCommands, "commands", "", "Shows availible commands", "Type HELP [command-name] for more info");
-		GCCommands.registerCommand(GCCommands.listFunctions, "functions", "funcs", "Lists registered functions", "To call a function type functionName( args ), make sure the args type and number are correct");
-		GCCommands.registerCommand(GCCommands.listObjects, "objects", "objs", "Lists registered objects", "To print an object field type object.field\nTo set and object field type object.field = value");
-		GCCommands.registerCommand(clearConsole, "clear", "", "Clears console view");
-		GCCommands.registerCommand(toggleMonitor, "monitor", "", "Toggles monitor on and off", "Monitor is used to track variable values in runtime\nCONTROL + CONSOLE_KEY (default TAB) also toggles monitor");
-		GCCommands.registerCommand(toggleProfiler, "profiler", "", "Toggles profiler on and off", "Profiler is used to profile app and view statistics like time elapsed and percentage in runtime\nSHIFT + CONSOLE_KEY (default TAB) also toggles profiler");
+		DCCommands.registerCommand(DCCommands.showHelp, "help", "", "Type HELP [command-name] for more info");
+		DCCommands.registerCommand(DCCommands.showCommands, "commands", "", "Shows availible commands", "Type HELP [command-name] for more info");
+		DCCommands.registerCommand(DCCommands.listFunctions, "functions", "funcs", "Lists registered functions", "To call a function type functionName( args ), make sure the args type and number are correct");
+		DCCommands.registerCommand(DCCommands.listObjects, "objects", "objs", "Lists registered objects", "To print an object field type object.field\nTo set and object field type object.field = value");
+		DCCommands.registerCommand(clearConsole, "clear", "", "Clears console view");
+		DCCommands.registerCommand(toggleMonitor, "monitor", "", "Toggles monitor on and off", "Monitor is used to track variable values in runtime\nCONTROL + CONSOLE_KEY (default TAB) also toggles monitor");
+		DCCommands.registerCommand(toggleProfiler, "profiler", "", "Toggles profiler on and off", "Profiler is used to profile app and view statistics like time elapsed and percentage in runtime\nSHIFT + CONSOLE_KEY (default TAB) also toggles profiler");
 		
-		GC.logInfo("~~~~~~~~~~ GAME CONSOLE ~~~~~~~~~~ (v" + VERSION + ")");
+		DC.logInfo("~~~~~~~~~~ D_CONSOLE ~~~~~~~~~~ (v" + VERSION + ")");
 	}
 	
 	
@@ -155,24 +155,24 @@ class GConsole {
 	public function monitorField(object:Dynamic, fieldName:String, alias:String) {
 		
 		if (fieldName == null || fieldName == "") {
-			GC.logError("invalid fieldName");
+			DC.logError("invalid fieldName");
 			return;
 		}
 		
 		if (alias == null || alias == "") {
-			GC.logError("invalid alias");
+			DC.logError("invalid alias");
 			return;
 		}
 		
 		if (object == null || !Reflect.isObject(object)) {
-			GC.logError("invalid object.");
+			DC.logError("invalid object.");
 			return;
 		}
 		
 		try {
 			Reflect.getProperty(object, fieldName);
 		} catch (e:Dynamic) {
-			GC.logError("could not find field: " + fieldName);
+			DC.logError("could not find field: " + fieldName);
 			return;
 		}
 		
@@ -264,7 +264,7 @@ class GConsole {
 		log("> " + currText);
 		interfc.clearInput();
 		
-		GCCommands.evaluate(currText);
+		DCCommands.evaluate(currText);
 	}
 	
 	// returns history index to beggining.
@@ -284,20 +284,20 @@ class GConsole {
 		// remove white space added pressing CTRL + SPACE.
 		interfc.inputRemoveLastChar();
 		
-		var autoC:Array<String> = GCUtil.autoComplete(interfc.getInputTxt());
+		var autoC:Array<String> = DCUtil.autoComplete(interfc.getInputTxt());
 		if (autoC != null)
 		{
 			if (autoC.length == 1) // only one entry in autocomplete - replace user entry.
 			{
-				interfc.setInputTxt(GCUtil.joinResult(interfc.getInputTxt(), autoC[0]));
+				interfc.setInputTxt(DCUtil.joinResult(interfc.getInputTxt(), autoC[0]));
 				interfc.moveCarretToEnd();
 			}
 			else	// many entries in autocomplete, list them all.
 			{
-				GC.log(" "); // new line.
+				DC.log(" "); // new line.
 				for (entry in autoC)
 				{
-					GC.logInfo(entry);
+					DC.logInfo(entry);
 				}
 			}
 		}

@@ -1,11 +1,11 @@
-package pgr.gconsole;
+package pgr.dconsole ;
 
  /**
-  * GC class provides user API to Game Console.
+  * DC class provides user API to The Console.
   * 
   * @author TiagoLr ( ~~~ProG4mr~~~ )
   */
-class GC 
+class DC 
 {
 	
 	/** Aligns console to bottom */
@@ -14,18 +14,18 @@ class GC
 	static public var ALIGN_UP:String = "UP";
 	
 	/**
-	 * Inits GameConsole.
+	 * Inits TheConsole.
 	 * @param	height	The height of the console (percent of app window height).
 	 * @param	align	Aligns console using "UP" or "DOWN".
 	 * @param	theme	Select the console theme from GCThemes.
 	 * @param	monitorRate The number of frames elapsed for each monitor refresh.
 	 */
-	public static function init(height:Float = 0.33, align:String = "DOWN", theme:GCThemes.Theme = null, monitorRate:Int = 10) {
-		if (GConsole.instance != null) {
-			return; // GConsole has been initialized already.
+	public static function init(height:Float = 0.33, align:String = "DOWN", theme:DCThemes.Theme = null, monitorRate:Int = 10) {
+		if (DConsole.instance != null) {
+			return; // DConsole has been initialized already.
 		}
 		
-		new GConsole(height, align, theme, monitorRate);
+		new DConsole(height, align, theme, monitorRate);
 	}
 	/**
 	 * Sets the console font.
@@ -39,7 +39,7 @@ class GC
 	 */
 	public static function setConsoleFont(font:String = null, embed:Bool = true, size:Int = 14, bold:Bool = false, italic:Bool = false, underline:Bool = false ){
 		checkInstance();
-		GConsole.instance.interfc.setConsoleFont(font, embed, size, bold, italic, underline);
+		DConsole.instance.interfc.setConsoleFont(font, embed, size, bold, italic, underline);
 	}
 	/**
 	 * Sets the prompt font.
@@ -52,7 +52,7 @@ class GC
 	 */
 	public static function setPromptFont(font:String = null, embed:Bool = true, size:Int = 16, bold:Bool = false, ?italic:Bool = false, underline:Bool = false ){
 		checkInstance();
-		GConsole.instance.interfc.setPromptFont(font, embed, size, bold, italic, underline);
+		DConsole.instance.interfc.setPromptFont(font, embed, size, bold, italic, underline);
 	}
 	/**
 	 * Sets the monitor font.
@@ -66,7 +66,7 @@ class GC
 	 */
 	public static function setMonitorFont(font:String = null, embed:Bool = true, size:Int = 14, bold:Bool = false, ?italic:Bool = false, underline:Bool = false ){
 		checkInstance();
-		GConsole.instance.interfc.setConsoleFont(font, embed, size, bold, italic, underline);
+		DConsole.instance.interfc.setConsoleFont(font, embed, size, bold, italic, underline);
 	}
 	
 	/**
@@ -82,10 +82,10 @@ class GC
 	 */
 	public static function setFont(font:String = null, embed:Bool = true, size:Int = 16, bold:Bool = false, ?italic:Bool = false, underline:Bool = false){
 		checkInstance();
-		GConsole.instance.interfc.setConsoleFont(font, embed, size, bold, italic, underline);
-		GConsole.instance.interfc.setPromptFont(font, embed, size, bold, italic, underline);
-		GConsole.instance.interfc.setConsoleFont(font, embed, size, bold, italic, underline);
-		GConsole.instance.interfc.setProfilerFont(font, embed, size, bold, italic, underline);
+		DConsole.instance.interfc.setConsoleFont(font, embed, size, bold, italic, underline);
+		DConsole.instance.interfc.setPromptFont(font, embed, size, bold, italic, underline);
+		DConsole.instance.interfc.setConsoleFont(font, embed, size, bold, italic, underline);
+		DConsole.instance.interfc.setProfilerFont(font, embed, size, bold, italic, underline);
 	}
 	
 	/**
@@ -93,21 +93,21 @@ class GC
 	 */
 	public static function showConsole() {
 		checkInstance();
-		GConsole.instance.showConsole();
+		DConsole.instance.showConsole();
 	}
 	/**
 	 * Hides console.
 	 */
 	public static function hideConsole() {
 		checkInstance();
-		GConsole.instance.hideConsole();
+		DConsole.instance.hideConsole();
 	}
 	/**
 	 * Shows monitor and refreshes displayed info according to refreshRate.
 	 */
 	public static function showMonitor() {
 		checkInstance();
-		GConsole.instance.showMonitor();
+		DConsole.instance.showMonitor();
 	}
 	/**
 	 * Stops monitoring.
@@ -115,14 +115,14 @@ class GC
 	public static function hideMonitor()
 	{
 		checkInstance();
-		GConsole.instance.hideMonitor();
+		DConsole.instance.hideMonitor();
 	}
 	/**
 	 * Shows profiler and refreshes statistics according to refreshRate.
 	 */
 	public static function showProfiler() {
 		checkInstance();
-		GConsole.instance.showProfiler();
+		DConsole.instance.showProfiler();
 	}
 	/**
 	 * Stops showing and refreshing profiler.
@@ -130,21 +130,21 @@ class GC
 	public static function hideProfiler()
 	{
 		checkInstance();
-		GConsole.instance.hideProfiler();
+		DConsole.instance.hideProfiler();
 	}
 	/**
 	 * Enables console and its listeners.
 	 */
 	public static function enable() {
 		checkInstance();
-		GConsole.instance.enable();
+		DConsole.instance.enable();
 	}
 	/**
 	 * Disable console and its listeners.
 	 */
 	public static function disable() {
 		checkInstance();
-		GConsole.instance.disable();
+		DConsole.instance.disable();
 	}
 	/**
 	 * Sets the keycode to open the console.
@@ -152,7 +152,7 @@ class GC
 	 */
 	public static function setShortcutKeyCode(key:Int) {
 		checkInstance();
-		GConsole.instance.setToggleKey(key);
+		DConsole.instance.setToggleKey(key);
 	}
 	/**
 	 * Logs a message to the console.
@@ -161,7 +161,7 @@ class GC
 	 */
 	public static function log(data:Dynamic, color:Int = -1) {
 		checkInstance();
-		GConsole.instance.log(data, color);
+		DConsole.instance.log(data, color);
 	}
 	/**
 	 * Logs a warning message to the console.
@@ -169,7 +169,7 @@ class GC
 	 */
 	static public function logWarning(data:Dynamic) {
 		checkInstance();
-		GConsole.instance.log(data, GCThemes.current.LOG_WAR);
+		DConsole.instance.log(data, DCThemes.current.LOG_WAR);
 	}
 	/**
 	 * Logs a error message to the console.
@@ -177,7 +177,7 @@ class GC
 	 */
 	static public function logError(data:Dynamic) {
 		checkInstance();
-		GConsole.instance.log(data, GCThemes.current.LOG_ERR);
+		DConsole.instance.log(data, DCThemes.current.LOG_ERR);
 	}
 	/**
 	 * Logs a confirmation message to the console.
@@ -185,7 +185,7 @@ class GC
 	 */
 	static public function logConfirmation(data:Dynamic) {
 		checkInstance();
-		GConsole.instance.log(data, GCThemes.current.LOG_CON);
+		DConsole.instance.log(data, DCThemes.current.LOG_CON);
 	}
 	/**
 	 * Logs a info message to the console.
@@ -193,7 +193,7 @@ class GC
 	 */
 	static public function logInfo(data:Dynamic) {
 		checkInstance();
-		GConsole.instance.log(data, GCThemes.current.LOG_INF);
+		DConsole.instance.log(data, DCThemes.current.LOG_INF);
 	}
 	
 	/**
@@ -207,7 +207,7 @@ class GC
 	 */
 	static public function monitorField(object:Dynamic, fieldName:String, alias:String) {
 		checkInstance();
-		GConsole.instance.monitorField(object, fieldName, alias);
+		DConsole.instance.monitorField(object, fieldName, alias);
 	}
 	
 	/**
@@ -216,7 +216,7 @@ class GC
 	 */
 	static public function setMonitorRefreshRate(refreshRate:Int = 100) {
 		checkInstance();
-		GConsole.instance.monitor.setRefreshRate(refreshRate);
+		DConsole.instance.monitor.setRefreshRate(refreshRate);
 	}
 	
 	/**
@@ -236,7 +236,7 @@ class GC
 										   help:String = "") 
 	{
 		checkInstance();
-		GCCommands.registerCommand(Function, alias, shortcut, description, help);
+		DCCommands.registerCommand(Function, alias, shortcut, description, help);
 	}
 	
 	/**
@@ -246,7 +246,7 @@ class GC
 	 */
 	public static function registerObject(object:Dynamic, alias:String = "") {
 		checkInstance();
-		GCCommands.registerObject(object, alias);
+		DCCommands.registerObject(object, alias);
 	}
 	/**
 	 * Registers a function to be called from the console.
@@ -257,7 +257,7 @@ class GC
 	 */
 	public static function registerFunction(Function:Dynamic, alias:String) {
 		checkInstance();
-		GCCommands.registerFunction(Function, alias);
+		DCCommands.registerFunction(Function, alias);
 	}
 	/**
 	 * Deletes field from registry.
@@ -265,26 +265,26 @@ class GC
 	 */
 	public static function unregisterFunction(alias:String) {
 		checkInstance();
-		GCCommands.unregisterFunction(alias);
+		DCCommands.unregisterFunction(alias);
 	}
 	
 	public static function unregisterObject(alias:String) {
 		checkInstance();
-		GCCommands.unregisterObject(alias);
+		DCCommands.unregisterObject(alias);
 	}
 	/**
 	 * Clears console logs.
 	 */
 	public static function clearConsole() {
 		checkInstance();
-		GConsole.instance.clearConsole();
+		DConsole.instance.clearConsole();
 	}
 	/**
 	 * Removes all entrys from registry.
 	 */
 	public static function clearRegistry() {
 		checkInstance();
-		GCCommands.clearRegistry();
+		DCCommands.clearRegistry();
 	}
 	
 	/**
@@ -293,7 +293,7 @@ class GC
 	 */
 	static public function clearProfiler() {
 		checkInstance();
-		GConsole.instance.profiler.clear();
+		DConsole.instance.profiler.clear();
 	}
 	
 	/**
@@ -301,7 +301,7 @@ class GC
 	 */
 	public static function clearMonitor() {
 		checkInstance();
-		GConsole.instance.monitor.clear();
+		DConsole.instance.monitor.clear();
 	}
 	
 	/**
@@ -310,7 +310,7 @@ class GC
 	 */
 	public static function toFront() {
 		checkInstance();
-		GConsole.instance.interfc.toFront();
+		DConsole.instance.interfc.toFront();
 	}
 	
 	/**
@@ -319,7 +319,7 @@ class GC
 	 */
 	public static function beginProfile(sampleName:String) {
 		checkInstance();
-		GConsole.instance.profiler.begin(sampleName);
+		DConsole.instance.profiler.begin(sampleName);
 	}
 	/**
 	 * Ends the sample and dumps output to the profiler if this sample has no
@@ -327,14 +327,14 @@ class GC
 	 */
 	public static function endProfile(sampleName:String) {
 		checkInstance();
-		GConsole.instance.profiler.end(sampleName);
+		DConsole.instance.profiler.end(sampleName);
 	}
 	
 	//---------------------------------------------------------------------------------
 	//  PRIVATE / AUX
 	//---------------------------------------------------------------------------------
 	private static function checkInstance() {
-		if (GConsole.instance == null) {
+		if (DConsole.instance == null) {
 			init();
 		}
 	}

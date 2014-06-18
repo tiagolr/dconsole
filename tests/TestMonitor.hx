@@ -4,11 +4,11 @@ import flash.ui.Keyboard;
 import haxe.unit.TestCase;
 import flash.events.KeyboardEvent;
 import flash.Lib;
-import pgr.gconsole.GCInterface;
-import pgr.gconsole.GC;
-import pgr.gconsole.GConsole;
-import pgr.gconsole.GCProfiler;
-import pgr.gconsole.GCMonitor;
+import pgr.dconsole.DCInterface;
+import pgr.dconsole.DC;
+import pgr.dconsole.DConsole;
+import pgr.dconsole.DCProfiler;
+import pgr.dconsole.DCMonitor;
 
 /**
  * Tests monitor.
@@ -17,10 +17,10 @@ import pgr.gconsole.GCMonitor;
  */
 class TestMonitor extends TestCase
 {	 
-	var interfc:GCInterface;
-	var console:GConsole;
-	var monitor:GCMonitor;
-	var profiler:GCProfiler;
+	var interfc:DCInterface;
+	var console:DConsole;
+	var monitor:DCMonitor;
+	var profiler:DCProfiler;
 	
 	var i:Int;
 	var b:Bool;
@@ -35,8 +35,8 @@ class TestMonitor extends TestCase
 	
 	override public function setup() {
 		if (console == null) {
-			GC.init();
-			console = GConsole.instance;
+			DC.init();
+			console = DConsole.instance;
 			interfc = console.interfc;
 			monitor = console.monitor;
 			profiler = console.profiler;
@@ -49,7 +49,7 @@ class TestMonitor extends TestCase
 		console.showConsole();
 		console.hideMonitor();
 		console.hideProfiler();
-		GC.clearMonitor();
+		DC.clearMonitor();
 		refreshMonitor();
 		i = 0;
 		b = false;
@@ -60,20 +60,20 @@ class TestMonitor extends TestCase
 	override public function tearDown():Void {
 		console.hideProfiler();
 		console.hideMonitor();
-		GC.clearMonitor();
+		DC.clearMonitor();
 		refreshMonitor();
 	}
 	
 	public function testClearMonitor() {
 		i = 999;
 		
-		GC.monitorField(this, "i", "i");
+		DC.monitorField(this, "i", "i");
 		refreshMonitor();
 		
 		assertTrue(monitorHasField("i"));
 		assertTrue(monitorHasText("999"));
 		
-		GC.clearMonitor();
+		DC.clearMonitor();
 		refreshMonitor();
 		
 		assertFalse(monitorHasField("i"));
@@ -126,25 +126,25 @@ class TestMonitor extends TestCase
 	
 	public function testAddField() {
 		// test adding valid fields
-		GC.monitorField(this, "i", "i");
-		GC.monitorField(this, "b", "b");
-		GC.monitorField(this, "f", "f");
+		DC.monitorField(this, "i", "i");
+		DC.monitorField(this, "b", "b");
+		DC.monitorField(this, "f", "f");
 		
 		assertTrue(monitor.fields.length == 3);
 		assertTrue(monitorHasField("i"));
 		assertTrue(monitorHasField("b"));
 		assertTrue(monitorHasField("f"));
 		
-		GC.clearMonitor();
+		DC.clearMonitor();
 		
 		// test adding invalid fields
-		GC.monitorField(null, null, null);
-		GC.monitorField(this, null, null);
-		GC.monitorField(this, "i", null);
-		GC.monitorField(this, "", "i");
-		GC.monitorField(this, "i", "");
-		GC.monitorField(this, null, "i");
-		GC.monitorField(this, null, "i");
+		DC.monitorField(null, null, null);
+		DC.monitorField(this, null, null);
+		DC.monitorField(this, "i", null);
+		DC.monitorField(this, "", "i");
+		DC.monitorField(this, "i", "");
+		DC.monitorField(this, null, "i");
+		DC.monitorField(this, null, "i");
 		
 		assertTrue(monitor.fields.length == 0);
 	}
@@ -155,9 +155,9 @@ class TestMonitor extends TestCase
 		b = true;
 		f = 0.001;
 		
-		GC.monitorField(this, "i", "vari");
-		GC.monitorField(this, "b", "varb");
-		GC.monitorField(this, "f", "varf");
+		DC.monitorField(this, "i", "vari");
+		DC.monitorField(this, "b", "varb");
+		DC.monitorField(this, "f", "varf");
 		
 		refreshMonitor();
 		

@@ -3,11 +3,11 @@ import flash.ui.Keyboard;
 import haxe.unit.TestCase;
 import flash.events.KeyboardEvent;
 import flash.Lib;
-import pgr.gconsole.GCInterface;
-import pgr.gconsole.GC;
-import pgr.gconsole.GCMonitor;
-import pgr.gconsole.GConsole;
-import pgr.gconsole.GCProfiler;
+import pgr.dconsole.DCInterface;
+import pgr.dconsole.DC;
+import pgr.dconsole.DCMonitor;
+import pgr.dconsole.DConsole;
+import pgr.dconsole.DCProfiler;
 
 /**
  * Tests profiler.
@@ -16,15 +16,15 @@ import pgr.gconsole.GCProfiler;
  */
 class TestProfiler extends TestCase
 {	 
-	var monitor:GCMonitor;
-	var profiler:GCProfiler;
-	var interfc:GCInterface;
-	var console:GConsole;
+	var monitor:DCMonitor;
+	var profiler:DCProfiler;
+	var interfc:DCInterface;
+	var console:DConsole;
 	
 	override public function setup() {
 		if (console == null) {
-			GC.init();
-			console = GConsole.instance;
+			DC.init();
+			console = DConsole.instance;
 			interfc = console.interfc;
 			monitor = console.monitor;
 			profiler = console.profiler;
@@ -37,12 +37,12 @@ class TestProfiler extends TestCase
 		console.showConsole();
 		console.hideMonitor();
 		console.hideProfiler();
-		GC.clearProfiler();
+		DC.clearProfiler();
 	}
 	
 	override public function tearDown():Void {
 		// clear profiler
-		GC.clearProfiler();
+		DC.clearProfiler();
 		console.hideProfiler();
 		console.hideMonitor();
 	}
@@ -91,28 +91,28 @@ class TestProfiler extends TestCase
 	public function testBeginProfile() {
 		// test opening same sample twice.
 		try {
-			GC.beginProfile("start1");
-			GC.beginProfile("start1");
+			DC.beginProfile("start1");
+			DC.beginProfile("start1");
 			assertTrue(false); // this should not be reached
 		} catch (s:String) {}
 		
-		GC.clearProfiler();
+		DC.clearProfiler();
 		assertFalse(existsSample("start1"));
 		
 		// test samples status after begin
-		GC.beginProfile("start1");
+		DC.beginProfile("start1");
 		assertTrue(existsSample("start1"));
 		assertTrue(getSample("start1").openInstances == 1);
 		assertTrue(getSample("start1").instances == 1);
 		
-		GC.endProfile("start1");
+		DC.endProfile("start1");
 		assertTrue(existsSample("start1")); // sample now exists but has 0 open instances
 		assertTrue(getSample("start1").openInstances == 0);
 		
 		try {
-			GC.beginProfile("start1");
-			GC.beginProfile("start2");
-			GC.beginProfile("start1"); // test opening same sample as a nested nested child
+			DC.beginProfile("start1");
+			DC.beginProfile("start2");
+			DC.beginProfile("start1"); // test opening same sample as a nested nested child
 			assertTrue(false);
 		} catch (s:String) {}
 		
@@ -121,14 +121,14 @@ class TestProfiler extends TestCase
 	
 	public function testEndProfile() {
 		try {
-			GC.endProfile("start1"); // ending non existing sample
+			DC.endProfile("start1"); // ending non existing sample
 			assertTrue(false); // this line should not be reached.
 		} catch (s:String) {}
 		
 		try {
-			GC.beginProfile("start1");
-			GC.endProfile("start1");
-			GC.endProfile("start1"); // ending same sample twice
+			DC.beginProfile("start1");
+			DC.endProfile("start1");
+			DC.endProfile("start1"); // ending same sample twice
 			assertTrue(false); // this line should not be reached.
 		} catch (s:String) { }
 		
@@ -138,9 +138,9 @@ class TestProfiler extends TestCase
 	
 	public function testCrossProfile() {
 		try {
-			GC.beginProfile("s1");
-			GC.beginProfile("s2");
-			GC.endProfile("s1");
+			DC.beginProfile("s1");
+			DC.beginProfile("s2");
+			DC.endProfile("s1");
 			assertTrue(false); // code not supposed to be reached.
 		} catch (s:Dynamic) {}
 		
@@ -156,10 +156,10 @@ class TestProfiler extends TestCase
 		var lastElapsed;
 		
 		// Run sample, verify statistics
-		GC.beginProfile("start1");
+		DC.beginProfile("start1");
 		startTime = Lib.getTimer();
 		delaySample("start1", 100);
-		GC.endProfile("start1");
+		DC.endProfile("start1");
 		delta = Lib.getTimer() - startTime;
 		
 		h1 = getHistory("start1");
@@ -172,10 +172,10 @@ class TestProfiler extends TestCase
 		lastElapsed = h1.elapsed;
 		
 		// Re-Run sample, verify updated statistics
-		GC.beginProfile("start1");
+		DC.beginProfile("start1");
 		startTime = Lib.getTimer();
 		delaySample("start1", 200);
-		GC.endProfile("start1");
+		DC.endProfile("start1");
 		delta = Lib.getTimer() - startTime;
 		
 		assertTrue(h1.elapsed >= 200 && h1.elapsed <= 200 + delta);
@@ -197,13 +197,13 @@ class TestProfiler extends TestCase
 		var lastElapsed;
 		
 		// run samples 1 and 2, sample 2 multiple times inside 1
-		GC.beginProfile("start1");
+		DC.beginProfile("start1");
 		startTime = Lib.getTimer();
 		delaySample("start1", 100);
-			GC.beginProfile("start2");
+			DC.beginProfile("start2");
 			delaySample("start2", 100);
-			GC.endProfile("start2");
-		GC.endProfile("start1");
+			DC.endProfile("start2");
+		DC.endProfile("start1");
 		delta = Lib.getTimer() - startTime;
 		
 		h1 = getHistory("start1");

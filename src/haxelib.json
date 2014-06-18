@@ -1,11 +1,11 @@
 {
-	"name": "gameconsole",
-	"url" : "https://github.com/ProG4mr/gameconsole",
+	"name": "dconsole",
+	"url" : "https://github.com/ProG4mr/dconsole",
 	"license": "MIT",
 	"tags": ["console", "logger", "monitor", "profiler", "utility", "game"],
-	"description": "A game-like console that provides runtime acess to methods and variables, logging, monitoring, profiling, you name it.",
-	"version": "3.0.2",
-	"releasenote": "Linux and Mac font fix.",
+	"description": "A real-time console with multiple utilities: scripting, logging, monitoring, profiling etc.",
+	"version": "4.0.0",
+	"releasenote": "hscript and command registering added",
 	"contributors": ["prog4mr"],
 	"dependencies": { "hscript": "" }
 }

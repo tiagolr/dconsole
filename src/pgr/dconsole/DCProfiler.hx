@@ -1,7 +1,7 @@
-package pgr.gconsole;
+package pgr.dconsole ;
 import haxe.Timer;
-import pgr.gconsole.GCProfiler.PFSample;
-import pgr.gconsole.GCProfiler.SampleHistory;
+import pgr.dconsole.DCProfiler.PFSample;
+import pgr.dconsole.DCProfiler.SampleHistory;
 
 typedef PFSample = {
 	name:String,			
@@ -20,7 +20,7 @@ typedef PFSample = {
  * 
  * @author TiagoLr ( ~~~ProG4mr~~~ )
  */
-class GCProfiler {
+class DCProfiler {
 	
 	/** Number of spaces between each display field (Elapsed, average, etc..) */
 	static public inline var NUM_SPACES:Int = 8;
@@ -41,7 +41,7 @@ class GCProfiler {
 	public function clear() {
 		for (sample in samples) {
 			if (sample.openInstances > 0) {
-				GC.logWarning("cannot clear profiler while samples are open");
+				DC.logWarning("cannot clear profiler while samples are open");
 			}
 		}
 		
@@ -52,14 +52,14 @@ class GCProfiler {
 	//---------------------------------------------------------------------------------
 	//  LOGIC
 	//---------------------------------------------------------------------------------
-	@:allow(pgr.gconsole.GConsole)
+	@:allow(pgr.dconsole.DConsole)
 	function show() {
 		visible = true;
 		startTimer();
 		writeOutput();	// renders first frame.
 	}
 
-	@:allow(pgr.gconsole.GConsole)
+	@:allow(pgr.dconsole.DConsole)
 	function hide() {
 		visible = false;
 		stopTimer();
@@ -218,7 +218,7 @@ class GCProfiler {
 			}
 		}
 		
-		GConsole.instance.interfc.writeProfilerOutput(output);
+		DConsole.instance.interfc.writeProfilerOutput(output);
 		
 	}
 	

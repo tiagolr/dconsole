@@ -1,11 +1,11 @@
-package pgr.gconsole;
+package pgr.dconsole ;
 import hscript.Interp;
 
 /**
  * Overrides hscript interp with small changes.
  * @author TiagoLr
  */
-class GCInterp extends Interp {
+class DCInterp extends Interp {
 
 	public function new () {
 		super();

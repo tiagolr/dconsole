@@ -3,9 +3,9 @@ import flash.ui.Keyboard;
 import haxe.unit.TestCase;
 import flash.events.KeyboardEvent;
 import flash.Lib;
-import pgr.gconsole.GCInterface;
-import pgr.gconsole.GC;
-import pgr.gconsole.GConsole;
+import pgr.dconsole.DCInterface;
+import pgr.dconsole.DC;
+import pgr.dconsole.DConsole;
 
 /**
  * Tests console runtime commands.
@@ -14,8 +14,8 @@ import pgr.gconsole.GConsole;
  */
 class TestCommands extends TestCase
 {	 
-	var interfc:GCInterface;
-	var console:GConsole;
+	var interfc:DCInterface;
+	var console:DConsole;
 	
 	var i:Int;
 	var f:Float;
@@ -35,8 +35,8 @@ class TestCommands extends TestCase
 	
 	override public function setup() {
 		if (console == null) {
-			GC.init();
-			console = GConsole.instance;
+			DC.init();
+			console = DConsole.instance;
 			interfc = console.interfc;
 			testObject = new TestObject();
 		}
@@ -49,16 +49,16 @@ class TestCommands extends TestCase
 		testObject.i = 0;
 		testObject.s = "";
 		
-		GC.clearRegistry();
+		DC.clearRegistry();
 		interfc.clearInput();
 		interfc.clearConsole();
-		GC.showConsole();
-		GC.enable();
+		DC.showConsole();
+		DC.enable();
 	}
 	
 	/** */
 	public function testSet() {
-		GC.registerObject(this, "o1");
+		DC.registerObject(this, "o1");
 		
 		// set this object string
 		consoleDo("o1.s = 'haha'");
@@ -112,11 +112,11 @@ class TestCommands extends TestCase
 	}
 	
 	public function testCall() {
-		GC.registerFunction(F1, "F1");
-		GC.registerFunction(TestCommands.F2, "F2");
-		GC.registerFunction(testObject.F, "F3");
-		GC.registerFunction(F4, "F4");
-		GC.registerObject(this, "o1");
+		DC.registerFunction(F1, "F1");
+		DC.registerFunction(TestCommands.F2, "F2");
+		DC.registerFunction(testObject.F, "F3");
+		DC.registerFunction(F4, "F4");
+		DC.registerObject(this, "o1");
 		
 		// call this object function
 		consoleDo("F1()");
@@ -129,20 +129,20 @@ class TestCommands extends TestCase
 		assertTrue(consoleHasText("F2 LOGGED"));
 		
 		// call nested object function
-		GC.clearConsole();
+		DC.clearConsole();
 		assertFalse(consoleHasText("OF LOGGED"));
 		consoleDo("o1.testObject.F()");
 		assertTrue(consoleHasText("OF LOGGED"));
 		
 		// call function with arguments
-		GC.clearConsole();
+		DC.clearConsole();
 		consoleDo("F4('test',0, true)");
 		assertTrue(consoleHasText("testF4 LOGGED"));
 		assertTrue(consoleHasText("1"));
 		assertTrue(consoleHasText("true"));
 		
 		// call nested object function with arguments
-		GC.clearConsole();
+		DC.clearConsole();
 		consoleDo("o1.testObject.F2('test',0,true)");
 		assertTrue(consoleHasText("testOF4 LOGGED"));
 		assertTrue(consoleHasText("2"));
@@ -171,7 +171,7 @@ class TestCommands extends TestCase
 	
 	
 	public function testPrint() {
-		GC.registerObject(this, "o1");
+		DC.registerObject(this, "o1");
 		
 		// test print this object int
 		this.i = 100;
@@ -220,17 +220,17 @@ class TestCommands extends TestCase
 	}
 
 	function F1() {
-		GC.log("F1 LOGGED");
+		DC.log("F1 LOGGED");
 	}
 	
 	public static function F2() {
-		GC.log("F2 LOGGED");
+		DC.log("F2 LOGGED");
 	}
 	
 	function F4(s:String, i:Int, b:Bool) {
-		GC.log(s + "F4 LOGGED");
-		GC.log(i + 1);
-		GC.log(!b);
+		DC.log(s + "F4 LOGGED");
+		DC.log(i + 1);
+		DC.log(!b);
 	}
 
 }
@@ -244,12 +244,12 @@ private class TestObject {
 	public function new() {}
 	
 	public function F() {
-		GC.log("OF LOGGED");
+		DC.log("OF LOGGED");
 	}
 	
 	public function F2(s:String, i:Int, b:Bool) {
-		GC.log(s + "OF4 LOGGED");
-		GC.log(i + 2);
-		GC.log(!b);
+		DC.log(s + "OF4 LOGGED");
+		DC.log(i + 2);
+		DC.log(!b);
 	}
 }

@@ -1,4 +1,4 @@
-package pgr.gconsole;
+package pgr.dconsole ;
 
 import flash.display.MovieClip;
 import flash.display.Sprite;
@@ -8,7 +8,7 @@ import flash.text.TextFieldAutoSize;
 import flash.text.TextFieldType;
 import flash.text.TextFormat;
 import flash.text.TextFormatAlign;
-import pgr.gconsole.GCThemes.Theme;
+import pgr.dconsole.DCThemes.Theme;
 
 
 /**
@@ -16,7 +16,7 @@ import pgr.gconsole.GCThemes.Theme;
  * @author TiagoLr ( ~~~ProG4mr~~~ )
  */
 
-class GCInterface extends Sprite
+class DCInterface extends Sprite
 {
 	var _width:Int;
 	var _height:Int;
@@ -60,7 +60,7 @@ class GCInterface extends Sprite
 	
 	function createConsoleDisplay() {
 		consoleDisplay = new Sprite();
-		consoleDisplay.alpha = GCThemes.current.CON_TXT_A;
+		consoleDisplay.alpha = DCThemes.current.CON_TXT_A;
 		addChild(consoleDisplay);
 		
 		promptDisplay = new Sprite();
@@ -76,7 +76,7 @@ class GCInterface extends Sprite
 		txtConsole.selectable = false;
 		txtConsole.multiline = true;
 		txtConsole.wordWrap = true;
-		txtConsole.alpha = GCThemes.current.CON_TXT_A;
+		txtConsole.alpha = DCThemes.current.CON_TXT_A;
 		consoleDisplay.addChild(txtConsole);
 		#if flash
 		txtConsole.mouseWheelEnabled = true;
@@ -92,15 +92,15 @@ class GCInterface extends Sprite
 		
 		// draw console background.
 		consoleDisplay.graphics.clear();
-		consoleDisplay.graphics.beginFill(GCThemes.current.CON_C, 1);
+		consoleDisplay.graphics.beginFill(DCThemes.current.CON_C, 1);
 		consoleDisplay.graphics.drawRect(0, 0, _width, _height);
 		consoleDisplay.graphics.endFill();
 		consoleDisplay.y = _yOffset;
-		consoleDisplay.alpha = GCThemes.current.CON_A;
+		consoleDisplay.alpha = DCThemes.current.CON_A;
 		
 		// draw text input field.
 		promptDisplay.graphics.clear();
-		promptDisplay.graphics.beginFill(GCThemes.current.PRM_C);
+		promptDisplay.graphics.beginFill(DCThemes.current.PRM_C);
 		promptDisplay.graphics.drawRect(0, 0, _width, txtPrompt.textHeight);
 		promptDisplay.graphics.endFill();
 		promptDisplay.y = _height - txtPrompt.textHeight + _yOffset;
@@ -124,13 +124,13 @@ class GCInterface extends Sprite
 		#end
 	}
 	
-	@:allow(pgr.gconsole.GConsole)
+	@:allow(pgr.dconsole.DConsole)
 	function showConsole() {
 		consoleDisplay.visible = true;
 		promptDisplay.visible = true;
 		Lib.current.stage.focus = txtPrompt;
 	}
-	@:allow(pgr.gconsole.GConsole)
+	@:allow(pgr.dconsole.DConsole)
 	function hideConsole() {
 		consoleDisplay.visible = false;
 		promptDisplay.visible = false;
@@ -142,10 +142,10 @@ class GCInterface extends Sprite
 	function createMonitorDisplay() {
 		
 		monitorDisplay = new Sprite();
-		monitorDisplay.graphics.beginFill(GCThemes.current.MON_C, GCThemes.current.MON_A);
+		monitorDisplay.graphics.beginFill(DCThemes.current.MON_C, DCThemes.current.MON_A);
 		monitorDisplay.graphics.drawRect(0, 0, Lib.current.stage.stageWidth, Lib.current.stage.stageHeight);
 		monitorDisplay.graphics.endFill();
-		monitorDisplay.alpha = GCThemes.current.MON_TXT_A;
+		monitorDisplay.alpha = DCThemes.current.MON_TXT_A;
 		addChild(monitorDisplay);
 		
 		txtMonitorLeft = new TextField();
@@ -177,7 +177,7 @@ class GCInterface extends Sprite
 		txtMonitorLeft.text += "GC Monitor\n\n";
 		txtMonitorRight.text += "\n\n";
 		
-		monitorDisplay.graphics.lineStyle(1, GCThemes.current.MON_TXT_C);
+		monitorDisplay.graphics.lineStyle(1, DCThemes.current.MON_TXT_C);
 		monitorDisplay.graphics.moveTo(0, txtMonitorLeft.textHeight);
 		monitorDisplay.graphics.lineTo(Lib.current.stage.stageWidth, txtMonitorLeft.textHeight);
 		
@@ -193,11 +193,11 @@ class GCInterface extends Sprite
 		}
 	}
 	
-	@:allow(pgr.gconsole.GConsole)
+	@:allow(pgr.dconsole.DConsole)
 	function showMonitor() {
 		monitorDisplay.visible = true;
 	}
-	@:allow(pgr.gconsole.GConsole)
+	@:allow(pgr.dconsole.DConsole)
 	function hideMonitor() {
 		monitorDisplay.visible = false;
 	}
@@ -208,7 +208,7 @@ class GCInterface extends Sprite
 	function createProfilerDisplay() {
 		
 		profilerDisplay = new Sprite();
-		profilerDisplay.graphics.beginFill(GCThemes.current.MON_C, GCThemes.current.MON_A);
+		profilerDisplay.graphics.beginFill(DCThemes.current.MON_C, DCThemes.current.MON_A);
 		profilerDisplay.graphics.drawRect(0, 0, Lib.current.stage.stageWidth, Lib.current.stage.stageHeight);
 		profilerDisplay.graphics.endFill();
 		addChild(profilerDisplay);
@@ -217,7 +217,7 @@ class GCInterface extends Sprite
 		txtProfiler.selectable = false;
 		txtProfiler.multiline = true;
 		txtProfiler.wordWrap = true;
-		txtProfiler.alpha = GCThemes.current.MON_TXT_A;
+		txtProfiler.alpha = DCThemes.current.MON_TXT_A;
 		txtProfiler.x = 0;
 		txtProfiler.y = 0;
 		txtProfiler.width = Lib.current.stage.stageWidth;
@@ -230,18 +230,18 @@ class GCInterface extends Sprite
 		
 		txtProfiler.text = "GC Profiler\n\n";
 		
-		profilerDisplay.graphics.lineStyle(1, GCThemes.current.MON_TXT_C);
+		profilerDisplay.graphics.lineStyle(1, DCThemes.current.MON_TXT_C);
 		profilerDisplay.graphics.moveTo(0, txtProfiler.textHeight);
 		profilerDisplay.graphics.lineTo(Lib.current.stage.stageWidth, txtProfiler.textHeight);
 		txtProfiler.text += output;
 	}
 	
-	@:allow(pgr.gconsole.GConsole)
+	@:allow(pgr.dconsole.DConsole)
 	function showProfiler() {
 		profilerDisplay.visible = true;
 	}
 	
-	@:allow(pgr.gconsole.GConsole)
+	@:allow(pgr.dconsole.DConsole)
 	function hideProfiler() {
 		profilerDisplay.visible = false;
 	}
@@ -257,7 +257,7 @@ class GCInterface extends Sprite
 		
 		// Applies color - is always applied to avoid bug.
 		if (color == -1) {
-			color = GCThemes.current.CON_TXT_C;
+			color = DCThemes.current.CON_TXT_C;
 		}
 		
 		// Applies text formatting
@@ -301,7 +301,7 @@ class GCInterface extends Sprite
 			font = "Consolas";
 		}
 		embed ? txtConsole.embedFonts = true : txtConsole.embedFonts = false;
-		txtConsole.defaultTextFormat = new TextFormat(font, size, GCThemes.current.CON_TXT_C, bold, italic, underline, '', '', TextFormatAlign.LEFT, margin, margin);
+		txtConsole.defaultTextFormat = new TextFormat(font, size, DCThemes.current.CON_TXT_C, bold, italic, underline, '', '', TextFormatAlign.LEFT, margin, margin);
 		// TODO - redraw console here?
 	}
 	
@@ -315,7 +315,7 @@ class GCInterface extends Sprite
 			font = "Consolas";
 		}
 		embed ? txtPrompt.embedFonts = true : txtPrompt.embedFonts = false;
-		txtPrompt.defaultTextFormat = new TextFormat(font, size, GCThemes.current.PRM_TXT_C, bold, italic, underline, '', '' , TextFormatAlign.LEFT);
+		txtPrompt.defaultTextFormat = new TextFormat(font, size, DCThemes.current.PRM_TXT_C, bold, italic, underline, '', '' , TextFormatAlign.LEFT);
 		// TODO - redraw console here?
 	}
 	
@@ -329,7 +329,7 @@ class GCInterface extends Sprite
 		}
 		
 		embed ? txtProfiler.embedFonts = true : txtProfiler.embedFonts = false;
-		txtProfiler.defaultTextFormat = new TextFormat(font, size, GCThemes.current.MON_TXT_C, bold, italic, underline, '', '', TextFormatAlign.LEFT, 10,10);
+		txtProfiler.defaultTextFormat = new TextFormat(font, size, DCThemes.current.MON_TXT_C, bold, italic, underline, '', '', TextFormatAlign.LEFT, 10,10);
 	}
 	
 	public function setMonitorFont(font:String = null, embed:Bool = false, size:Int = 14, bold:Bool = false, ?italic:Bool = false, underline:Bool = false ){
@@ -343,8 +343,8 @@ class GCInterface extends Sprite
 		
 		embed ? txtMonitorLeft.embedFonts = true : txtMonitorLeft.embedFonts = false;
 		embed ? txtMonitorRight.embedFonts = true : txtMonitorRight.embedFonts = false;
-		txtMonitorLeft.defaultTextFormat = new TextFormat(font, size, GCThemes.current.MON_TXT_C, bold, italic, underline, '', '', TextFormatAlign.LEFT, 10,10);
-		txtMonitorRight.defaultTextFormat = new TextFormat(font, size, GCThemes.current.MON_TXT_C, bold, italic, underline, '', '', TextFormatAlign.LEFT, 10,10);
+		txtMonitorLeft.defaultTextFormat = new TextFormat(font, size, DCThemes.current.MON_TXT_C, bold, italic, underline, '', '', TextFormatAlign.LEFT, 10,10);
+		txtMonitorRight.defaultTextFormat = new TextFormat(font, size, DCThemes.current.MON_TXT_C, bold, italic, underline, '', '', TextFormatAlign.LEFT, 10,10);
 	}
 	
 	/**
