@@ -71,7 +71,7 @@ DG.monitorField(player, "x", "playerX");
 
 Pressing **CTRL + TAB** brings up the monitor that shows the variable updated in real time
 ![monitor](http://i1148.photobucket.com/albums/o562/ProG4mr/monitor_zps1cba1388.jpg "monitor")
-The screenshot shows monitor being used in Adam Atomic's Mode demo.
+<br />The screenshot shows monitor being used in Adam Atomic's Mode demo.
 
 ### Profiler<br />
 
@@ -90,7 +90,7 @@ DC.endProfile("SampleName");
 Now toggling the profiler with **SHIFT + TAB** shows real-time statistics that are updated according to refresh rate. <br />
 
 ![profiler](http://i1148.photobucket.com/albums/o562/ProG4mr/profiler_zps30be5bb6.jpg "profiler")
-The screenshot shows the profiler using multiple nested samples, idents are used to vizualize the samples hierarchy.<br />
+<br />The screenshot shows the profiler using multiple nested samples, idents are used to vizualize the samples hierarchy.<br />
 
 * **EL** elapsed milliseconds)
 * **AVG** average elapsed milliseconds)
