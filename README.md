@@ -48,7 +48,7 @@ DC.registerObject(this, "myobject");
 ```
 
 Now while running your application, press **TAB** to show the console and type **"help"** or **"commands"**
-to see what commands are availible.
+to see what commands are availible, **"objects"** and **"functions"** are useful to show registered objects and functions.
 
 ![help](http://i1148.photobucket.com/albums/o562/ProG4mr/dconsole1_zps2287758b.png "help")
 
@@ -63,14 +63,13 @@ Its even possible to do maths, students homework will never be the same.
 
 ### Monitor<br />
 
-The console allows you to register fields and monitor them in real time.<br />
-
+The console allows you to register fields and monitor them in real time.
 For example, to monitor a display object x position:
 ```js
 DG.monitorField(player, "x", "playerX");  
 ```
 
-Pressing **CTRL + TAB** brings up the monitor that shows the variable updated in real time <br />
+Pressing **CTRL + TAB** brings up the monitor that shows the variable updated in real time
 ![monitor](http://i1148.photobucket.com/albums/o562/ProG4mr/monitor_zps1cba1388.jpg "monitor")
 The screenshot shows monitor being used in Adam Atomic's Mode demo.
 
@@ -88,7 +87,7 @@ To profile a block simply do:
 DC.beginProfile("SampleName");
 DC.endProfile("SampleName");
 ```
-Now toggling the profiler with **SHIFT + TAB** it shows real-time statistics that are updated everytime the sample finishes. <br />
+Now toggling the profiler with **SHIFT + TAB** shows real-time statistics that are updated according to refresh rate. <br />
 
 ![profiler](http://i1148.photobucket.com/albums/o562/ProG4mr/profiler_zps30be5bb6.jpg "profiler")
 The screenshot shows the profiler using multiple nested samples, idents are used to vizualize the samples hierarchy.<br />
@@ -105,7 +104,7 @@ The screenshot shows the profiler using multiple nested samples, idents are used
 
 * Console can have fullscreen using DC.init(1) where 1 means 100% screen height.
 * Registering commands allows to add new behavior to the console based on user input (see other registered commands).
-* Profiler can be configured to display other statistics, see DProfiler.writeOutput()
+* Profiler can be configured to display other statistics, see DCProfiler.writeOutput()
 * Profiler and Monitor refresh rate are also configurable.
 * Private functions, private fields and fields with getter and setter can also be accessed.
 * Using DCCommands.evaluate() can be used to evaluate a string directly.
