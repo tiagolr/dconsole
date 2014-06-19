@@ -27,8 +27,8 @@ class DCCommands
 	public static var objectsMap:Map<String, Dynamic> = new Map<String, Dynamic>();
 	public static var commandsMap:Map < String, Command > = new Map < String, Command > ();
 	
-	private static var hScriptParser:Parser;
-	private static var hScriptInterp:DCInterp;
+	public static var hScriptParser:Parser;
+	public static var hScriptInterp:DCInterp;
 	
 
 	static public function init() {

@@ -3,7 +3,7 @@
 	"url" : "https://github.com/ProG4mr/dconsole",
 	"license": "MIT",
 	"tags": ["console", "logger", "monitor", "profiler", "utility", "game"],
-	"description": "A real-time console with multiple utilities: scripting, logging, monitoring, profiling etc.",
+	"description": "A real-time console with multiple utilities like scripting, logging, monitoring, profiling etc.",
 	"version": "4.0.0",
 	"releasenote": "hscript and command registering added",
 	"contributors": ["prog4mr"],

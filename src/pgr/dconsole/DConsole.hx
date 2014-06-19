@@ -6,7 +6,7 @@ import pgr.dconsole.DCThemes.Theme;
  * DConsole is the main class of this lib, it should be instantiated only once
  * and then use its instance to control the console.
  * 
- * Its recomended to use GC class as API for this lib.
+ * Its recomended to use DC class as API for this lib.
  * 
  * @author TiagoLr ( ~~~ProG4mr~~~ )
  */
@@ -80,7 +80,7 @@ class DConsole {
 		DCCommands.registerCommand(toggleMonitor, "monitor", "", "Toggles monitor on and off", "Monitor is used to track variable values in runtime\nCONTROL + CONSOLE_KEY (default TAB) also toggles monitor");
 		DCCommands.registerCommand(toggleProfiler, "profiler", "", "Toggles profiler on and off", "Profiler is used to profile app and view statistics like time elapsed and percentage in runtime\nSHIFT + CONSOLE_KEY (default TAB) also toggles profiler");
 		
-		DC.logInfo("~~~~~~~~~~ D_CONSOLE ~~~~~~~~~~ (v" + VERSION + ")");
+		DC.logInfo("~~~~~~~~~~ DCONSOLE ~~~~~~~~~~ (v" + VERSION + ")");
 	}
 	
 	
