@@ -1,7 +1,7 @@
 # DConsole
 
-DConsole (as in **TheConsole**) is a real-time console that allows to:
-
+**DConsole** or **The Console** is a real-time console that allows to:
+ 
 * Run scripts.
 * Access and modify fields and objects.
 * Call registered functions.
@@ -10,7 +10,7 @@ DConsole (as in **TheConsole**) is a real-time console that allows to:
 * Profile the app in realtime.
 * Register new commands that respond to user input.
 
-It uses openfl and supports multiple targets (flash, cpp and neko). Multiple rendering devices and html5 may be availibe in time.
+
 
 **Major Changes**
 V 4.0.0
@@ -22,7 +22,9 @@ V 4.0.0
 * Aliases are sanitized and guaranteed to be unique
 * Autocomplete removed temporarily.
 
-For more changes or other versions, see CHANGELOG.
+For more changes or other versions, see CHANGELOG. <br/><br/>
+The console uses **openfl** and supports multiple targets (**flash**, **cpp** and **neko**).<br/>
+Multiple rendering devices and html5 may be availibe in time.
 
 ____________
 
@@ -34,15 +36,15 @@ haxelib install dconsole
 
 ### Getting Started
 
-Using DConsole is very straightforward and it can be setup in few steps:
+Using dconsole is very straightforward and it can be setup in a few steps:
 
-```js
-    import pgr.gconsole.GC;
+```actionscript
+import pgr.dconsole.DC;
 
-    DC.init();
-    DC.log("This text will be logged.");
-    DC.registerFunction(this.testFunction, "myfunction");
-	DC.registerObject(this, "myobject");
+DC.init();
+DC.log("This text will be logged.");
+DC.registerFunction(this.testFunction, "myfunction");
+DC.registerObject(this, "myobject");
 ```
 
 Now while running your application, press **TAB** to show the console and type **"help"** or **"commands"**
@@ -70,13 +72,11 @@ DG.monitorField(player, "x", "playerX");
 
 Pressing **CTRL + TAB** brings up the monitor that shows the variable updated in real time <br />
 ![monitor](http://i1148.photobucket.com/albums/o562/ProG4mr/monitor_zps1cba1388.jpg "monitor")
-<br /> <br />
-
-The screenshot shows monitor being used in game-demo Mode by Adam Atomic.
+The screenshot shows monitor being used in Adam Atomic's Mode demo.
 
 ### Profiler<br />
 
-The console profiler is a lightweight and portable way to know: 
+The profiler is lightweight and portable and allows to know: 
 
 * What code is taking more cpu
 * How many times is some code executed inside other code block.
