@@ -93,7 +93,6 @@ Now toggling the profiler with **SHIFT + TAB** it shows real-time statistics tha
 ![profiler](http://i1148.photobucket.com/albums/o562/ProG4mr/profiler_zps30be5bb6.jpg "profiler")
 The screenshot shows the profiler using multiple nested samples, idents are used to vizualize the samples hierarchy.<br />
 
-<br /> 
 * **EL** elapsed milliseconds)
 * **AVG** average elapsed milliseconds)
 * **EL(%)** elapsed percentage
@@ -121,8 +120,7 @@ Or create a new issue (even better).
 
 Bug reports and feedback are very welcomed.
 
-To contribute code make sure tests work by running tests/testFlash.bat, testNeko.bat, testWindows.bat
-Updating tests or write new ones if necessary, the goal is to make sure the console basic functionality 
+To contribute code make sure tests work by running tests/testFlash.bat, testNeko.bat and testWindows.bat. Update tests or write new ones if necessary, the goal is to make sure the console basic functionality 
 is likely to be working on all targets.
 
 **Big thanks** to every one contributing to this project so far!
