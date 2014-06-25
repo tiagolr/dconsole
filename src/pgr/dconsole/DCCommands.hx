@@ -4,7 +4,6 @@ import haxe.CallStack;
 import hscript.Expr.Error;
 import hscript.Interp;
 import hscript.Parser;
-import massive.haxe.Exception;
 import pgr.dconsole.DCUtil.ALIAS_TYPE;
 
 
