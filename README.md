@@ -48,7 +48,7 @@ DC.registerObject(this, "myobject");
 ```
 
 Now while running your application, press **TAB** to show the console and type **"help"** or **"commands"**
-to see what commands are availible.
+to see what commands are availible, **"objects"** and **"functions"** are useful to show registered objects and functions.
 
 ![help](http://i1148.photobucket.com/albums/o562/ProG4mr/dconsole1_zps2287758b.png "help")
 
@@ -63,16 +63,15 @@ Its even possible to do maths, students homework will never be the same.
 
 ### Monitor<br />
 
-The console allows you to register fields and monitor them in real time.<br />
-
+The console allows you to register fields and monitor them in real time.
 For example, to monitor a display object x position:
 ```js
 DG.monitorField(player, "x", "playerX");  
 ```
 
-Pressing **CTRL + TAB** brings up the monitor that shows the variable updated in real time <br />
+Pressing **CTRL + TAB** brings up the monitor that shows the variable updated in real time
 ![monitor](http://i1148.photobucket.com/albums/o562/ProG4mr/monitor_zps1cba1388.jpg "monitor")
-The screenshot shows monitor being used in Adam Atomic's Mode demo.
+<br />The screenshot shows monitor being used in Adam Atomic's Mode demo.
 
 ### Profiler<br />
 
@@ -88,12 +87,11 @@ To profile a block simply do:
 DC.beginProfile("SampleName");
 DC.endProfile("SampleName");
 ```
-Now toggling the profiler with **SHIFT + TAB** it shows real-time statistics that are updated everytime the sample finishes. <br />
+Now toggling the profiler with **SHIFT + TAB** shows real-time statistics that are updated according to refresh rate. <br />
 
 ![profiler](http://i1148.photobucket.com/albums/o562/ProG4mr/profiler_zps30be5bb6.jpg "profiler")
-The screenshot shows the profiler using multiple nested samples, idents are used to vizualize the samples hierarchy.<br />
+<br />The screenshot shows the profiler using multiple nested samples, idents are used to vizualize the samples hierarchy.<br />
 
-<br /> 
 * **EL** elapsed milliseconds)
 * **AVG** average elapsed milliseconds)
 * **EL(%)** elapsed percentage
@@ -121,8 +119,7 @@ Or create a new issue (even better).
 
 Bug reports and feedback are very welcomed.
 
-To contribute code make sure tests work by running tests/testFlash.bat, testNeko.bat, testWindows.bat
-Updating tests or write new ones if necessary, the goal is to make sure the console basic functionality 
+To contribute code make sure tests work by running tests/testFlash.bat, testNeko.bat and testWindows.bat. Update tests or write new ones if necessary, the goal is to make sure the console basic functionality 
 is likely to be working on all targets.
 
 **Big thanks** to every one contributing to this project so far!
