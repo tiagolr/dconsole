@@ -66,7 +66,10 @@ class DCCommands
 		
 		// hscript interp handle input
 		try {
-			var program = hScriptParser.parseString(input + ";");
+			if (StringTools.endsWith(StringTools.trim(input), ";") == false) {
+				input = StringTools.trim(input) + ";";
+			}
+			var program = hScriptParser.parseString(input);
 			
 			// using exprReturn instead of execute to skip interp internal state reset.
 			var result = hScriptInterp.exprReturn(program); 
