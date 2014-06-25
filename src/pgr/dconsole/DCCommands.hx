@@ -37,6 +37,7 @@ class DCCommands
 
 	static public function init() {
 		hScriptParser = new Parser();
+		hScriptParser.allowJSON = true;
 		hScriptInterp = new DCInterp();
 		hScriptInterp.variables.set("objectsMap", objectsMap);
 		hScriptInterp.variables.set("Math", Math);
