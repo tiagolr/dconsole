@@ -104,13 +104,13 @@ The screenshot shows the profiler using multiple nested samples, idents are used
 
 ### Tips<br />
 
-* Console can have fullscreen using DC.init(1) where 1 means 100% screen height.
-* Registering commands allows to add new behavior to the console based on user input (see other registered commands).
-* Profiler can be configured to display other statistics, see DProfiler.writeOutput()
-* Profiler and Monitor refresh rate are also configurable.
-* Private functions, private fields and fields with getter and setter can also be accessed.
-* Using DCCommands.evaluate() can be used to evaluate a string directly.
+* Console can have fullscreen using **DC.init(1)** where 1 means 100% screen height.
+* To vizualize more info when erros occur use **DC.setVerboseErrors(true)**.
+* Registering commands using **DC.registerCommand()** allows to add custom behavior based on input.
+* Private functions, private fields and getters/setters can be accessed thro the console.
 * To expose more classes to the interpreter (other than Math) use DCCommands.hscriptInterp.variables.set("name", Class)
+* Profiler and Monitor refresh rate are configurable.
+* **DCCommands.evaluate()** can be used to evaluate a string from code.
 
 ### Suggestions / Comments / Bugs 
 

@@ -330,6 +330,14 @@ class DC
 		DConsole.instance.profiler.end(sampleName);
 	}
 	
+	/**
+	 * Set weather to print stack information when errors occur
+	 * @param	b
+	 */
+	public static function setVerboseErrors(b:Bool) {
+		DCCommands.printErrorStack = b;
+	}
+	
 	//---------------------------------------------------------------------------------
 	//  PRIVATE / AUX
 	//---------------------------------------------------------------------------------

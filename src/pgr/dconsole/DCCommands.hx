@@ -1,8 +1,10 @@
 package pgr.dconsole ;
 
+import haxe.CallStack;
 import hscript.Expr.Error;
 import hscript.Interp;
 import hscript.Parser;
+import massive.haxe.Exception;
 import pgr.dconsole.DCUtil.ALIAS_TYPE;
 
 
@@ -29,6 +31,8 @@ class DCCommands
 	
 	public static var hScriptParser:Parser;
 	public static var hScriptInterp:DCInterp;
+	
+	public static var printErrorStack:Bool = false;
 	
 
 	static public function init() {
@@ -57,7 +61,7 @@ class DCCommands
 					command.callback(args);
 					return;
 				}
-			} 
+			}
 		}
 		
 		// hscript interp handle input
@@ -70,7 +74,14 @@ class DCCommands
 				DC.logConfirmation(result);
 			}
 			
-		} catch (e:Dynamic) {
+		} 
+		catch (e:Dynamic) {
+			if (printErrorStack) {
+				var stack = CallStack.exceptionStack();
+				for (entry in stack) {
+					DC.log(entry);
+				}
+			}
 			DC.logError(Std.string(e));
 		} 
 		

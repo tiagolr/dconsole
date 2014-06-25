@@ -174,7 +174,7 @@ class DCInterface extends Sprite
 		txtMonitorLeft.text = "";
 		txtMonitorRight.text = "";
 		
-		txtMonitorLeft.text += "GC Monitor\n\n";
+		txtMonitorLeft.text += "DC Monitor\n\n";
 		txtMonitorRight.text += "\n\n";
 		
 		monitorDisplay.graphics.lineStyle(1, DCThemes.current.MON_TXT_C);
@@ -228,7 +228,7 @@ class DCInterface extends Sprite
 	
 	public function writeProfilerOutput(output:String) {
 		
-		txtProfiler.text = "GC Profiler\n\n";
+		txtProfiler.text = "DC Profiler\n\n";
 		
 		profilerDisplay.graphics.lineStyle(1, DCThemes.current.MON_TXT_C);
 		profilerDisplay.graphics.moveTo(0, txtProfiler.textHeight);

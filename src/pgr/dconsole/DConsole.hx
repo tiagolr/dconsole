@@ -12,7 +12,7 @@ import pgr.dconsole.DCThemes.Theme;
  */
 class DConsole {
 
-	inline static public var VERSION = "4.0.0";
+	inline static public var VERSION = "4.0.1";
 	
 	/** Aligns console to bottom */
 	static public var ALIGN_DOWN:String = "DOWN";
