@@ -24,7 +24,7 @@ V 4.0.0
 
 For more changes or other versions, see CHANGELOG. <br/><br/>
 The console uses **openfl** and supports multiple targets (**flash**, **cpp** and **neko**).<br/>
-Multiple rendering devices and html5 may be availibe in time.
+Multiple rendering devices and html5 may be available in time.
 
 ____________
 
@@ -48,7 +48,7 @@ DC.registerObject(this, "myobject");
 ```
 
 Now while running your application, press **TAB** to show the console and type **"help"** or **"commands"**
-to see what commands are availible, **"objects"** and **"functions"** are useful to show registered objects and functions.
+to see what commands are available, **"objects"** and **"functions"** are useful to show registered objects and functions.
 
 ![help](http://i1148.photobucket.com/albums/o562/ProG4mr/dconsole1_zps2287758b.png "help")
 

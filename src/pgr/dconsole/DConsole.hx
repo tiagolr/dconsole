@@ -73,7 +73,7 @@ class DConsole {
 		hideProfiler();
 
 		DCCommands.registerCommand(DCCommands.showHelp, "help", "", "Type HELP [command-name] for more info");
-		DCCommands.registerCommand(DCCommands.showCommands, "commands", "", "Shows availible commands", "Type HELP [command-name] for more info");
+		DCCommands.registerCommand(DCCommands.showCommands, "commands", "", "Shows available commands", "Type HELP [command-name] for more info");
 		DCCommands.registerCommand(DCCommands.listFunctions, "functions", "funcs", "Lists registered functions", "To call a function type functionName( args ), make sure the args type and number are correct");
 		DCCommands.registerCommand(DCCommands.listObjects, "objects", "objs", "Lists registered objects", "To print an object field type object.field\nTo set and object field type object.field = value");
 		DCCommands.registerCommand(clearConsole, "clear", "", "Clears console view");
