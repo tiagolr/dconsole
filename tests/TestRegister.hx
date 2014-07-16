@@ -25,7 +25,7 @@ class TestRegister extends TestCase
 	override public function setup() {
 		if (console == null) {
 			DC.init();
-			console = DConsole.instance;
+			console = DC.instance;
 			interfc = console.interfc;
 		}
 		
@@ -48,11 +48,11 @@ class TestRegister extends TestCase
 		
 		// tests if command is called and receives arguments
 		DC.registerCommand(commandDummy, "commandDummy");
-		DCCommands.evaluate("commandDummy 123");
+		console.commands.evaluate("commandDummy 123");
 		assertTrue(args.length == 1);
-		DCCommands.evaluate("commandDummy"); // no args
+		console.commands.evaluate("commandDummy"); // no args
 		assertTrue(args.length == 0);
-		DCCommands.evaluate("CoMmanDDumMy test"); // case sensitivity test
+		console.commands.evaluate("CoMmanDDumMy test"); // case sensitivity test
 		assertTrue(args.length == 1);
 	}
 	
@@ -121,16 +121,16 @@ class TestRegister extends TestCase
 	//---------------------------------------------------------------------------------
 	//  AUX
 	//---------------------------------------------------------------------------------
-	static function objectsCount():Int {
-		return Lambda.array(DCCommands.objectsMap).length;
+	function objectsCount():Int {
+		return Lambda.array(console.commands.objectsMap).length;
 	}
 	
-	static function functionsCount():Int {
-		return Lambda.array(DCCommands.functionsMap).length;
+	function functionsCount():Int {
+		return Lambda.array(console.commands.functionsMap).length;
 	}
 	
-	static function commandsCount():Int {
-		return Lambda.array(DCCommands.commandsMap).length;
+	function commandsCount():Int {
+		return Lambda.array(console.commands.commandsMap).length;
 	}
 	
 	public static function testF1():String {

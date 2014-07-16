@@ -1,4 +1,4 @@
-package pgr.dconsole ;
+package pgr.dconsole;
 
 import pgr.dconsole.DCThemes.Theme;
 
@@ -12,8 +12,6 @@ import pgr.dconsole.DCThemes.Theme;
  */
 class DConsole {
 
-	inline static public var VERSION = "4.0.1";
-	
 	/** Aligns console to bottom */
 	static public var ALIGN_DOWN:String = "DOWN";
 	/** Aligns console to top */
@@ -24,10 +22,10 @@ class DConsole {
 	public var interfc:DCInterface;
 	public var monitor:DCMonitor;
 	public var profiler:DCProfiler;
+	public var commands:DCCommands;
 
 	/** shortcutkey to show/hide console. */ 
 	public var toggleKey:Int = 9; 
-	public static var instance:DConsole;
 	
 	public var enabled(default, null):Bool;
 	public var visible(default, null):Bool;
@@ -35,35 +33,32 @@ class DConsole {
 	public var input:DCInput;
 	
 	
-	public function new(height:Float = 0.33, align:String = "DOWN", theme:DCThemes.Theme = null, monitorRate:Int = 10) {
+	public function new(width:Float = 100, height:Float = 33, align:String = "DOWN", theme:DCThemes.Theme = null) {
 		
-		if (instance != null) {
-			return;
-		}
-		instance = this;
+		if (width <= 0 || width > 100) width = 100; // clamp to >0..100
+		if (height <= 0 || height > 100) height = 100; // clamp to >0..100
+		if (width < 1) width = Std.int(width * 100); // turn >0..1 into percentage
+		if (height < 1) height = Std.int(height * 100); // turn >0..1 into percentage
 		
 		if (theme == null) {
 			DCThemes.current = DCThemes.DARK;
 		} else {
 			DCThemes.current = theme;
 		}
-
-		if (height > 1) height = 1;
-		if (height < 0.1) height = 0.1;
 		
 		// create input
-		input = new DCInput();
+		input = new DCInput(this);
 		
 		// create monitor
-		monitor = new DCMonitor();
+		monitor = new DCMonitor(this);
 		
 		// create profiler
-		profiler = new DCProfiler();
+		profiler = new DCProfiler(this);
 		
 		// create console interface
-		interfc = new DCInterface(height, align);
+		interfc = new DCInterface(width, height, align);
 		
-		DCCommands.init();
+		commands = new DCCommands();
 
 		clearHistory();
 		
@@ -72,15 +67,13 @@ class DConsole {
 		hideMonitor();
 		hideProfiler();
 
-		DCCommands.registerCommand(DCCommands.showHelp, "help", "", "Type HELP [command-name] for more info");
-		DCCommands.registerCommand(DCCommands.showCommands, "commands", "", "Shows availible commands", "Type HELP [command-name] for more info");
-		DCCommands.registerCommand(DCCommands.listFunctions, "functions", "funcs", "Lists registered functions", "To call a function type functionName( args ), make sure the args type and number are correct");
-		DCCommands.registerCommand(DCCommands.listObjects, "objects", "objs", "Lists registered objects", "To print an object field type object.field\nTo set and object field type object.field = value");
-		DCCommands.registerCommand(clearConsole, "clear", "", "Clears console view");
-		DCCommands.registerCommand(toggleMonitor, "monitor", "", "Toggles monitor on and off", "Monitor is used to track variable values in runtime\nCONTROL + CONSOLE_KEY (default TAB) also toggles monitor");
-		DCCommands.registerCommand(toggleProfiler, "profiler", "", "Toggles profiler on and off", "Profiler is used to profile app and view statistics like time elapsed and percentage in runtime\nSHIFT + CONSOLE_KEY (default TAB) also toggles profiler");
-		
-		DC.logInfo("~~~~~~~~~~ DCONSOLE ~~~~~~~~~~ (v" + VERSION + ")");
+		commands.registerCommand(commands.showHelp, "help", "", "Type HELP [command-name] for more info");
+		commands.registerCommand(commands.showCommands, "commands", "", "Shows availible commands", "Type HELP [command-name] for more info");
+		commands.registerCommand(commands.listFunctions, "functions", "funcs", "Lists registered functions", "To call a function type functionName( args ), make sure the args type and number are correct");
+		commands.registerCommand(commands.listObjects, "objects", "objs", "Lists registered objects", "To print an object field type object.field\nTo set and object field type object.field = value");
+		commands.registerCommand(clearConsole, "clear", "", "Clears console view");
+		commands.registerCommand(toggleMonitor, "monitor", "", "Toggles monitor on and off", "Monitor is used to track variable values in runtime\nCONTROL + CONSOLE_KEY (default TAB) also toggles monitor");
+		commands.registerCommand(toggleProfiler, "profiler", "", "Toggles profiler on and off", "Profiler is used to profile app and view statistics like time elapsed and percentage in runtime\nSHIFT + CONSOLE_KEY (default TAB) also toggles profiler");
 	}
 	
 	
@@ -264,7 +257,7 @@ class DConsole {
 		log("> " + currText);
 		interfc.clearInput();
 		
-		DCCommands.evaluate(currText);
+		commands.evaluate(currText);
 	}
 	
 	// returns history index to beggining.
@@ -278,29 +271,6 @@ class DConsole {
 	
 	public function scrollUp() {
 		interfc.scrollConsoleUp();
-	}
-	
-	public function autoComplete() {
-		// remove white space added pressing CTRL + SPACE.
-		interfc.inputRemoveLastChar();
-		
-		var autoC:Array<String> = DCUtil.autoComplete(interfc.getInputTxt());
-		if (autoC != null)
-		{
-			if (autoC.length == 1) // only one entry in autocomplete - replace user entry.
-			{
-				interfc.setInputTxt(DCUtil.joinResult(interfc.getInputTxt(), autoC[0]));
-				interfc.moveCarretToEnd();
-			}
-			else	// many entries in autocomplete, list them all.
-			{
-				DC.log(" "); // new line.
-				for (entry in autoC)
-				{
-					DC.logInfo(entry);
-				}
-			}
-		}
 	}
 	
 }

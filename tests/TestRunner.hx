@@ -13,6 +13,11 @@ class TestRunner {
 		r.add(new TestProfiler());
         r.run();
 		
+		#if COVERAGE
+		var logger = mcover.coverage.MCoverage.getLogger();
+		logger.report();
+		#end
+		
 		#if !flash
 		Sys.exit(0);
 		#end

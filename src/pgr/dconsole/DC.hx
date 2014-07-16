@@ -1,31 +1,35 @@
-package pgr.dconsole ;
+package pgr.dconsole;
 
  /**
   * DC class provides user API to The Console.
+  * It creates a console instance that is added on top of other stage sprites (default).
   * 
   * @author TiagoLr ( ~~~ProG4mr~~~ )
   */
 class DC 
 {
-	
+	inline static public var VERSION = "4.1.0";
 	/** Aligns console to bottom */
 	static public var ALIGN_DOWN:String = "DOWN";
 	/** Aligns console to top */
 	static public var ALIGN_UP:String = "UP";
 	
+	static public var instance:DConsole;
+	
 	/**
 	 * Inits TheConsole.
-	 * @param	height	The height of the console (percent of app window height).
-	 * @param	align	Aligns console using "UP" or "DOWN".
-	 * @param	theme	Select the console theme from GCThemes.
+	 * @param	heightPt	Percentage height (relative to container).
+	 * @param	align		Aligns console using "UP" or "DOWN".
+	 * @param	theme		Select the console theme from GCThemes.
 	 * @param	monitorRate The number of frames elapsed for each monitor refresh.
 	 */
-	public static function init(height:Float = 0.33, align:String = "DOWN", theme:DCThemes.Theme = null, monitorRate:Int = 10) {
-		if (DConsole.instance != null) {
+	public static function init(heightPt:Float = 33, align:String = "DOWN", theme:DCThemes.Theme = null) {
+		if (instance != null) {
 			return; // DConsole has been initialized already.
 		}
 		
-		new DConsole(height, align, theme, monitorRate);
+		instance = new DConsole(100, heightPt, align, theme);
+		DC.logInfo("~~~~~~~~~~ DCONSOLE ~~~~~~~~~~ (v" + VERSION + ")");
 	}
 	/**
 	 * Sets the console font.
@@ -39,7 +43,7 @@ class DC
 	 */
 	public static function setConsoleFont(font:String = null, embed:Bool = true, size:Int = 14, bold:Bool = false, italic:Bool = false, underline:Bool = false ){
 		checkInstance();
-		DConsole.instance.interfc.setConsoleFont(font, embed, size, bold, italic, underline);
+		instance.interfc.setConsoleFont(font, embed, size, bold, italic, underline);
 	}
 	/**
 	 * Sets the prompt font.
@@ -52,7 +56,7 @@ class DC
 	 */
 	public static function setPromptFont(font:String = null, embed:Bool = true, size:Int = 16, bold:Bool = false, ?italic:Bool = false, underline:Bool = false ){
 		checkInstance();
-		DConsole.instance.interfc.setPromptFont(font, embed, size, bold, italic, underline);
+		instance.interfc.setPromptFont(font, embed, size, bold, italic, underline);
 	}
 	/**
 	 * Sets the monitor font.
@@ -66,7 +70,7 @@ class DC
 	 */
 	public static function setMonitorFont(font:String = null, embed:Bool = true, size:Int = 14, bold:Bool = false, ?italic:Bool = false, underline:Bool = false ){
 		checkInstance();
-		DConsole.instance.interfc.setConsoleFont(font, embed, size, bold, italic, underline);
+		instance.interfc.setConsoleFont(font, embed, size, bold, italic, underline);
 	}
 	
 	/**
@@ -82,10 +86,10 @@ class DC
 	 */
 	public static function setFont(font:String = null, embed:Bool = true, size:Int = 16, bold:Bool = false, ?italic:Bool = false, underline:Bool = false){
 		checkInstance();
-		DConsole.instance.interfc.setConsoleFont(font, embed, size, bold, italic, underline);
-		DConsole.instance.interfc.setPromptFont(font, embed, size, bold, italic, underline);
-		DConsole.instance.interfc.setConsoleFont(font, embed, size, bold, italic, underline);
-		DConsole.instance.interfc.setProfilerFont(font, embed, size, bold, italic, underline);
+		instance.interfc.setConsoleFont(font, embed, size, bold, italic, underline);
+		instance.interfc.setPromptFont(font, embed, size, bold, italic, underline);
+		instance.interfc.setConsoleFont(font, embed, size, bold, italic, underline);
+		instance.interfc.setProfilerFont(font, embed, size, bold, italic, underline);
 	}
 	
 	/**
@@ -93,21 +97,21 @@ class DC
 	 */
 	public static function showConsole() {
 		checkInstance();
-		DConsole.instance.showConsole();
+		instance.showConsole();
 	}
 	/**
 	 * Hides console.
 	 */
 	public static function hideConsole() {
 		checkInstance();
-		DConsole.instance.hideConsole();
+		instance.hideConsole();
 	}
 	/**
 	 * Shows monitor and refreshes displayed info according to refreshRate.
 	 */
 	public static function showMonitor() {
 		checkInstance();
-		DConsole.instance.showMonitor();
+		instance.showMonitor();
 	}
 	/**
 	 * Stops monitoring.
@@ -115,14 +119,14 @@ class DC
 	public static function hideMonitor()
 	{
 		checkInstance();
-		DConsole.instance.hideMonitor();
+		instance.hideMonitor();
 	}
 	/**
 	 * Shows profiler and refreshes statistics according to refreshRate.
 	 */
 	public static function showProfiler() {
 		checkInstance();
-		DConsole.instance.showProfiler();
+		instance.showProfiler();
 	}
 	/**
 	 * Stops showing and refreshing profiler.
@@ -130,21 +134,21 @@ class DC
 	public static function hideProfiler()
 	{
 		checkInstance();
-		DConsole.instance.hideProfiler();
+		instance.hideProfiler();
 	}
 	/**
 	 * Enables console and its listeners.
 	 */
 	public static function enable() {
 		checkInstance();
-		DConsole.instance.enable();
+		instance.enable();
 	}
 	/**
 	 * Disable console and its listeners.
 	 */
 	public static function disable() {
 		checkInstance();
-		DConsole.instance.disable();
+		instance.disable();
 	}
 	/**
 	 * Sets the keycode to open the console.
@@ -152,7 +156,7 @@ class DC
 	 */
 	public static function setShortcutKeyCode(key:Int) {
 		checkInstance();
-		DConsole.instance.setToggleKey(key);
+		instance.setToggleKey(key);
 	}
 	/**
 	 * Logs a message to the console.
@@ -161,7 +165,7 @@ class DC
 	 */
 	public static function log(data:Dynamic, color:Int = -1) {
 		checkInstance();
-		DConsole.instance.log(data, color);
+		instance.log(data, color);
 	}
 	/**
 	 * Logs a warning message to the console.
@@ -169,7 +173,7 @@ class DC
 	 */
 	static public function logWarning(data:Dynamic) {
 		checkInstance();
-		DConsole.instance.log(data, DCThemes.current.LOG_WAR);
+		instance.log(data, DCThemes.current.LOG_WAR);
 	}
 	/**
 	 * Logs a error message to the console.
@@ -177,7 +181,7 @@ class DC
 	 */
 	static public function logError(data:Dynamic) {
 		checkInstance();
-		DConsole.instance.log(data, DCThemes.current.LOG_ERR);
+		instance.log(data, DCThemes.current.LOG_ERR);
 	}
 	/**
 	 * Logs a confirmation message to the console.
@@ -185,7 +189,7 @@ class DC
 	 */
 	static public function logConfirmation(data:Dynamic) {
 		checkInstance();
-		DConsole.instance.log(data, DCThemes.current.LOG_CON);
+		instance.log(data, DCThemes.current.LOG_CON);
 	}
 	/**
 	 * Logs a info message to the console.
@@ -193,7 +197,7 @@ class DC
 	 */
 	static public function logInfo(data:Dynamic) {
 		checkInstance();
-		DConsole.instance.log(data, DCThemes.current.LOG_INF);
+		instance.log(data, DCThemes.current.LOG_INF);
 	}
 	
 	/**
@@ -207,7 +211,7 @@ class DC
 	 */
 	static public function monitorField(object:Dynamic, fieldName:String, alias:String) {
 		checkInstance();
-		DConsole.instance.monitorField(object, fieldName, alias);
+		instance.monitorField(object, fieldName, alias);
 	}
 	
 	/**
@@ -216,7 +220,7 @@ class DC
 	 */
 	static public function setMonitorRefreshRate(refreshRate:Int = 100) {
 		checkInstance();
-		DConsole.instance.monitor.setRefreshRate(refreshRate);
+		instance.monitor.setRefreshRate(refreshRate);
 	}
 	
 	/**
@@ -236,7 +240,7 @@ class DC
 										   help:String = "") 
 	{
 		checkInstance();
-		DCCommands.registerCommand(Function, alias, shortcut, description, help);
+		instance.commands.registerCommand(Function, alias, shortcut, description, help);
 	}
 	
 	/**
@@ -246,7 +250,7 @@ class DC
 	 */
 	public static function registerObject(object:Dynamic, alias:String = "") {
 		checkInstance();
-		DCCommands.registerObject(object, alias);
+		instance.commands.registerObject(object, alias);
 	}
 	/**
 	 * Registers a function to be called from the console.
@@ -257,7 +261,7 @@ class DC
 	 */
 	public static function registerFunction(Function:Dynamic, alias:String) {
 		checkInstance();
-		DCCommands.registerFunction(Function, alias);
+		instance.commands.registerFunction(Function, alias);
 	}
 	/**
 	 * Deletes field from registry.
@@ -265,26 +269,26 @@ class DC
 	 */
 	public static function unregisterFunction(alias:String) {
 		checkInstance();
-		DCCommands.unregisterFunction(alias);
+		instance.commands.unregisterFunction(alias);
 	}
 	
 	public static function unregisterObject(alias:String) {
 		checkInstance();
-		DCCommands.unregisterObject(alias);
+		instance.commands.unregisterObject(alias);
 	}
 	/**
 	 * Clears console logs.
 	 */
 	public static function clearConsole() {
 		checkInstance();
-		DConsole.instance.clearConsole();
+		instance.clearConsole();
 	}
 	/**
 	 * Removes all entrys from registry.
 	 */
 	public static function clearRegistry() {
 		checkInstance();
-		DCCommands.clearRegistry();
+		instance.commands.clearRegistry();
 	}
 	
 	/**
@@ -293,7 +297,7 @@ class DC
 	 */
 	static public function clearProfiler() {
 		checkInstance();
-		DConsole.instance.profiler.clear();
+		instance.profiler.clear();
 	}
 	
 	/**
@@ -301,7 +305,7 @@ class DC
 	 */
 	public static function clearMonitor() {
 		checkInstance();
-		DConsole.instance.monitor.clear();
+		instance.monitor.clear();
 	}
 	
 	/**
@@ -310,7 +314,7 @@ class DC
 	 */
 	public static function toFront() {
 		checkInstance();
-		DConsole.instance.interfc.toFront();
+		instance.interfc.toFront();
 	}
 	
 	/**
@@ -319,7 +323,7 @@ class DC
 	 */
 	public static function beginProfile(sampleName:String) {
 		checkInstance();
-		DConsole.instance.profiler.begin(sampleName);
+		instance.profiler.begin(sampleName);
 	}
 	/**
 	 * Ends the sample and dumps output to the profiler if this sample has no
@@ -327,7 +331,7 @@ class DC
 	 */
 	public static function endProfile(sampleName:String) {
 		checkInstance();
-		DConsole.instance.profiler.end(sampleName);
+		instance.profiler.end(sampleName);
 	}
 	
 	/**
@@ -335,14 +339,14 @@ class DC
 	 * @param	b
 	 */
 	public static function setVerboseErrors(b:Bool) {
-		DCCommands.printErrorStack = b;
+		instance.commands.printErrorStack = b;
 	}
 	
 	//---------------------------------------------------------------------------------
 	//  PRIVATE / AUX
 	//---------------------------------------------------------------------------------
 	private static function checkInstance() {
-		if (DConsole.instance == null) {
+		if (instance == null) {
 			init();
 		}
 	}

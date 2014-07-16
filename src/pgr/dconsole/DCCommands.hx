@@ -1,4 +1,4 @@
-package pgr.dconsole ;
+package pgr.dconsole;
 
 import haxe.CallStack;
 import hscript.Expr.Error;
@@ -24,17 +24,16 @@ typedef Command = {
 @:access(hscript.Interp)
 class DCCommands
 {
-	public static var functionsMap:Map<String, Dynamic> = new Map<String, Dynamic>();
-	public static var objectsMap:Map<String, Dynamic> = new Map<String, Dynamic>();
-	public static var commandsMap:Map < String, Command > = new Map < String, Command > ();
+	public var functionsMap:Map<String, Dynamic> = new Map<String, Dynamic>();
+	public var objectsMap:Map<String, Dynamic> = new Map<String, Dynamic>();
+	public var commandsMap:Map < String, Command > = new Map < String, Command > ();
 	
-	public static var hScriptParser:Parser;
-	public static var hScriptInterp:DCInterp;
+	public var hScriptParser:Parser;
+	public var hScriptInterp:DCInterp;
 	
-	public static var printErrorStack:Bool = false;
-	
+	public var printErrorStack:Bool = false;
 
-	static public function init() {
+	public function new() {
 		hScriptParser = new Parser();
 		hScriptParser.allowJSON = true;
 		hScriptInterp = new DCInterp();
@@ -48,7 +47,7 @@ class DCCommands
 	 * call that command and send rest of input as arguments (tokens)
 	 * Otherwise let the interpreter handle the input.
 	 */
-	static public function evaluate(input:String) {
+	public function evaluate(input:String) {
 		
 		var args:Array<String> = input.split(' ');
 		var commandName = args[0].toLowerCase();
@@ -90,7 +89,7 @@ class DCCommands
 		
 	}
 	
-	static public function registerCommand(Function:Array<String>->Void,
+	public function registerCommand(Function:Array<String>->Void,
 										   alias:String, 
 										   shortcut:String = "",
 										   description:String = "",
@@ -101,14 +100,14 @@ class DCCommands
 			return;
 		}
 		
-		alias = DCUtil.formatAlias(alias, ALIAS_TYPE.COMMAND);
+		alias = DCUtil.formatAlias(this, alias, ALIAS_TYPE.COMMAND);
 		if (alias == null) {
 			DC.log("Failed to register command, make sure alias or shortcut is correct");
 			return;
 		}
 		
 		if (shortcut != "") {
-			shortcut = DCUtil.formatAlias(shortcut, ALIAS_TYPE.COMMAND);
+			shortcut = DCUtil.formatAlias(this, shortcut, ALIAS_TYPE.COMMAND);
 			// failed to validade this
 			if (shortcut == null) {
 				shortcut = ""; // no shortcut
@@ -128,14 +127,14 @@ class DCCommands
 										   
 										   
 	
-	static public function registerFunction(Function:Dynamic, alias:String) {
+	public function registerFunction(Function:Dynamic, alias:String) {
 		
 		if (!Reflect.isFunction(Function)) {
 			DC.logError("Function " + Std.string(Function) + " is not valid.");
 			return;
 		}
 		
-		alias = DCUtil.formatAlias(alias, ALIAS_TYPE.FUNCTION);
+		alias = DCUtil.formatAlias(this, alias, ALIAS_TYPE.FUNCTION);
 		if (alias == null) {
 			DC.logError("Function " + Std.string(Function) + " alias not valid");
 			return;
@@ -146,7 +145,7 @@ class DCCommands
 	}
 	
 	
-	static public function registerObject(object:Dynamic, alias:String) {
+	public function registerObject(object:Dynamic, alias:String) {
 		
 		if (!Reflect.isObject(object)) {
 			DC.logError("dynamic passed is not an object.");
@@ -154,9 +153,9 @@ class DCCommands
 		}
 		
 		if (alias == "") {
-			alias = DCUtil.formatAlias(Type.getClassName(Type.getClass(object)).toLowerCase(), ALIAS_TYPE.OBJECT);
+			alias = DCUtil.formatAlias(this, Type.getClassName(Type.getClass(object)).toLowerCase(), ALIAS_TYPE.OBJECT);
 		} else {
-			alias = DCUtil.formatAlias(alias, ALIAS_TYPE.OBJECT);
+			alias = DCUtil.formatAlias(this, alias, ALIAS_TYPE.OBJECT);
 		}
 		
 		if (alias == null) {
@@ -170,7 +169,7 @@ class DCCommands
 	}
 
 	
-	public static function unregisterFunction(alias:String) {
+	public function unregisterFunction(alias:String) {
 		
 		if (functionsMap.exists(alias)) {
 			functionsMap.remove(alias);
@@ -181,7 +180,7 @@ class DCCommands
 	}
 	
 	
-	public static function unregisterObject(alias:String) {
+	public function unregisterObject(alias:String) {
 		
 		if (objectsMap.exists(alias)) {
 			objectsMap.remove(alias);
@@ -192,7 +191,7 @@ class DCCommands
 	}
 	
 	
-	public static function clearRegistry() {
+	public function clearRegistry() {
 		functionsMap  = new Map<String, Dynamic>();
 		objectsMap	= new Map<String, Dynamic>();
 	}
@@ -201,7 +200,7 @@ class DCCommands
 	//-------------------------------------------------------------------------------
 	//  CONSOLE RUNTIME COMMANDS
 	//-------------------------------------------------------------------------------
-	public static function showHelp(args:Array<String>) {
+	public function showHelp(args:Array<String>) {
 		var output :String = "\n";
 		
 		if (args.length > 0) {
@@ -235,7 +234,7 @@ class DCCommands
 	}
 
 	
-	public static function showCommands(args:Array<String>) {
+	public function showCommands(args:Array<String>) {
 		var output:String = "";
 		
 		for (command in commandsMap.iterator()) {
@@ -251,7 +250,7 @@ class DCCommands
 	}
 	
 
-	public static function listFunctions(args:Array<String>) {
+	public function listFunctions(args:Array<String>) {
 		var list = "";
 		for (key in functionsMap.keys()) {
 			list += key + '\n'; 
@@ -266,7 +265,7 @@ class DCCommands
 	}
 
 	
-	public static function listObjects(args:Array<String>)
+	public function listObjects(args:Array<String>)
 	{
 		var list = "";
 		for (key in objectsMap.keys())  {
@@ -285,16 +284,16 @@ class DCCommands
 	//---------------------------------------------------------------------------------
 	//  AUX
 	//---------------------------------------------------------------------------------
-	public static function getFunction(alias:String):Dynamic {
+	public function getFunction(alias:String):Dynamic {
 		return functionsMap[alias];
 	}
 
 	
-	public static function getObject(alias:String) {
+	public function getObject(alias:String) {
 		return objectsMap[alias];
 	}
 	
-	public static function getCommand(alias:String):Command {
+	public function getCommand(alias:String):Command {
 		alias = alias.toLowerCase();
 		for (command in commandsMap.iterator()) {
 			if (command.alias == alias || command.shortcut == alias) {

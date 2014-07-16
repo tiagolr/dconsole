@@ -1,4 +1,4 @@
-package pgr.dconsole ;
+package pgr.dconsole;
 
 import flash.display.MovieClip;
 import flash.display.Sprite;
@@ -10,7 +10,6 @@ import flash.text.TextFormat;
 import flash.text.TextFormatAlign;
 import pgr.dconsole.DCThemes.Theme;
 
-
 /**
  * 
  * @author TiagoLr ( ~~~ProG4mr~~~ )
@@ -18,10 +17,12 @@ import pgr.dconsole.DCThemes.Theme;
 
 class DCInterface extends Sprite
 {
-	var _width:Int;
-	var _height:Int;
 	var _promptFontYOffset:Int;
-	var _yOffset:Int;
+	var yAlign:String;
+	var heightPt:Float; // percentage height
+	var widthPt:Float; // percentage width
+	var _width:Float; // width in pixels
+	var _height:Float; // height in pixels
 	var margin:Int = 0;
 	
 	var monitorDisplay:Sprite;
@@ -36,12 +37,13 @@ class DCInterface extends Sprite
 	var txtConsole:TextField;
 	var txtPrompt:TextField;
 	
-	public function new(height:Float, align:String) {
+	public function new(widthPt:Float, heightPt:Float, align:String) {
 		super();
+		Lib.current.stage.addChild(this); // by default the interface adds itself to the stage.
 		
-		_width = Lib.current.stage.stageWidth;
-		_height = Std.int(Lib.current.stage.stageHeight * height);
-		align == "DOWN" ? _yOffset = Lib.current.stage.stageHeight - _height : _yOffset = 0;
+		this.widthPt = widthPt;
+		this.heightPt = heightPt;
+		yAlign = align;
 		
 		createMonitorDisplay();
 		createProfilerDisplay();
@@ -52,9 +54,15 @@ class DCInterface extends Sprite
 		setProfilerFont();
 		setPromptFont();
 		
-		drawConsole();
+		onResize();
+	}
+	
+	function onResize() {
+		_width = this.parent.width * (widthPt / 100);
+		_height = this.parent.height * (heightPt / 100);
 		
-		Lib.current.stage.addChild(this);
+		drawConsole(); // redraws console.
+		drawMonitor();
 	}
 	
 	
@@ -86,9 +94,10 @@ class DCInterface extends Sprite
 	
 	/** 
 	 * Draws console fields after changes to console appearence
-	 * TODO - redraw on stage resize.
 	 */
-	function drawConsole() {	
+	function drawConsole() {
+		
+		var _yOffset = (yAlign == DC.ALIGN_DOWN) ? _height - _height * heightPt : 0; 
 		
 		// draw console background.
 		consoleDisplay.graphics.clear();
@@ -134,6 +143,7 @@ class DCInterface extends Sprite
 	function hideConsole() {
 		consoleDisplay.visible = false;
 		promptDisplay.visible = false;
+		Lib.current.stage.focus = null;
 	}
 	
 	//---------------------------------------------------------------------------------
@@ -142,31 +152,42 @@ class DCInterface extends Sprite
 	function createMonitorDisplay() {
 		
 		monitorDisplay = new Sprite();
-		monitorDisplay.graphics.beginFill(DCThemes.current.MON_C, DCThemes.current.MON_A);
-		monitorDisplay.graphics.drawRect(0, 0, Lib.current.stage.stageWidth, Lib.current.stage.stageHeight);
-		monitorDisplay.graphics.endFill();
-		monitorDisplay.alpha = DCThemes.current.MON_TXT_A;
 		addChild(monitorDisplay);
 		
 		txtMonitorLeft = new TextField();
 		txtMonitorLeft.selectable = false;
 		txtMonitorLeft.multiline = true;
 		txtMonitorLeft.wordWrap = true;
-		txtMonitorLeft.x = 0;
-		txtMonitorLeft.width = Lib.current.stage.stageWidth / 2;
-		txtMonitorLeft.height = Lib.current.stage.stageHeight;
 		monitorDisplay.addChild(txtMonitorLeft);
 		
 		txtMonitorRight = new TextField();
 		txtMonitorRight.selectable = false;
 		txtMonitorRight.multiline = true;
 		txtMonitorRight.wordWrap = true;
-		txtMonitorRight.x = Lib.current.stage.stageWidth / 2;
-		txtMonitorRight.width = Lib.current.stage.stageWidth / 2;
-		txtMonitorRight.height = Lib.current.stage.stageHeight;
 		monitorDisplay.addChild(txtMonitorRight);
 		monitorDisplay.visible = false;
+	}
+	
+	function drawMonitor() {
 		
+		// draws background
+		monitorDisplay.graphics.clear(); 
+		monitorDisplay.graphics.beginFill(DCThemes.current.MON_C, DCThemes.current.MON_A);
+		monitorDisplay.graphics.drawRect(0, 0, _width, _height);
+		monitorDisplay.graphics.endFill();
+		// draws decoration line
+		monitorDisplay.alpha = DCThemes.current.MON_TXT_A; 
+		monitorDisplay.graphics.lineStyle(1, DCThemes.current.MON_TXT_C);
+		monitorDisplay.graphics.moveTo(0, txtMonitorLeft.textHeight);
+		monitorDisplay.graphics.lineTo(_width, txtMonitorLeft.textHeight);
+		// position and scales left text
+		txtMonitorLeft.x = 0;
+		txtMonitorLeft.width = _width / 2;
+		txtMonitorLeft.height = _height;
+		// position and scale right text
+		txtMonitorRight.x = _width / 2;
+		txtMonitorRight.width = _width / 2;
+		txtMonitorRight.height = _height;
 	}
 	
 	// Splits output into left and right monitor text fields
@@ -176,10 +197,6 @@ class DCInterface extends Sprite
 		
 		txtMonitorLeft.text += "DC Monitor\n\n";
 		txtMonitorRight.text += "\n\n";
-		
-		monitorDisplay.graphics.lineStyle(1, DCThemes.current.MON_TXT_C);
-		monitorDisplay.graphics.moveTo(0, txtMonitorLeft.textHeight);
-		monitorDisplay.graphics.lineTo(Lib.current.stage.stageWidth, txtMonitorLeft.textHeight);
 		
 		var i = 0;
 		while (output.length > 0) {
@@ -208,31 +225,35 @@ class DCInterface extends Sprite
 	function createProfilerDisplay() {
 		
 		profilerDisplay = new Sprite();
-		profilerDisplay.graphics.beginFill(DCThemes.current.MON_C, DCThemes.current.MON_A);
-		profilerDisplay.graphics.drawRect(0, 0, Lib.current.stage.stageWidth, Lib.current.stage.stageHeight);
-		profilerDisplay.graphics.endFill();
 		addChild(profilerDisplay);
 		
 		txtProfiler = new TextField();
 		txtProfiler.selectable = false;
 		txtProfiler.multiline = true;
 		txtProfiler.wordWrap = true;
-		txtProfiler.alpha = DCThemes.current.MON_TXT_A;
-		txtProfiler.x = 0;
-		txtProfiler.y = 0;
-		txtProfiler.width = Lib.current.stage.stageWidth;
-		txtProfiler.height = Lib.current.stage.stageHeight;
 		profilerDisplay.addChild(txtProfiler);
 		profilerDisplay.visible = false;
 	}
 	
-	public function writeProfilerOutput(output:String) {
+	function drawProfiler() {
 		
-		txtProfiler.text = "DC Profiler\n\n";
-		
-		profilerDisplay.graphics.lineStyle(1, DCThemes.current.MON_TXT_C);
+		// draw background
+		profilerDisplay.graphics.clear();
+		profilerDisplay.graphics.beginFill(DCThemes.current.MON_C, DCThemes.current.MON_A);
+		profilerDisplay.graphics.drawRect(0, 0, _width, _height);
+		profilerDisplay.graphics.endFill();
+		// draw decoration line
+		profilerDisplay.graphics.lineStyle(1, DCThemes.current.MON_TXT_C); 
 		profilerDisplay.graphics.moveTo(0, txtProfiler.textHeight);
-		profilerDisplay.graphics.lineTo(Lib.current.stage.stageWidth, txtProfiler.textHeight);
+		profilerDisplay.graphics.lineTo(_width, txtProfiler.textHeight);
+		// position and scale monitor text
+		txtProfiler.alpha = DCThemes.current.MON_TXT_A;
+		txtProfiler.width = _width;
+		txtProfiler.height = _height;
+	}
+	
+	public function writeProfilerOutput(output:String) {
+		txtProfiler.text = "DC Profiler\n\n";
 		txtProfiler.text += output;
 	}
 	
@@ -289,7 +310,7 @@ class DCInterface extends Sprite
 	 * Brings this display object to the front of display list.
 	 */
 	public function toFront() {
-		Lib.current.stage.swapChildren(this, Lib.current.stage.getChildAt(Lib.current.stage.numChildren - 1));
+		parent.swapChildren(this, parent.getChildAt(parent.numChildren - 1));
 	}
 	
 	public function setConsoleFont(font:String = null, embed:Bool = false, size:Int = 14, bold:Bool = false, italic:Bool = false, underline:Bool = false ){

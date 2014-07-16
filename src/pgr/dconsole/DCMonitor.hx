@@ -1,4 +1,4 @@
-package pgr.dconsole ;
+package pgr.dconsole;
 import haxe.Timer;
 
 typedef MonitorField = {
@@ -20,8 +20,10 @@ class DCMonitor {
 	
 	var refreshTimer:Timer;
 	var hidden:Bool;
+	var console:DConsole;
 	
-	public function new() {
+	public function new(console:DConsole) {
+		this.console = console;
 		fields = new Array<MonitorField>();
 		setRefreshRate();
 	}
@@ -64,7 +66,7 @@ class DCMonitor {
 			output.push(v.alias + ':' + Reflect.getProperty(v.object, v.field) + '\n');
 		}
 		
-		DConsole.instance.interfc.writeMonitorOutput(output);
+		console.interfc.writeMonitorOutput(output);
 	}
 	
 	

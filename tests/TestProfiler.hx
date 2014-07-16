@@ -24,7 +24,7 @@ class TestProfiler extends TestCase
 	override public function setup() {
 		if (console == null) {
 			DC.init();
-			console = DConsole.instance;
+			console = DC.instance;
 			interfc = console.interfc;
 			monitor = console.monitor;
 			profiler = console.profiler;

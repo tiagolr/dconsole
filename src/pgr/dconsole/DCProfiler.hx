@@ -1,4 +1,4 @@
-package pgr.dconsole ;
+package pgr.dconsole;
 import haxe.Timer;
 import pgr.dconsole.DCProfiler.PFSample;
 import pgr.dconsole.DCProfiler.SampleHistory;
@@ -30,9 +30,11 @@ class DCProfiler {
 	public var samples:Array<PFSample>;
 	public var history:Array<SampleHistory>;
 	
+	var console:DConsole;
 	var refreshTimer:Timer;
 	
-	public function new() {
+	public function new(console:DConsole) {
+		this.console = console;
 		history = new Array<SampleHistory>();
 		samples = new Array<PFSample>();
 		setRefreshRate();
@@ -218,7 +220,7 @@ class DCProfiler {
 			}
 		}
 		
-		DConsole.instance.interfc.writeProfilerOutput(output);
+		console.interfc.writeProfilerOutput(output);
 		
 	}
 	

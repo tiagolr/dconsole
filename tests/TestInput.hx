@@ -26,7 +26,7 @@ class TestInput extends TestCase
 	override public function setup() {
 		if (console == null) {
 			DC.init();
-			console = DConsole.instance;
+			console = DC.instance;
 			interfc = console.interfc;
 			input = console.input;
 		}

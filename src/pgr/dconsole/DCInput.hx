@@ -1,4 +1,4 @@
-package pgr.dconsole ;
+package pgr.dconsole;
 import flash.events.KeyboardEvent;
 import flash.Lib;
 import flash.ui.Keyboard;
@@ -12,9 +12,9 @@ class DCInput{
 
 	var console:DConsole;
 	
-	public function new() {
+	public function new(console:DConsole) {
 		
-		console = DConsole.instance;
+		this.console = console;
 		console.setToggleKey(Keyboard.TAB); // ensures TAB key using openfl
 		
 		enable();
@@ -103,13 +103,6 @@ class DCInput{
 		else 
 		if (e.keyCode == 40) { 
 			console.prevHistory();
-		}
-		
-		// CONTROL + SPACE = AUTOCOMPLETE
-		else 
-		if (e.keyCode == 32 && e.ctrlKey)  
-		{   
-			console.autoComplete();
 		}
 		
 		else 

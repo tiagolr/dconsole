@@ -1,4 +1,4 @@
-package pgr.dconsole ;
+package pgr.dconsole;
 import hscript.Interp;
 
 /**

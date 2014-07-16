@@ -25,7 +25,7 @@ class TestUtils extends TestCase
 	override public function setup() {
 		if (console == null) {
 			DC.init();
-			console = DConsole.instance;
+			console = DC.instance;
 			interfc = console.interfc;
 		}
 		
@@ -40,22 +40,22 @@ class TestUtils extends TestCase
 	public function testAutoAlias() {
 		var alias:String;
 		
-		alias = DCUtil.formatAlias("", ALIAS_TYPE.OBJECT);
+		alias = DCUtil.formatAlias(console.commands, "", ALIAS_TYPE.OBJECT);
 		assertTrue(alias == null);
 		
-		alias = DCUtil.formatAlias(null, ALIAS_TYPE.OBJECT);
+		alias = DCUtil.formatAlias(console.commands, null, ALIAS_TYPE.OBJECT);
 		assertTrue(alias == null);
 		
-		alias = DCUtil.formatAlias(".invalidName", ALIAS_TYPE.OBJECT);
+		alias = DCUtil.formatAlias(console.commands, ".invalidName", ALIAS_TYPE.OBJECT);
 		assertTrue(alias == null);
 		
-		alias = DCUtil.formatAlias("(invalidName)", ALIAS_TYPE.OBJECT);
+		alias = DCUtil.formatAlias(console.commands, "(invalidName)", ALIAS_TYPE.OBJECT);
 		assertTrue(alias == null);
 		
-		alias = DCUtil.formatAlias(" invalidName)", ALIAS_TYPE.OBJECT);
+		alias = DCUtil.formatAlias(console.commands, " invalidName)", ALIAS_TYPE.OBJECT);
 		assertTrue(alias == null);
 		
-		alias = DCUtil.formatAlias("!invalidName)", ALIAS_TYPE.OBJECT);
+		alias = DCUtil.formatAlias(console.commands, "!invalidName)", ALIAS_TYPE.OBJECT);
 		assertTrue(alias == null);
 		
 		DC.registerCommand(commandDummy, "c", "cs");
@@ -93,15 +93,15 @@ class TestUtils extends TestCase
 	function fDummy() {};
 	
 	function existsCommand(c:String) {
-		return DCCommands.getCommand(c) != null;
+		return console.commands.getCommand(c) != null;
 	}
 	
 	function existsFunction(f:String) {
-		return DCCommands.getFunction(f) != null;
+		return console.commands.getFunction(f) != null;
 	}
 	
 	function existsObject(o:String) {
-		return DCCommands.getObject(o) != null;
+		return console.commands.getObject(o) != null;
 	}
 	
 }
