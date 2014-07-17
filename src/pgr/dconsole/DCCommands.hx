@@ -15,6 +15,11 @@ typedef Command = {
 	help:String, 					// extended description on how to use the command
 }
 
+typedef Func = {
+	callback:Dynamic,
+	description:String,
+}
+
 /**
  * DCCommands contains the logic used by GC to execute the commands
  * given by the user.
@@ -24,7 +29,7 @@ typedef Command = {
 @:access(hscript.Interp)
 class DCCommands
 {
-	public var functionsMap:Map<String, Dynamic> = new Map<String, Dynamic>();
+	public var functionsMap:Map<String, Func> = new Map<String, Func>();
 	public var objectsMap:Map<String, Dynamic> = new Map<String, Dynamic>();
 	public var commandsMap:Map < String, Command > = new Map < String, Command > ();
 	
@@ -127,7 +132,7 @@ class DCCommands
 										   
 										   
 	
-	public function registerFunction(Function:Dynamic, alias:String) {
+	public function registerFunction(Function:Dynamic, alias:String, description:String) {
 		
 		if (!Reflect.isFunction(Function)) {
 			DC.logError("Function " + Std.string(Function) + " is not valid.");
@@ -140,7 +145,7 @@ class DCCommands
 			return;
 		}
 		
-		functionsMap.set(alias, Function);
+		functionsMap.set(alias, { callback:Function, description:description });
 		hScriptInterp.variables.set(alias, Function); // registers var in hscript
 	}
 	
@@ -192,7 +197,7 @@ class DCCommands
 	
 	
 	public function clearRegistry() {
-		functionsMap  = new Map<String, Dynamic>();
+		functionsMap  = new Map<String, Func>();
 		objectsMap	= new Map<String, Dynamic>();
 	}
 
@@ -253,13 +258,17 @@ class DCCommands
 	public function listFunctions(args:Array<String>) {
 		var list = "";
 		for (key in functionsMap.keys()) {
-			list += key + '\n'; 
+			var line:String = "";
+			line += key;
+			line = StringTools.rpad(line, ' ', 20);
+			line += functionsMap[key].description + '\n';
+			list += line;
 		}
 
 		if (list.toString() == "") {
 			DC.logInfo("no functions registered.");
 			return;
-		} 
+		}
 		
 		DC.logConfirmation(list);
 	}
@@ -285,7 +294,10 @@ class DCCommands
 	//  AUX
 	//---------------------------------------------------------------------------------
 	public function getFunction(alias:String):Dynamic {
-		return functionsMap[alias];
+		if (functionsMap.exists(alias)) {
+			return functionsMap[alias].callback;
+		}
+		return null;
 	}
 
 	

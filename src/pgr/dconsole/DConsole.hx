@@ -2,6 +2,12 @@ package pgr.dconsole;
 
 import pgr.dconsole.DCThemes.Theme;
 
+typedef SCKey = {
+	altKey:Bool,
+	ctrlKey:Bool,
+	shiftKey:Bool,
+	keycode:Int,
+}
 /**
  * DConsole is the main class of this lib, it should be instantiated only once
  * and then use its instance to control the console.
@@ -24,8 +30,12 @@ class DConsole {
 	public var profiler:DCProfiler;
 	public var commands:DCCommands;
 
-	/** shortcutkey to show/hide console. */ 
-	public var toggleKey:Int = 9; 
+	/** console toggle key */ 
+	public var consoleKey:SCKey;
+	/** monitor toggle key */
+	public var monitorKey:SCKey;
+	/** profiler toggle key */
+	public var profilerKey:SCKey;
 	
 	public var enabled(default, null):Bool;
 	public var visible(default, null):Bool;
@@ -33,18 +43,23 @@ class DConsole {
 	public var input:DCInput;
 	
 	
-	public function new(width:Float = 100, height:Float = 33, align:String = "DOWN", theme:DCThemes.Theme = null) {
+	public function new(height:Float = 33, align:String = "DOWN", theme:DCThemes.Theme = null) {
 		
-		if (width <= 0 || width > 100) width = 100; // clamp to >0..100
-		if (height <= 0 || height > 100) height = 100; // clamp to >0..100
-		if (width < 1) width = Std.int(width * 100); // turn >0..1 into percentage
-		if (height < 1) height = Std.int(height * 100); // turn >0..1 into percentage
+		if (height <= 0 || height > 100) height = 100; // clamp to >0..1
+		if (height > 1) height = Std.int(height) / 100; // turn >0..100 into percentage from 1..0
 		
 		if (theme == null) {
 			DCThemes.current = DCThemes.DARK;
 		} else {
 			DCThemes.current = theme;
 		}
+		
+		// default key is tab
+		setConsoleKey(9);
+		// default key is ctrl + tab
+		setMonitorKey(9, true);
+		// default key is shift + tab
+		setProfilerKey(9, false, true);
 		
 		// create input
 		input = new DCInput(this);
@@ -56,7 +71,7 @@ class DConsole {
 		profiler = new DCProfiler(this);
 		
 		// create console interface
-		interfc = new DCInterface(width, height, align);
+		interfc = new DCInterface(height, align);
 		
 		commands = new DCCommands();
 
@@ -117,9 +132,25 @@ class DConsole {
 		input.disable();
 	}
 
+	public function setConsoleKey(keyCode:Int, ctrlKey:Bool = false, shiftKey:Bool = false, altKey:Bool = false) {
+		consoleKey = makeShorcutKey(keyCode, ctrlKey, shiftKey, altKey); 
+	}
 	
-	public function setToggleKey(key:Int) {
-		toggleKey = key;
+	public function setMonitorKey(keyCode:Int, ctrlKey:Bool = false, shiftKey:Bool = false, altKey:Bool = false) {
+		monitorKey = makeShorcutKey(keyCode, ctrlKey, shiftKey, altKey); 
+	}
+	
+	public function setProfilerKey(keyCode:Int, ctrlKey:Bool = false, shiftKey:Bool = false, altKey:Bool = false) {
+		profilerKey = makeShorcutKey(keyCode, ctrlKey, shiftKey, altKey); 
+	}
+	
+	function makeShorcutKey(keyCode:Int, ctrlKey:Bool = false, shiftKey:Bool = false, altKey:Bool = false):SCKey {
+		return {
+			altKey:altKey,
+			ctrlKey:ctrlKey,
+			shiftKey:shiftKey,
+			keycode:keyCode,
+		}
 	}
 
 	

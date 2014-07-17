@@ -18,7 +18,7 @@ class DC
 	
 	/**
 	 * Inits TheConsole.
-	 * @param	heightPt	Percentage height (relative to container).
+	 * @param	heightPt	Pertentage height of the console
 	 * @param	align		Aligns console using "UP" or "DOWN".
 	 * @param	theme		Select the console theme from GCThemes.
 	 * @param	monitorRate The number of frames elapsed for each monitor refresh.
@@ -28,7 +28,7 @@ class DC
 			return; // DConsole has been initialized already.
 		}
 		
-		instance = new DConsole(100, heightPt, align, theme);
+		instance = new DConsole(heightPt, align, theme);
 		DC.logInfo("~~~~~~~~~~ DCONSOLE ~~~~~~~~~~ (v" + VERSION + ")");
 	}
 	/**
@@ -151,12 +151,37 @@ class DC
 		instance.disable();
 	}
 	/**
-	 * Sets the keycode to open the console.
-	 * @param	key		The keycode for the new console shortcut key.
+	 * Sets console toggle key combination.
+	 * @param	keyCode		The key code.
+	 * @param	ctrlKey		If control key is pressed.
+	 * @param	shiftKey	If shift key is pressed.
+	 * @param	altKey		If alt key is pressed.
 	 */
-	public static function setShortcutKeyCode(key:Int) {
+	public static function setConsoleKey(keyCode:Int, ctrlKey:Bool = false, shiftKey:Bool = false, altKey:Bool = false) {
 		checkInstance();
-		instance.setToggleKey(key);
+		instance.setConsoleKey(keyCode, ctrlKey, shiftKey, altKey);
+	}
+	/**
+	 * Sets monitor toggle key combination.
+	 * @param	keyCode		The key code.
+	 * @param	ctrlKey		If control key is pressed.
+	 * @param	shiftKey	If shift key is pressed.
+	 * @param	altKey		If alt key is pressed.
+	 */
+	public static function setMonitorKey(keyCode:Int, ctrlKey:Bool = false, shiftKey:Bool = false, altKey:Bool = false) {
+		checkInstance();
+		instance.setMonitorKey(keyCode, ctrlKey, shiftKey, altKey);
+	}
+	/**
+	 * Sets console toggle key combination.
+	 * @param	keyCode		The key code.
+	 * @param	ctrlKey		If control key is pressed.
+	 * @param	shiftKey	If shift key is pressed.
+	 * @param	altKey		If alt key is pressed.
+	 */
+	public static function setProfilerKey(keyCode:Int, ctrlKey:Bool = false, shiftKey:Bool = false, altKey:Bool = false) {
+		checkInstance();
+		instance.setProfilerKey(keyCode, ctrlKey, shiftKey, altKey);
 	}
 	/**
 	 * Logs a message to the console.
@@ -258,10 +283,11 @@ class DC
 	 * 
 	 * @param	Function	The function to be registered.
 	 * @param	alias		The alias displayed in the console.
+	 * @param 	description	Short description shown in commands list.
 	 */
-	public static function registerFunction(Function:Dynamic, alias:String) {
+	public static function registerFunction(Function:Dynamic, alias:String, description:String = "") {
 		checkInstance();
-		instance.commands.registerFunction(Function, alias);
+		instance.commands.registerFunction(Function, alias, description);
 	}
 	/**
 	 * Deletes field from registry.

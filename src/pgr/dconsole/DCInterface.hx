@@ -8,6 +8,8 @@ import flash.text.TextFieldAutoSize;
 import flash.text.TextFieldType;
 import flash.text.TextFormat;
 import flash.text.TextFormatAlign;
+import openfl.display.Stage;
+import openfl.events.Event;
 import pgr.dconsole.DCThemes.Theme;
 
 /**
@@ -21,8 +23,8 @@ class DCInterface extends Sprite
 	var yAlign:String;
 	var heightPt:Float; // percentage height
 	var widthPt:Float; // percentage width
-	var _width:Float; // width in pixels
-	var _height:Float; // height in pixels
+	var maxWidth:Float; // width in pixels
+	var maxHeight:Float; // height in pixels
 	var margin:Int = 0;
 	
 	var monitorDisplay:Sprite;
@@ -37,11 +39,10 @@ class DCInterface extends Sprite
 	var txtConsole:TextField;
 	var txtPrompt:TextField;
 	
-	public function new(widthPt:Float, heightPt:Float, align:String) {
+	public function new(heightPt:Float, align:String) {
 		super();
 		Lib.current.stage.addChild(this); // by default the interface adds itself to the stage.
 		
-		this.widthPt = widthPt;
 		this.heightPt = heightPt;
 		yAlign = align;
 		
@@ -55,20 +56,30 @@ class DCInterface extends Sprite
 		setPromptFont();
 		
 		onResize();
+		Lib.current.stage.addEventListener(Event.RESIZE, onResize);
 	}
 	
-	function onResize() {
-		_width = this.parent.width * (widthPt / 100);
-		_height = this.parent.height * (heightPt / 100);
+	public function onResize(e:Event = null) {
+		
+		if (Std.is(this.parent, Stage)) {
+			var stg:Stage = cast this.parent;
+			maxWidth = stg.stageWidth;
+			maxHeight = stg.stageHeight;
+		} else {
+			maxWidth = this.parent.width;
+			maxHeight = this.parent.height;
+		}
 		
 		drawConsole(); // redraws console.
 		drawMonitor();
+		drawProfiler();
 	}
 	
 	
 	function createConsoleDisplay() {
 		consoleDisplay = new Sprite();
 		consoleDisplay.alpha = DCThemes.current.CON_TXT_A;
+		consoleDisplay.mouseEnabled = false;
 		addChild(consoleDisplay);
 		
 		promptDisplay = new Sprite();
@@ -82,6 +93,7 @@ class DCInterface extends Sprite
 		
 		txtConsole = new TextField();
 		txtConsole.selectable = false;
+		txtConsole.mouseEnabled = false;
 		txtConsole.multiline = true;
 		txtConsole.wordWrap = true;
 		txtConsole.alpha = DCThemes.current.CON_TXT_A;
@@ -97,12 +109,12 @@ class DCInterface extends Sprite
 	 */
 	function drawConsole() {
 		
-		var _yOffset = (yAlign == DC.ALIGN_DOWN) ? _height - _height * heightPt : 0; 
+		var _yOffset = (yAlign == DC.ALIGN_DOWN) ? maxHeight - maxHeight * heightPt: 0; 
 		
 		// draw console background.
 		consoleDisplay.graphics.clear();
 		consoleDisplay.graphics.beginFill(DCThemes.current.CON_C, 1);
-		consoleDisplay.graphics.drawRect(0, 0, _width, _height);
+		consoleDisplay.graphics.drawRect(0, 0, maxWidth, maxHeight * heightPt);
 		consoleDisplay.graphics.endFill();
 		consoleDisplay.y = _yOffset;
 		consoleDisplay.alpha = DCThemes.current.CON_A;
@@ -110,16 +122,18 @@ class DCInterface extends Sprite
 		// draw text input field.
 		promptDisplay.graphics.clear();
 		promptDisplay.graphics.beginFill(DCThemes.current.PRM_C);
-		promptDisplay.graphics.drawRect(0, 0, _width, txtPrompt.textHeight);
+		promptDisplay.graphics.drawRect(0, 0, maxWidth, txtPrompt.textHeight);
 		promptDisplay.graphics.endFill();
-		promptDisplay.y = _height - txtPrompt.textHeight + _yOffset;
+		promptDisplay.y = consoleDisplay.y + maxHeight * heightPt - txtPrompt.textHeight;
 		
 		// Resize textfields
-		txtConsole.width = _width;
-		txtConsole.height = _height - txtPrompt.textHeight + 2;
+		txtConsole.width = maxWidth;
+		txtConsole.x = 0;
+		txtPrompt.x = 0;
+		txtConsole.height = maxHeight * heightPt - txtPrompt.textHeight + 2;
 		
 		txtPrompt.y = - 2; // -2 just looks better.
-		txtPrompt.width = _width;
+		txtPrompt.width = maxWidth;
 		txtPrompt.height = 32;
 		
 		#if (cpp || neko) // BUGFIX
@@ -152,6 +166,8 @@ class DCInterface extends Sprite
 	function createMonitorDisplay() {
 		
 		monitorDisplay = new Sprite();
+		monitorDisplay.mouseEnabled = false;
+		monitorDisplay.mouseChildren = false;
 		addChild(monitorDisplay);
 		
 		txtMonitorLeft = new TextField();
@@ -173,21 +189,25 @@ class DCInterface extends Sprite
 		// draws background
 		monitorDisplay.graphics.clear(); 
 		monitorDisplay.graphics.beginFill(DCThemes.current.MON_C, DCThemes.current.MON_A);
-		monitorDisplay.graphics.drawRect(0, 0, _width, _height);
+		monitorDisplay.graphics.drawRect(0, 0, maxWidth, maxHeight);
 		monitorDisplay.graphics.endFill();
 		// draws decoration line
+		var s = txtMonitorLeft.text;
+		txtMonitorLeft.text = " ";
+		var h = txtMonitorLeft.textHeight; 
 		monitorDisplay.alpha = DCThemes.current.MON_TXT_A; 
 		monitorDisplay.graphics.lineStyle(1, DCThemes.current.MON_TXT_C);
-		monitorDisplay.graphics.moveTo(0, txtMonitorLeft.textHeight);
-		monitorDisplay.graphics.lineTo(_width, txtMonitorLeft.textHeight);
+		monitorDisplay.graphics.moveTo(0, h);
+		monitorDisplay.graphics.lineTo(maxWidth, h);
+		txtMonitorLeft.text = s;
 		// position and scales left text
 		txtMonitorLeft.x = 0;
-		txtMonitorLeft.width = _width / 2;
-		txtMonitorLeft.height = _height;
+		txtMonitorLeft.width = maxWidth / 2;
+		txtMonitorLeft.height = maxHeight;
 		// position and scale right text
-		txtMonitorRight.x = _width / 2;
-		txtMonitorRight.width = _width / 2;
-		txtMonitorRight.height = _height;
+		txtMonitorRight.x = maxWidth / 2;
+		txtMonitorRight.width = maxWidth / 2;
+		txtMonitorRight.height = maxHeight;
 	}
 	
 	// Splits output into left and right monitor text fields
@@ -225,6 +245,8 @@ class DCInterface extends Sprite
 	function createProfilerDisplay() {
 		
 		profilerDisplay = new Sprite();
+		profilerDisplay.mouseEnabled = false;
+		profilerDisplay.mouseChildren = false;
 		addChild(profilerDisplay);
 		
 		txtProfiler = new TextField();
@@ -240,16 +262,20 @@ class DCInterface extends Sprite
 		// draw background
 		profilerDisplay.graphics.clear();
 		profilerDisplay.graphics.beginFill(DCThemes.current.MON_C, DCThemes.current.MON_A);
-		profilerDisplay.graphics.drawRect(0, 0, _width, _height);
+		profilerDisplay.graphics.drawRect(0, 0, maxWidth, maxHeight);
 		profilerDisplay.graphics.endFill();
 		// draw decoration line
+		var s = txtProfiler.text;
+		txtProfiler.text = " ";
+		var h = txtProfiler.textHeight;
 		profilerDisplay.graphics.lineStyle(1, DCThemes.current.MON_TXT_C); 
-		profilerDisplay.graphics.moveTo(0, txtProfiler.textHeight);
-		profilerDisplay.graphics.lineTo(_width, txtProfiler.textHeight);
+		profilerDisplay.graphics.moveTo(0, h);
+		profilerDisplay.graphics.lineTo(maxWidth, h);
+		txtProfiler.text = s;
 		// position and scale monitor text
 		txtProfiler.alpha = DCThemes.current.MON_TXT_A;
-		txtProfiler.width = _width;
-		txtProfiler.height = _height;
+		txtProfiler.width = maxWidth;
+		txtProfiler.height = maxHeight;
 	}
 	
 	public function writeProfilerOutput(output:String) {

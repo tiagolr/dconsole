@@ -13,9 +13,7 @@ class DCInput{
 	var console:DConsole;
 	
 	public function new(console:DConsole) {
-		
 		this.console = console;
-		console.setToggleKey(Keyboard.TAB); // ensures TAB key using openfl
 		
 		enable();
 	}
@@ -47,21 +45,21 @@ class DCInput{
 	
 	private function onKeyUp(e:KeyboardEvent):Void {
 		// TOGGLE MONITOR
-		if (e.ctrlKey && cast(e.keyCode, Int) == console.toggleKey) {
+		if (matchesKey(console.monitorKey, e)) {
 			console.toggleMonitor();
 			return;
 		}
 		
 		// TOGGLE PROFILER
 		else 
-		if (e.shiftKey && cast(e.keyCode, Int) == console.toggleKey) {
+		if (matchesKey(console.profilerKey, e)) {
 			console.toggleProfiler();
 			return;
 		}
 		
 		// SHOW/HIDE CONSOLE
 		else 
-		if (cast(e.keyCode, Int) == console.toggleKey) {
+		if (matchesKey(console.consoleKey, e)) {
 			if (console.visible) {
 				console.hideConsole();
 			} else {
@@ -113,6 +111,13 @@ class DCInput{
 		#if !(cpp || neko) // BUGFIX
 		e.stopImmediatePropagation(); // BUG - cpp issues.
 		#end
+	}
+	
+	function matchesKey(key:SCKey, e:KeyboardEvent) {
+		return (key.keycode == cast(e.keyCode, Int) 
+				&& key.altKey == e.altKey
+				&& key.ctrlKey == e.ctrlKey
+				&& key.shiftKey == e.shiftKey);
 	}
 	
 }
