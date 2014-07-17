@@ -11,18 +11,14 @@
 * Register new commands that respond to user input.
 
 
+**Latest Version - 4.1 **
+* Console supports multiple instances
+* Console(s) can be added to sprites other than stage.
+* Console resizes when stage resizes.
+* Added custom key combinations to toggle console, monitor and profiler.
+* Functions, like commands, also support description.
 
-**Major Changes**
-V 4.0.0
-* Renamed GameConsole/GConsole to TheConsole or DConsole
-* Lib classes starting with GC renamed to DC
-* Switched to hscript as default interp
-* Added command registering
-* Small fixes and improvements
-* Aliases are sanitized and guaranteed to be unique
-* Autocomplete removed temporarily.
-
-For more changes or other versions, see CHANGELOG. <br/><br/>
+For more changes or other versions, see [CHANGELOG](https://github.com/ProG4mr/dconsole/blob/master/CHANGELOG). <br/><br/>
 The console uses **openfl** and supports multiple targets (**flash**, **cpp** and **neko**).<br/>
 Multiple rendering devices and html5 may be availibe in time.
 
@@ -102,7 +98,7 @@ Now toggling the profiler with **SHIFT + TAB** shows real-time statistics that a
 
 ### Tips<br />
 
-* Console can have fullscreen using **DC.init(1)** where 1 means 100% screen height.
+* Console can use full parent height using **DC.init(100)** 
 * To vizualize more info when erros occur use **DC.setVerboseErrors(true)**.
 * Registering commands using **DC.registerCommand()** allows to add custom behavior based on input.
 * Private functions, private fields and getters/setters can be accessed thro the console.

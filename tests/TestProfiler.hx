@@ -30,7 +30,9 @@ class TestProfiler extends TestCase
 			profiler = console.profiler;
 		}
 		
-		console.setToggleKey(Keyboard.TAB);
+		console.setConsoleKey(Keyboard.TAB);
+		console.setMonitorKey(Keyboard.TAB, true);
+		console.setProfilerKey(Keyboard.TAB, false, true);
 		interfc.clearInput();
 		interfc.clearConsole();
 		console.enable();
@@ -50,7 +52,7 @@ class TestProfiler extends TestCase
 	// test response with console disabled
 	public function testDisable() {
 		console.disable();
-		pressKey(console.toggleKey, false, true);
+		pressKey(console.consoleKey.keycode, false, true); // toggle profiler
 		assertFalse(profiler.visible);
 		console.showProfiler();
 		//assertFalse(monitor.visible);
@@ -69,11 +71,11 @@ class TestProfiler extends TestCase
 		assertTrue(profiler.visible);
 		
 		// SHIFT + console key
-		pressKey(console.toggleKey, false, true);
+		pressKey(console.consoleKey.keycode, false, true);
 		assertFalse(profiler.visible);
 		
 		// SHIFT + Console key
-		pressKey(console.toggleKey, false, true);
+		pressKey(console.consoleKey.keycode, false, true);
 		assertTrue(profiler.visible);
 		
 		// tests profiler and monitor not be visible at the same time.

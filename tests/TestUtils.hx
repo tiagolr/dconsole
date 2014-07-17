@@ -29,7 +29,9 @@ class TestUtils extends TestCase
 			interfc = console.interfc;
 		}
 		
-		console.setToggleKey(Keyboard.TAB);
+		console.setConsoleKey(Keyboard.TAB);
+		console.setMonitorKey(Keyboard.TAB, true);
+		console.setProfilerKey(Keyboard.TAB, false, true);
 		interfc.clearInput();
 		interfc.clearConsole();
 		console.enable();

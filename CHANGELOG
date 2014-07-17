@@ -1,6 +1,15 @@
 ##################################################################
-V 4.0.0
+V 4x
 ##################################################################
+
+4.1
+* Console supports multiple instances
+* Console(s) can be added to other sprites than stage.
+* Console resizes with on stage resize event.
+* Added custom key combinations to toggle console, monitor and profiler.
+* Functions, like commands, also support description.
+
+4.0
 * Renamed GameConsole/GConsole to TheConsole or DConsole
 * Lib classes starting with GC renamed to DC
 * Switched to hscript as default interp
@@ -8,28 +17,30 @@ V 4.0.0
 * Small fixes and improvements
 * Autocomplete temporarily removed.
 
+
 ##################################################################
-V 3.0.0
+V 3x
 ##################################################################
+3.1
+* Rendering and input refactored
+
+3.0
 * Reverted main api to GC instead of GameConsole, easier to use.
 * Function registering changed, it now registers a pointer to the function instead of the function name + object
 * Field registering removed (use object instead).
 * Added print command to print field values in runtime.
 * Added unit tests.
 * Lots of internal fixes and improvements.
-
 Monitor
 * Monitor fields are now registered using GC.MonitorField()	
 * Monitor no longer supports functions, only fields
-
 Profiler
 * Added profiler 
 
-3.1.0 
-* Rendering and input refactored
+
 
 ###################################################################
-V 2.00
+V 2x
 ###################################################################
 * AutoAlias - If no alias is passed, an alias is generated based on the class name.
 * Message logging can now be colored.

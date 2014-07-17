@@ -31,7 +31,9 @@ class TestInput extends TestCase
 			input = console.input;
 		}
 		
-		console.setToggleKey(Keyboard.TAB);
+		console.setConsoleKey(Keyboard.TAB);
+		console.setMonitorKey(Keyboard.TAB, true);
+		console.setProfilerKey(Keyboard.TAB, false, true);
 		interfc.clearInput();
 		interfc.clearConsole();
 		console.enable();
@@ -54,9 +56,9 @@ class TestInput extends TestCase
 	public function testConsoleToggleKey() {
 		console.hideConsole();
 		assertFalse(console.visible);
-		pressKey(console.toggleKey);
+		pressKey(console.consoleKey.keycode);
 		assertTrue(console.visible);
-		pressKey(console.toggleKey);
+		pressKey(console.consoleKey.keycode);
 		assertFalse(console.visible);
 	}
 	
@@ -68,7 +70,7 @@ class TestInput extends TestCase
 		var consoleDisplay = Reflect.getProperty(interfc, "consoleDisplay");
 		
 		console.disable();
-		pressKey(console.toggleKey);
+		pressKey(console.consoleKey.keycode);
 		assertFalse(consoleDisplay.visible);
 		console.showConsole();
 		assertFalse(consoleDisplay.visible);
@@ -86,7 +88,7 @@ class TestInput extends TestCase
 		pressKey(Keyboard.ENTER); 
 		assertTrue(interfc.getConsoleText() == "");
 		
-		pressKey(console.toggleKey);
+		pressKey(console.consoleKey.keycode);
 		assertTrue(console.visible);
 		pressKey(Keyboard.ENTER); 
 		assertFalse(interfc.getConsoleText() == "");
