@@ -5,7 +5,7 @@
 	"tags": ["console", "logger", "monitor", "profiler", "utility", "game"],
 	"description": "A real-time console with multiple utilities like scripting, logging, monitoring, profiling etc.",
 	"version": "4.1.0",
-	"releasenote": "Fixes and improvements",
+	"releasenote": "Improvements and fixes",
 	"contributors": ["prog4mr"],
 	"dependencies": { "hscript": "" }
 }

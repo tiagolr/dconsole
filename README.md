@@ -11,7 +11,7 @@
 * Register new commands that respond to user input.
 
 
-**Latest Version - 4.1 **
+**Latest Changes - 4.1 **
 * Console supports multiple instances
 * Console(s) can be added to sprites other than stage.
 * Console resizes when stage resizes.
