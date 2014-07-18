@@ -231,7 +231,7 @@ class DCCommands
 			
 		}  else {
 			// print normal help
-			output += "Type COMMANDS to view availible commands\n"; 
+			output += "Type COMMANDS to view available commands\n"; 
 			output += "'PAGEUP' or 'PAGEDOWN' keys to scroll text\n";
 			output += "'UP' or 'DOWN' keys to navigate history\n";
 			DC.logInfo(output);

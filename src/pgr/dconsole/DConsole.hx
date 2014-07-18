@@ -83,7 +83,7 @@ class DConsole {
 		hideProfiler();
 
 		commands.registerCommand(commands.showHelp, "help", "", "Type HELP [command-name] for more info");
-		commands.registerCommand(commands.showCommands, "commands", "", "Shows availible commands", "Type HELP [command-name] for more info");
+		commands.registerCommand(commands.showCommands, "commands", "", "Shows available commands", "Type HELP [command-name] for more info");
 		commands.registerCommand(commands.listFunctions, "functions", "funcs", "Lists registered functions", "To call a function type functionName( args ), make sure the args type and number are correct");
 		commands.registerCommand(commands.listObjects, "objects", "objs", "Lists registered objects", "To print an object field type object.field\nTo set and object field type object.field = value");
 		commands.registerCommand(clearConsole, "clear", "", "Clears console view");

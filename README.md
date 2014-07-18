@@ -20,7 +20,7 @@
 
 For more changes or other versions, see [CHANGELOG](https://github.com/ProG4mr/dconsole/blob/master/CHANGELOG). <br/><br/>
 The console uses **openfl** and supports multiple targets (**flash**, **cpp** and **neko**).<br/>
-Multiple rendering devices and html5 may be availibe in time.
+Multiple rendering devices and html5 may be available in time.
 
 ____________
 
@@ -44,7 +44,7 @@ DC.registerObject(this, "myobject");
 ```
 
 Now while running your application, press **TAB** to show the console and type **"help"** or **"commands"**
-to see what commands are availible, **"objects"** and **"functions"** are useful to show registered objects and functions.
+to see what commands are available, **"objects"** and **"functions"** are useful to show registered objects and functions.
 
 ![help](http://i1148.photobucket.com/albums/o562/ProG4mr/dconsole1_zps2287758b.png "help")
 
@@ -98,7 +98,7 @@ Now toggling the profiler with **SHIFT + TAB** shows real-time statistics that a
 
 ### Tips<br />
 
-* Console can use full parent height using **DC.init(100)** 
+* Console can have full height using **DC.init(100)** where 100 means 100% parent sprite height.
 * To vizualize more info when erros occur use **DC.setVerboseErrors(true)**.
 * Registering commands using **DC.registerCommand()** allows to add custom behavior based on input.
 * Private functions, private fields and getters/setters can be accessed thro the console.
