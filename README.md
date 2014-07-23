@@ -11,7 +11,7 @@
 * Register new commands that respond to user input.
 
 
-**Latest Changes - 4.2 **
+**Latest Changes - 4.2**
 * Added register class support (allows to access static fields and methods).
 
 For more changes or other versions, see [CHANGELOG](https://github.com/ProG4mr/dconsole/blob/master/CHANGELOG). <br/><br/>
