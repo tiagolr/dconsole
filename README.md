@@ -11,12 +11,8 @@
 * Register new commands that respond to user input.
 
 
-**Latest Changes - 4.1 **
-* Console supports multiple instances
-* Console(s) can be added to sprites other than stage.
-* Console resizes when stage resizes.
-* Added custom key combinations to toggle console, monitor and profiler.
-* Functions, like commands, also support description.
+**Latest Changes - 4.2 **
+* Added register class support (allows to access static fields and methods).
 
 For more changes or other versions, see [CHANGELOG](https://github.com/ProG4mr/dconsole/blob/master/CHANGELOG). <br/><br/>
 The console uses **openfl** and supports multiple targets (**flash**, **cpp** and **neko**).<br/>
@@ -41,6 +37,7 @@ DC.init();
 DC.log("This text will be logged.");
 DC.registerFunction(this.testFunction, "myfunction");
 DC.registerObject(this, "myobject");
+DC.registerClass(Math, "Math");
 ```
 
 Now while running your application, press **TAB** to show the console and type **"help"** or **"commands"**
@@ -101,10 +98,10 @@ Now toggling the profiler with **SHIFT + TAB** shows real-time statistics that a
 * Console can have full height using **DC.init(100)** where 100 means 100% parent sprite height.
 * To vizualize more info when erros occur use **DC.setVerboseErrors(true)**.
 * Registering commands using **DC.registerCommand()** allows to add custom behavior based on input.
+* Registering classes using **DC.registerClass()** allows to access static functions and methods of that class.
 * Private functions, private fields and getters/setters can be accessed thro the console.
-* To expose more classes to the interpreter (other than Math) use DCCommands.hscriptInterp.variables.set("name", Class)
 * Profiler and Monitor refresh rate are configurable.
-* **DCCommands.evaluate()** can be used to evaluate a string from code.
+* **DCCommands.evaluate()** can be used to evaluate code directly.
 
 ### Suggestions / Comments / Bugs 
 

@@ -8,7 +8,7 @@ package pgr.dconsole;
   */
 class DC 
 {
-	inline static public var VERSION = "4.1.0";
+	inline static public var VERSION = "4.2.0";
 	/** Aligns console to bottom */
 	static public var ALIGN_DOWN:String = "DOWN";
 	/** Aligns console to top */
@@ -277,6 +277,16 @@ class DC
 		checkInstance();
 		instance.commands.registerObject(object, alias);
 	}
+	
+	/**
+	 * Allows a class static methods and properties to be used from the console.
+	 * @param	alias	The variable name that invokes this class.
+	 * @param	cls		The class to be exposed to the console.
+	 */
+	public static function registerClass(cls:Class<Dynamic>, alias:String) {
+		checkInstance();
+		instance.commands.registerClass(cls, alias);
+	}
 	/**
 	 * Registers a function to be called from the console.
 	 * If monitor argument is set, this function will be displayed on monitor window.
@@ -365,6 +375,7 @@ class DC
 	 * @param	b
 	 */
 	public static function setVerboseErrors(b:Bool) {
+		checkInstance();
 		instance.commands.printErrorStack = b;
 	}
 	

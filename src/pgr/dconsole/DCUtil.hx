@@ -34,7 +34,8 @@ class DCUtil
 		// while alias exists in any of the arrays, modify alias adding prefixes or suffixes.
 		while (commands.getCommand(alias) != null 
 			   || commands.getObject(alias) != null 
-			   || commands.getFunction(alias) != null) 
+			   || commands.getFunction(alias) != null 
+			   || commands.getClass(alias) != null)
 		{
 			switch (type) {
 				case COMMAND:

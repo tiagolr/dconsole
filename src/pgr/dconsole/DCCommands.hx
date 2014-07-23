@@ -32,10 +32,9 @@ class DCCommands
 	public var functionsMap:Map<String, Func> = new Map<String, Func>();
 	public var objectsMap:Map<String, Dynamic> = new Map<String, Dynamic>();
 	public var commandsMap:Map < String, Command > = new Map < String, Command > ();
-	
+	public var classMap:Map < String, Class<Dynamic>> = new Map < String, Class<Dynamic>>();
 	public var hScriptParser:Parser;
 	public var hScriptInterp:DCInterp;
-	
 	public var printErrorStack:Bool = false;
 
 	public function new() {
@@ -43,7 +42,14 @@ class DCCommands
 		hScriptParser.allowJSON = true;
 		hScriptInterp = new DCInterp();
 		hScriptInterp.variables.set("objectsMap", objectsMap);
-		hScriptInterp.variables.set("Math", Math);
+		registerClass(Math, "Math");
+	}
+	
+	public function registerClass(cls:Class<Dynamic>, alias:String) {
+		if (!hScriptInterp.variables.exists(alias) && cls != null) {
+			hScriptInterp.variables.set(alias, cls);
+			classMap.set(alias, cls);
+		}
 	}
 	
 	/**
@@ -129,8 +135,7 @@ class DCCommands
 		
 		commandsMap.set(alias, command);
 	}
-										   
-										   
+										   									   
 	
 	public function registerFunction(Function:Dynamic, alias:String, description:String) {
 		
@@ -274,8 +279,7 @@ class DCCommands
 	}
 
 	
-	public function listObjects(args:Array<String>)
-	{
+	public function listObjects(args:Array<String>) {
 		var list = "";
 		for (key in objectsMap.keys())  {
 			list += key + '\n'; 
@@ -288,7 +292,21 @@ class DCCommands
 		
 		DC.logConfirmation(list);
 	}
+	
+	
+	public function listClasses(args:Array<String>) {
+		var list = "";
+		for (key in classMap.keys())  {
+			list += key + '\n'; 
+		}
 
+		if (list.toString() == '') {
+			DC.logInfo("no classes registered.");
+			return;
+		} 
+		
+		DC.logConfirmation(list);
+	}
 	
 	//---------------------------------------------------------------------------------
 	//  AUX
@@ -313,6 +331,10 @@ class DCCommands
 			}
 		}
 		return null;
+	}
+	
+	public function getClass(alias:String):Class<Dynamic> {
+		return classMap[alias];
 	}
 	
 }

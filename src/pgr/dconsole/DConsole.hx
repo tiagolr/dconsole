@@ -86,6 +86,7 @@ class DConsole {
 		commands.registerCommand(commands.showCommands, "commands", "", "Shows available commands", "Type HELP [command-name] for more info");
 		commands.registerCommand(commands.listFunctions, "functions", "funcs", "Lists registered functions", "To call a function type functionName( args ), make sure the args type and number are correct");
 		commands.registerCommand(commands.listObjects, "objects", "objs", "Lists registered objects", "To print an object field type object.field\nTo set and object field type object.field = value");
+		commands.registerCommand(commands.listClasses, "classes", "", "Lists registered classes", "Registered classes can access their static fields and methods, eg: Math.abs(value), or Math.PI");
 		commands.registerCommand(clearConsole, "clear", "", "Clears console view");
 		commands.registerCommand(toggleMonitor, "monitor", "", "Toggles monitor on and off", "Monitor is used to track variable values in runtime\nCONTROL + CONSOLE_KEY (default TAB) also toggles monitor");
 		commands.registerCommand(toggleProfiler, "profiler", "", "Toggles profiler on and off", "Profiler is used to profile app and view statistics like time elapsed and percentage in runtime\nSHIFT + CONSOLE_KEY (default TAB) also toggles profiler");
