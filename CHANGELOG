@@ -2,7 +2,8 @@
 V 4x
 ##################################################################
 4.2 
-* Added register class support.
+* Added register class - (allows to register class and access its static fields and methods).
+* Added "classes" command to view all registered classes.
 
 4.1
 * Console supports multiple instances

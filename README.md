@@ -11,8 +11,9 @@
 * Register new commands that respond to user input.
 
 
-**Latest Changes - 4.2 **
-* Added register class support (allows to access static fields and methods).
+**Latest Changes - 4.2**
+* Added register class - (allows to register class and access its static fields and methods).
+* Added "classes" command to view all registered classes.
 
 For more changes or other versions, see [CHANGELOG](https://github.com/ProG4mr/dconsole/blob/master/CHANGELOG). <br/><br/>
 The console uses **openfl** and supports multiple targets (**flash**, **cpp** and **neko**).<br/>
