@@ -151,6 +151,7 @@ class DCInterface extends Sprite
 	function showConsole() {
 		consoleDisplay.visible = true;
 		promptDisplay.visible = true;
+		toFront();
 		Lib.current.stage.focus = txtPrompt;
 	}
 	@:allow(pgr.dconsole.DConsole)
@@ -336,7 +337,7 @@ class DCInterface extends Sprite
 	 * Brings this display object to the front of display list.
 	 */
 	public function toFront() {
-		parent.swapChildren(this, parent.getChildAt(parent.numChildren - 1));
+		parent.setChildIndex(this, parent.numChildren - 1);
 	}
 	
 	public function setConsoleFont(font:String = null, embed:Bool = false, size:Int = 14, bold:Bool = false, italic:Bool = false, underline:Bool = false ){
