@@ -1,4 +1,5 @@
-package pgr.dconsole;
+#if openfl
+package pgr.dconsole.input;
 import flash.events.KeyboardEvent;
 import flash.Lib;
 import flash.ui.Keyboard;
@@ -8,16 +9,15 @@ import pgr.dconsole.DConsole;
  * Handles input
  * @author TiagoLr
  */
-class DCInput{
+class DCOpenflInput implements DCInput {
 
-	var console:DConsole;
+	public var console:DConsole;
 	
-	public function new(console:DConsole) {
-		this.console = console;
-		
+	public function new() {}
+	
+	public function init() {
 		enable();
 	}
-	
 	
 	public function enable() {
 		// make sure events are removed first.
@@ -121,3 +121,4 @@ class DCInput{
 	}
 	
 }
+#end

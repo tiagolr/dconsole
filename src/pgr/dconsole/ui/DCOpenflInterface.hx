@@ -1,4 +1,5 @@
-package pgr.dconsole;
+#if openfl
+package pgr.dconsole.ui;
 
 import flash.display.MovieClip;
 import flash.display.Sprite;
@@ -17,7 +18,7 @@ import pgr.dconsole.DCThemes.Theme;
  * @author TiagoLr ( ~~~ProG4mr~~~ )
  */
 
-class DCInterface extends Sprite
+class DCOpenflInterface extends Sprite implements DCInterface
 {
 	var _promptFontYOffset:Int;
 	var yAlign:String;
@@ -43,9 +44,14 @@ class DCInterface extends Sprite
 		super();
 		Lib.current.stage.addChild(this); // by default the interface adds itself to the stage.
 		
+		if (heightPt <= 0 || heightPt > 100) heightPt = 100; // clamp to >0..1
+		if (heightPt > 1) heightPt = Std.int(heightPt) / 100; // turn >0..100 into percentage from 1..0
+		
 		this.heightPt = heightPt;
 		yAlign = align;
-		
+	}
+	
+	public function init() {
 		createMonitorDisplay();
 		createProfilerDisplay();
 		createConsoleDisplay();
@@ -59,7 +65,7 @@ class DCInterface extends Sprite
 		Lib.current.stage.addEventListener(Event.RESIZE, onResize);
 	}
 	
-	public function onResize(e:Event = null) {
+	function onResize(e:Event = null) {
 		
 		if (Std.is(this.parent, Stage)) {
 			var stg:Stage = cast this.parent;
@@ -147,15 +153,14 @@ class DCInterface extends Sprite
 		#end
 	}
 	
-	@:allow(pgr.dconsole.DConsole)
-	function showConsole() {
+	public function showConsole() {
 		consoleDisplay.visible = true;
 		promptDisplay.visible = true;
 		toFront();
 		Lib.current.stage.focus = txtPrompt;
 	}
-	@:allow(pgr.dconsole.DConsole)
-	function hideConsole() {
+	
+	public function hideConsole() {
 		consoleDisplay.visible = false;
 		promptDisplay.visible = false;
 		Lib.current.stage.focus = null;
@@ -231,12 +236,11 @@ class DCInterface extends Sprite
 		}
 	}
 	
-	@:allow(pgr.dconsole.DConsole)
-	function showMonitor() {
+	
+	public function showMonitor() {
 		monitorDisplay.visible = true;
 	}
-	@:allow(pgr.dconsole.DConsole)
-	function hideMonitor() {
+	public function hideMonitor() {
 		monitorDisplay.visible = false;
 	}
 	
@@ -284,13 +288,11 @@ class DCInterface extends Sprite
 		txtProfiler.text += output;
 	}
 	
-	@:allow(pgr.dconsole.DConsole)
-	function showProfiler() {
+	public function showProfiler() {
 		profilerDisplay.visible = true;
 	}
 	
-	@:allow(pgr.dconsole.DConsole)
-	function hideProfiler() {
+	public function hideProfiler() {
 		profilerDisplay.visible = false;
 	}
 	
@@ -431,3 +433,4 @@ class DCInterface extends Sprite
 
 	
 }
+#end

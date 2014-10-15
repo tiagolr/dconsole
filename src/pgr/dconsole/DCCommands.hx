@@ -36,8 +36,13 @@ class DCCommands
 	public var hScriptParser:Parser;
 	public var hScriptInterp:DCInterp;
 	public var printErrorStack:Bool = false;
+	
+	private var _console:DConsole;
 
-	public function new() {
+	public function new(console:DConsole) {
+		
+		_console = console;
+		
 		hScriptParser = new Parser();
 		hScriptParser.allowJSON = true;
 		hScriptInterp = new DCInterp();
@@ -80,11 +85,10 @@ class DCCommands
 				input = StringTools.trim(input) + ";";
 			}
 			var program = hScriptParser.parseString(input);
-			
 			// using exprReturn instead of execute to skip interp internal state reset.
 			var result = hScriptInterp.exprReturn(program); 
 			if (Std.is(result, Float) || Std.is(result, Bool) || result != null) { 
-				DC.logConfirmation(result);
+				_console.logConfirmation(result);
 			}
 			
 		} 
@@ -92,10 +96,10 @@ class DCCommands
 			if (printErrorStack) {
 				var stack = CallStack.exceptionStack();
 				for (entry in stack) {
-					DC.log(entry);
+					_console.log(entry);
 				}
 			}
-			DC.logError(Std.string(e));
+			_console.logError(Std.string(e));
 		} 
 		
 	}
@@ -107,13 +111,13 @@ class DCCommands
 										   help:String = "") 
 	{
 		if (!Reflect.isFunction(Function)) {
-			DC.logError("Command function " + Std.string(Function) + " is not valid.");
+			_console.logError("Command function " + Std.string(Function) + " is not valid.");
 			return;
 		}
 		
 		alias = DCUtil.formatAlias(this, alias, ALIAS_TYPE.COMMAND);
 		if (alias == null) {
-			DC.log("Failed to register command, make sure alias or shortcut is correct");
+			_console.log("Failed to register command, make sure alias or shortcut is correct");
 			return;
 		}
 		
@@ -140,13 +144,13 @@ class DCCommands
 	public function registerFunction(Function:Dynamic, alias:String, description:String) {
 		
 		if (!Reflect.isFunction(Function)) {
-			DC.logError("Function " + Std.string(Function) + " is not valid.");
+			_console.logError("Function " + Std.string(Function) + " is not valid.");
 			return;
 		}
 		
 		alias = DCUtil.formatAlias(this, alias, ALIAS_TYPE.FUNCTION);
 		if (alias == null) {
-			DC.logError("Function " + Std.string(Function) + " alias not valid");
+			_console.logError("Function " + Std.string(Function) + " alias not valid");
 			return;
 		}
 		
@@ -158,7 +162,7 @@ class DCCommands
 	public function registerObject(object:Dynamic, alias:String) {
 		
 		if (!Reflect.isObject(object)) {
-			DC.logError("dynamic passed is not an object.");
+			_console.logError("dynamic passed is not an object.");
 			return;
 		}
 		
@@ -169,7 +173,7 @@ class DCCommands
 		}
 		
 		if (alias == null) {
-			DC.logError("failed to register object " + Type.getClassName(Type.getClass(object)) + " make sure object alias is correct");
+			_console.logError("failed to register object " + Type.getClassName(Type.getClass(object)) + " make sure object alias is correct");
 			return;
 		}
 		
@@ -184,9 +188,9 @@ class DCCommands
 		if (functionsMap.exists(alias)) {
 			functionsMap.remove(alias);
 			hScriptInterp.variables.remove(alias);
-			DC.logInfo(alias + " unregistered.");
+			_console.logInfo(alias + " unregistered.");
 		}
-		DC.logError(alias + " not found.");
+		_console.logError(alias + " not found.");
 	}
 	
 	
@@ -195,9 +199,9 @@ class DCCommands
 		if (objectsMap.exists(alias)) {
 			objectsMap.remove(alias);
 			hScriptInterp.variables.remove(alias); // registers var in hscript
-			DC.logInfo(alias + " unregistered.");
+			_console.logInfo(alias + " unregistered.");
 		}
-		DC.logError(alias + " not found.");
+		_console.logError(alias + " not found.");
 	}
 	
 	
@@ -225,12 +229,12 @@ class DCCommands
 							output += "shortcut: " + '' + command.shortcut.toUpperCase() + '\n';
 						output += command.description + '\n\n';
 						output += command.help		  + '\n';
-						DC.logInfo(output);
+						_console.logInfo(output);
 						return;
 					}
 				}
 			} else {
-				DC.logWarning("Command name not found");
+				_console.logWarning("Command name not found");
 				return;
 			}
 			
@@ -239,7 +243,7 @@ class DCCommands
 			output += "Type COMMANDS to view available commands\n"; 
 			output += "'PAGEUP' or 'PAGEDOWN' keys to scroll text\n";
 			output += "'UP' or 'DOWN' keys to navigate history\n";
-			DC.logInfo(output);
+			_console.logInfo(output);
 		}
 	}
 
@@ -256,7 +260,7 @@ class DCCommands
 			output += line;
 		}
 		
-		DC.logInfo(output);
+		_console.logInfo(output);
 	}
 	
 
@@ -271,11 +275,11 @@ class DCCommands
 		}
 
 		if (list.toString() == "") {
-			DC.logInfo("no functions registered.");
+			_console.logInfo("no functions registered.");
 			return;
 		}
 		
-		DC.logConfirmation(list);
+		_console.logConfirmation(list);
 	}
 
 	
@@ -286,11 +290,11 @@ class DCCommands
 		}
 
 		if (list.toString() == '') {
-			DC.logInfo("no objects registered.");
+			_console.logInfo("no objects registered.");
 			return;
 		} 
 		
-		DC.logConfirmation(list);
+		_console.logConfirmation(list);
 	}
 	
 	
@@ -301,11 +305,11 @@ class DCCommands
 		}
 
 		if (list.toString() == '') {
-			DC.logInfo("no classes registered.");
+			_console.logInfo("no classes registered.");
 			return;
 		} 
 		
-		DC.logConfirmation(list);
+		_console.logConfirmation(list);
 	}
 	
 	//---------------------------------------------------------------------------------

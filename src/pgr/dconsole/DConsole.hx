@@ -1,6 +1,16 @@
 package pgr.dconsole;
 
 import pgr.dconsole.DCThemes.Theme;
+import pgr.dconsole.input.DCInput;
+import pgr.dconsole.input.DCEmptyInput;
+import pgr.dconsole.ui.DCInterface;
+import pgr.dconsole.ui.DCEmtpyInterface;
+
+
+#if openfl
+import pgr.dconsole.ui.DCOpenflInterface;
+import pgr.dconsole.input.DCOpenflInput;
+#end
 
 typedef SCKey = {
 	altKey:Bool,
@@ -8,6 +18,7 @@ typedef SCKey = {
 	shiftKey:Bool,
 	keycode:Int,
 }
+
 /**
  * DConsole is the main class of this lib, it should be instantiated only once
  * and then use its instance to control the console.
@@ -25,6 +36,7 @@ class DConsole {
 
 	private var _historyArray:Array<String>;
 	private var _historyIndex:Int;
+	public var input:DCInput;
 	public var interfc:DCInterface;
 	public var monitor:DCMonitor;
 	public var profiler:DCProfiler;
@@ -40,13 +52,25 @@ class DConsole {
 	public var enabled(default, null):Bool;
 	public var visible(default, null):Bool;
 	
-	public var input:DCInput;
 	
 	
-	public function new(height:Float = 33, align:String = "DOWN", theme:DCThemes.Theme = null) {
+	public function new(input:DCInput = null, interfc:DCInterface = null, theme:DCThemes.Theme = null) {
 		
-		if (height <= 0 || height > 100) height = 100; // clamp to >0..1
-		if (height > 1) height = Std.int(height) / 100; // turn >0..100 into percentage from 1..0
+		if (input == null) {
+			#if openfl
+			input = new DCOpenflInput();
+			#else
+			input = new DCEmptyInput();
+			#end
+		}
+		
+		if (interfc == null) {
+			#if openfl
+			interfc = new DCOpenflInterface(33, "DOWN");
+			#else
+			interfc = new DCEmtpyInterface();
+			#end
+		}
 		
 		if (theme == null) {
 			DCThemes.current = DCThemes.DARK;
@@ -61,19 +85,22 @@ class DConsole {
 		// default key is shift + tab
 		setProfilerKey(9, false, true);
 		
-		// create input
-		input = new DCInput(this);
-		
 		// create monitor
 		monitor = new DCMonitor(this);
 		
 		// create profiler
 		profiler = new DCProfiler(this);
 		
-		// create console interface
-		interfc = new DCInterface(height, align);
+		// create input
+		this.input = input;
+		input.console = this;
+		input.init();
 		
-		commands = new DCCommands();
+		// create console interface
+		this.interfc = interfc;
+		interfc.init();
+		
+		commands = new DCCommands(this);
 
 		clearHistory();
 		
@@ -157,11 +184,27 @@ class DConsole {
 	
 	public function log(data:Dynamic, color:Int = -1) {
 		
-		if (!Std.is(data,Float) && !Std.is(data,Bool) && data == "") {
+		if (!Std.is(data, Float) && !Std.is(data, Bool) && data == "") {
 			return;
 		}
-		
+		trace("OK LOGGING THIS " + data);
 		interfc.log(data, color);
+	}
+	
+	public function logConfirmation(data:Dynamic) {
+		log(data, DCThemes.current.LOG_CON);
+	}
+	
+	public function logInfo(data:Dynamic) {
+		log(data, DCThemes.current.LOG_INF);
+	}
+	
+	public function logError(data:Dynamic) {
+		log(data, DCThemes.current.LOG_ERR);
+	}
+	
+	public function logWarning(data:Dynamic) {
+		log(data, DCThemes.current.LOG_WAR);
 	}
 	
 	/**
@@ -180,24 +223,24 @@ class DConsole {
 	public function monitorField(object:Dynamic, fieldName:String, alias:String) {
 		
 		if (fieldName == null || fieldName == "") {
-			DC.logError("invalid fieldName");
+			logError("invalid fieldName");
 			return;
 		}
 		
 		if (alias == null || alias == "") {
-			DC.logError("invalid alias");
+			logError("invalid alias");
 			return;
 		}
 		
 		if (object == null || !Reflect.isObject(object)) {
-			DC.logError("invalid object.");
+			logError("invalid object.");
 			return;
 		}
 		
 		try {
 			Reflect.getProperty(object, fieldName);
 		} catch (e:Dynamic) {
-			DC.logError("could not find field: " + fieldName);
+			logError("could not find field: " + fieldName);
 			return;
 		}
 		

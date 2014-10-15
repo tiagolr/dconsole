@@ -1,4 +1,12 @@
 package pgr.dconsole;
+import pgr.dconsole.input.DCInput;
+import pgr.dconsole.input.DCEmptyInput;
+import pgr.dconsole.ui.DCInterface;
+import pgr.dconsole.ui.DCEmtpyInterface;
+#if openfl
+import pgr.dconsole.input.DCOpenflInput;
+import pgr.dconsole.ui.DCOpenflInterface;
+#end
 
  /**
   * DC class provides user API to The Console.
@@ -8,7 +16,7 @@ package pgr.dconsole;
   */
 class DC 
 {
-	inline static public var VERSION = "4.2.0";
+	inline static public var VERSION = "4.3.0";
 	/** Aligns console to bottom */
 	static public var ALIGN_DOWN:String = "DOWN";
 	/** Aligns console to top */
@@ -23,12 +31,28 @@ class DC
 	 * @param	theme		Select the console theme from GCThemes.
 	 * @param	monitorRate The number of frames elapsed for each monitor refresh.
 	 */
-	public static function init(heightPt:Float = 33, align:String = "DOWN", theme:DCThemes.Theme = null) {
+	public static function init(heightPt:Float = 33, align:String = "DOWN", theme:DCThemes.Theme = null, input:DCInput = null, interfc:DCInterface = null) {
 		if (instance != null) {
 			return; // DConsole has been initialized already.
 		}
 		
-		instance = new DConsole(heightPt, align, theme);
+		if (input == null) {
+			#if openfl
+			input = new DCOpenflInput();
+			#else
+			input = new DCEmptyInput();
+			#end
+		}
+		
+		if (interfc == null) {
+			#if openfl
+			interfc = new DCOpenflInterface(heightPt, align);
+			#else
+			interfc = new DCEmtpyInterface();
+			#end
+		}
+		
+		instance = new DConsole(input, interfc, theme);
 		DC.logInfo("~~~~~~~~~~ DCONSOLE ~~~~~~~~~~ (v" + VERSION + ")");
 	}
 	/**
@@ -198,7 +222,7 @@ class DC
 	 */
 	static public function logWarning(data:Dynamic) {
 		checkInstance();
-		instance.log(data, DCThemes.current.LOG_WAR);
+		instance.logWarning(data);
 	}
 	/**
 	 * Logs a error message to the console.
@@ -214,7 +238,7 @@ class DC
 	 */
 	static public function logConfirmation(data:Dynamic) {
 		checkInstance();
-		instance.log(data, DCThemes.current.LOG_CON);
+		instance.logConfirmation(data);
 	}
 	/**
 	 * Logs a info message to the console.
@@ -222,7 +246,7 @@ class DC
 	 */
 	static public function logInfo(data:Dynamic) {
 		checkInstance();
-		instance.log(data, DCThemes.current.LOG_INF);
+		instance.logInfo(data);
 	}
 	
 	/**
