@@ -86,7 +86,7 @@ class DCCommands
 			}
 			var program = hScriptParser.parseString(input);
 			// using exprReturn instead of execute to skip interp internal state reset.
-			var result = hScriptInterp.exprReturn(program); 
+			var result = hScriptInterp.execute(program); 
 			if (Std.is(result, Float) || Std.is(result, Bool) || result != null) { 
 				_console.logConfirmation(result);
 			}

@@ -100,9 +100,8 @@ Now toggling the profiler with **SHIFT + TAB** shows real-time statistics that a
 * To vizualize more info when erros occur use **DC.setVerboseErrors(true)**.
 * Registering commands using **DC.registerCommand()** allows to add custom behavior based on input.
 * Registering classes using **DC.registerClass()** allows to access static functions and methods of that class.
-* Private functions, private fields and getters/setters can be accessed thro the console.
-* Profiler and Monitor refresh rate are configurable.
-* **DCCommands.evaluate()** can be used to evaluate code directly.
+* Private functions, private fields and getters/setters can also be used.
+* **DC.eval()** can be used to evaluate code directly.
 
 ### Suggestions / Comments / Bugs 
 

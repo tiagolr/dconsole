@@ -4,11 +4,12 @@ import flash.ui.Keyboard;
 import haxe.unit.TestCase;
 import flash.events.KeyboardEvent;
 import flash.Lib;
-import pgr.dconsole.DCInterface;
+import pgr.dconsole.ui.DCInterface;
 import pgr.dconsole.DC;
 import pgr.dconsole.DConsole;
 import pgr.dconsole.DCProfiler;
 import pgr.dconsole.DCMonitor;
+import pgr.dconsole.ui.DCOpenflInterface;
 
 /**
  * Tests monitor.
@@ -17,7 +18,7 @@ import pgr.dconsole.DCMonitor;
  */
 class TestMonitor extends TestCase
 {	 
-	var interfc:DCInterface;
+	var interfc:DCOpenflInterface;
 	var console:DConsole;
 	var monitor:DCMonitor;
 	var profiler:DCProfiler;
@@ -37,7 +38,7 @@ class TestMonitor extends TestCase
 		if (console == null) {
 			DC.init();
 			console = DC.instance;
-			interfc = console.interfc;
+			interfc = cast console.interfc;
 			monitor = console.monitor;
 			profiler = console.profiler;
 		}

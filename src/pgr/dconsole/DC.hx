@@ -1,4 +1,5 @@
 package pgr.dconsole;
+import haxe.PosInfos;
 import pgr.dconsole.input.DCInput;
 import pgr.dconsole.input.DCEmptyInput;
 import pgr.dconsole.ui.DCInterface;
@@ -14,9 +15,10 @@ import pgr.dconsole.ui.DCOpenflInterface;
   * 
   * @author TiagoLr ( ~~~ProG4mr~~~ )
   */
+@:expose
 class DC 
 {
-	inline static public var VERSION = "4.3.0";
+	inline static public var VERSION = "4.4.1";
 	/** Aligns console to bottom */
 	static public var ALIGN_DOWN:String = "DOWN";
 	/** Aligns console to top */
@@ -401,6 +403,15 @@ class DC
 	public static function setVerboseErrors(b:Bool) {
 		checkInstance();
 		instance.commands.printErrorStack = b;
+	}
+	
+	/**
+	 * Makes console interp evaluate expression
+	 * @param	expr
+	 */
+	public static function eval(expr:String) {
+		checkInstance();
+		instance.commands.evaluate(expr);
 	}
 	
 	//---------------------------------------------------------------------------------

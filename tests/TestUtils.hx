@@ -4,7 +4,7 @@ import haxe.unit.TestCase;
 import flash.events.KeyboardEvent;
 import flash.Lib;
 import pgr.dconsole.DCCommands;
-import pgr.dconsole.DCInterface;
+import pgr.dconsole.ui.DCInterface;
 import pgr.dconsole.DC;
 import pgr.dconsole.DConsole;
 import pgr.dconsole.DCUtil;

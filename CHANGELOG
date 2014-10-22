@@ -1,6 +1,16 @@
 ##################################################################
 V 4x
 ##################################################################
+
+4.3.1
+* Updated to hscript 2.0.3
+* Updateds tests
+* Added JS/HTML5 log support.
+
+4.3
+* Refactored Input and Interface to allow handlers.
+* Fixed internal logging not going to right console instance.
+
 4.2 
 * Added register class - (allows to register class and access its static fields and methods).
 * Added "classes" command to view all registered classes.

@@ -1,5 +1,8 @@
 package pgr.dconsole;
 
+#if js
+import js.Lib;
+#end
 import pgr.dconsole.DCThemes.Theme;
 import pgr.dconsole.input.DCInput;
 import pgr.dconsole.input.DCEmptyInput;
@@ -187,8 +190,21 @@ class DConsole {
 		if (!Std.is(data, Float) && !Std.is(data, Bool) && data == "") {
 			return;
 		}
-		trace("OK LOGGING THIS " + data);
+		
 		interfc.log(data, color);
+		
+		#if js
+		// dispatches log inside a js event
+		var scolor = StringTools.hex(color, 6);
+		var s = Std.string(data);
+
+		// js Lib.eval does not support \n in strings, so split the string and log each line.
+		s = StringTools.replace(s, "\n", "\\n");
+		Lib.eval (
+				'var event = new CustomEvent("console_log", { detail: { data:"' + s + '", color:"' + scolor + '" }}); ' +
+				'document.dispatchEvent(event);'
+			);
+		#end
 	}
 	
 	public function logConfirmation(data:Dynamic) {

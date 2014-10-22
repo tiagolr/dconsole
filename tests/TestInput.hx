@@ -1,13 +1,15 @@
 package ;
+import pgr.dconsole.input.DCInput;
+import pgr.dconsole.ui.DCInterface;
 import flash.text.TextField;
 import flash.ui.Keyboard;
 import haxe.unit.TestCase;
 import flash.events.KeyboardEvent;
 import flash.Lib;
-import pgr.dconsole.DCInput;
-import pgr.dconsole.DCInterface;
+import pgr.dconsole.ui.DCInterface;
 import pgr.dconsole.DC;
 import pgr.dconsole.DConsole;
+import pgr.dconsole.ui.DCOpenflInterface;
 
 /**
  * Tests console reaction to keystrokes.
@@ -16,9 +18,9 @@ import pgr.dconsole.DConsole;
  */
 class TestInput extends TestCase
 {	 
-	var interfc:DCInterface;
-	var console:DConsole;
 	var input:DCInput;
+	var interfc:DCOpenflInterface;
+	var console:DConsole;
 	var i:Int;
 	var f:Float;
 	var s:String;
@@ -27,7 +29,7 @@ class TestInput extends TestCase
 		if (console == null) {
 			DC.init();
 			console = DC.instance;
-			interfc = console.interfc;
+			interfc = cast console.interfc;
 			input = console.input;
 		}
 		
@@ -223,7 +225,6 @@ class TestInput extends TestCase
 	}
 	
 	private function pressKey(key:UInt) {
-		
 		interfc.stage.dispatchEvent(new KeyboardEvent(KeyboardEvent.KEY_UP, true, false, 0, key)); 
 	}
 	
