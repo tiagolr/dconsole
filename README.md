@@ -97,7 +97,7 @@ Now toggling the profiler with **SHIFT + TAB** shows real-time statistics that a
 ### HTML5 / JS
 
 DConsole can run on html5 / javascript using jquery-terminal to process input and log console output.
-To do so, first download [jquery-terminal](http://terminal.jcubic.pl/) and place jquery.terminal-x.x.x.min.js and jquery.terminal.css inside your export directory. 
+To do so, first download [jquery-terminal](http://terminal.jcubic.pl/) and place **jquery.terminal-x.x.x.min.js** and **jquery.terminal.css** inside your export directory. 
 
 Then open your ```index.html``` (flashdevelop generates this automaticaly with haxe-js template)  and add the following:
 
@@ -139,8 +139,8 @@ And voilá:
 
 ![consolehtml](http://i1148.photobucket.com/albums/o562/ProG4mr/consolehtml5_zpsb26d8bc6.png)
 
-Profiler and monitor support will be added soon in the same fashion.
-
+Not the most elegant way to get it working but it surely works well.
+Profiler and monitor support will be added soon aswell as an online console to experiment with haxe and dconsole.
 
 ### Tips<br />
 
