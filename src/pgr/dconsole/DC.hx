@@ -18,7 +18,7 @@ import pgr.dconsole.ui.DCOpenflInterface;
 @:expose
 class DC 
 {
-	inline static public var VERSION = "4.4.1";
+	inline static public var VERSION = "4.3.1";
 	/** Aligns console to bottom */
 	static public var ALIGN_DOWN:String = "DOWN";
 	/** Aligns console to top */
@@ -39,7 +39,7 @@ class DC
 		}
 		
 		if (input == null) {
-			#if openfl
+			#if (openfl && !js)
 			input = new DCOpenflInput();
 			#else
 			input = new DCEmptyInput();
@@ -47,7 +47,7 @@ class DC
 		}
 		
 		if (interfc == null) {
-			#if openfl
+			#if (openfl && !js)
 			interfc = new DCOpenflInterface(heightPt, align);
 			#else
 			interfc = new DCEmtpyInterface();

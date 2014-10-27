@@ -60,7 +60,7 @@ class DConsole {
 	public function new(input:DCInput = null, interfc:DCInterface = null, theme:DCThemes.Theme = null) {
 		
 		if (input == null) {
-			#if openfl
+			#if (openfl && !js)
 			input = new DCOpenflInput();
 			#else
 			input = new DCEmptyInput();
@@ -68,7 +68,7 @@ class DConsole {
 		}
 		
 		if (interfc == null) {
-			#if openfl
+			#if (openfl && !js)
 			interfc = new DCOpenflInterface(33, "DOWN");
 			#else
 			interfc = new DCEmtpyInterface();
