@@ -140,7 +140,7 @@ And voilá:
 ![consolehtml](http://i1148.photobucket.com/albums/o562/ProG4mr/consolehtml5_zpsb26d8bc6.png)
 
 Not the most elegant way to get it working but it surely works well.
-Profiler and monitor support will be added soon aswell as an online console to experiment with haxe and dconsole.
+Profiler and monitor support will be added soon aswell as a webpage to experiment with haxe and dconsole online.
 
 ### Tips<br />
 
