@@ -141,6 +141,7 @@ And voilá:
 
 Not the most elegant way to get it working but it surely works well.
 Profiler and monitor support will be added soon aswell as a webpage to experiment with haxe and dconsole online.
+**Important** - Make sure dead code elimination is off with the flag ```-dce no``` otherwise problems do occur.
 
 ### Tips<br />
 
