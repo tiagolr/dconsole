@@ -107,7 +107,7 @@ Then open your ```index.html``` (flashdevelop generates this automaticaly with h
  
    ```html
    <script src="http://code.jquery.com/jquery-2.1.1.min.js" ></script>
-	<script src="lib/jquery.terminal-0.8.8.min.js"></script>
+	<script src="jquery.terminal-0.8.8.min.js"></script>
 	<script>
         terminal = $('#console').terminal(function(command, term) {
             if (command !== '') {
