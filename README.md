@@ -139,9 +139,9 @@ And voilá:
 
 ![consolehtml](http://i1148.photobucket.com/albums/o562/ProG4mr/consolehtml5_zpsb26d8bc6.png)
 
-Not the most elegant way to get it working but it surely works well.
-Profiler and monitor support will be added soon aswell as a webpage to experiment with haxe and dconsole online.
-**Important** - Make sure dead code elimination is off with the flag ```-dce no``` otherwise problems do occur.
+Not the most elegant way to get it working but it surely works well.<br/>
+Profiler and monitor support will be added soon aswell as a webpage to experiment with haxe and dconsole online.<br/>
+**Important** : make sure dead code elimination is off with ```-dce no``` flag, otherwise problems do occur.
 
 ### Tips<br />
 
