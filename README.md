@@ -11,13 +11,13 @@
 * Register new commands that respond to user input.
 
 
-**Latest Changes - 4.2**
-* Added register class - (allows to register class and access its static fields and methods).
-* Added "classes" command to view all registered classes.
+**Latest Changes - 4.3.1**
+* Added Html5/JS basic support, see notes at the end of this README
+* Updated to hscript 2.0.3 (older versions may experience bad behaviour)
+* Small fixes
 
 For more changes or other versions, see [CHANGELOG](https://github.com/ProG4mr/dconsole/blob/master/CHANGELOG). <br/><br/>
-The console uses **openfl** and supports multiple targets (**flash**, **cpp** and **neko**).<br/>
-Multiple rendering devices and html5 may be available in time.
+The console supports **flash**, **neko** and **cpp** targets using **openfl**, **html5** is also supported using [jquery-terminal](http://terminal.jcubic.pl/) and does not require openfl (see instructions below), other input/output implementations may also be added.
 
 ____________
 
@@ -94,10 +94,59 @@ Now toggling the profiler with **SHIFT + TAB** shows real-time statistics that a
 * **Name** Sample name
 <br />
 
+### HTML5 / JS
+
+DConsole can run on html5 / javascript using jquery-terminal to process input and log console output.
+To do so, first download [jquery-terminal](http://terminal.jcubic.pl/) and place **jquery.terminal-x.x.x.min.js** and **jquery.terminal.css** inside your export directory. 
+
+Then open your ```index.html``` (flashdevelop generates this automaticaly with haxe-js template)  and add the following:
+
+1. Add ```<link rel="stylesheet" href="jquery.terminal.css"/>``` inside ```<head></head>```
+2. Add the tag ```<div id="console"/>``` inside ```<body></body>``` 
+4. Add the following lines before your generated JS is executed (in flashdevelop template: ```<script src="project_name.js">```):
+ 
+   ```html
+   <script src="http://code.jquery.com/jquery-2.1.1.min.js" ></script>
+	<script src="jquery.terminal-0.8.8.min.js"></script>
+	<script>
+        terminal = $('#console').terminal(function(command, term) {
+            if (command !== '') {
+                pgr.dconsole.DC.eval(command);
+            } else {
+                term.echo('');
+            }
+        }, {
+            greetings: false,
+            name: 'dconsole',
+            width: "100%",
+            height: "200",
+            prompt: '> ',
+        });
+        
+        document.addEventListener('console_log', function(evt) {
+            terminal.echo(evt.detail.data, {
+                finalize: function(div) {
+                    div.css("color", "#" + evt.detail.color);
+                }
+            });
+        });
+	</script>
+   ```
+
+What this does is loading jquery from web, load jquery-terminal locally, and assign a jquery terminal with proper configurations to the div with id:console created earlier.
+
+And voilá:
+
+![consolehtml](http://i1148.photobucket.com/albums/o562/ProG4mr/consolehtml5_zpsb26d8bc6.png)
+
+Not the most elegant way to get it working but it surely works well.<br/>
+Profiler and monitor support will be added soon aswell as a webpage to experiment with haxe and dconsole online.<br/>
+**Important** : make sure dead code elimination is off with ```-dce no``` flag, otherwise problems do occur.
+
 ### Tips<br />
 
 * Console can have full height using **DC.init(100)** where 100 means 100% parent sprite height.
-* To vizualize more info when erros occur use **DC.setVerboseErrors(true)**.
+* To visualize more info when errors occur use **DC.setVerboseErrors(true)**.
 * Registering commands using **DC.registerCommand()** allows to add custom behavior based on input.
 * Registering classes using **DC.registerClass()** allows to access static functions and methods of that class.
 * Private functions, private fields and getters/setters can also be used.
