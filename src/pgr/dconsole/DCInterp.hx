@@ -9,6 +9,8 @@ class DCInterp extends Interp {
 
 	public function new () {
 		super();
+		declared = new Array();
+		depth = 0;
 	}
 	
 	override function get( o : Dynamic, f : String ) : Dynamic {
