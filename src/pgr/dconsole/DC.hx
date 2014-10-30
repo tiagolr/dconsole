@@ -18,7 +18,7 @@ import pgr.dconsole.ui.DCOpenflInterface;
 @:expose
 class DC 
 {
-	inline static public var VERSION = "4.3.1";
+	inline static public var VERSION = "4.3.2";
 	/** Aligns console to bottom */
 	static public var ALIGN_DOWN:String = "DOWN";
 	/** Aligns console to top */

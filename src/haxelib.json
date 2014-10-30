@@ -4,8 +4,8 @@
 	"license": "MIT",
 	"tags": ["console", "logger", "monitor", "profiler", "utility", "game"],
 	"description": "A real-time console with multiple utilities like scripting, logging, monitoring, profiling etc.",
-	"version": "4.3.1",
-	"releasenote": "Added basic html5 support, updated to hscript 2.0.3",
+	"version": "4.3.2",
+	"releasenote": "Updated to hscript 2.0.4",
 	"contributors": ["prog4mr"],
-	"dependencies": { "hscript": "" }
+	"dependencies": { "hscript": "2.0.4" }
 }
