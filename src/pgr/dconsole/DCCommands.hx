@@ -44,6 +44,7 @@ class DCCommands
 		_console = console;
 		
 		hScriptParser = new Parser();
+		hScriptParser.allowTypes = true;
 		hScriptParser.allowJSON = true;
 		hScriptInterp = new DCInterp();
 		hScriptInterp.variables.set("objectsMap", objectsMap);

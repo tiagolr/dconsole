@@ -1,10 +1,9 @@
 # DConsole
 
 ####Donsole-online
-You can now use dconsole on your [browser](http://www.haxedomain.com/console).
+Try it online at [HaxeDomain.com](http://www.haxedomain.com/console). Site repository available [here](https://github.com/prog4mr/dconsole-online).
 
-
-**DConsole** or **The Console** is a real-time console that allows to:
+**DConsole** or **The Console** is a real-time console that allows you to:
  
 * Run scripts.
 * Access and modify fields and objects.
