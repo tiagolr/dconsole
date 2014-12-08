@@ -77,6 +77,7 @@ class DCMonitor {
 					
 					if ( child != null)	
 						parent = child;
+					else break;
 				}
 				
 				output.push(v.alias + ':' + child + '\n');
