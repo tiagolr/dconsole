@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+
+        <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+        <meta charset="utf-8"/>
+        <title>Haxe Console</title>
+        <meta name="description" content="" />
+        
+        <link rel="stylesheet" href="css/combined.css">
+
+        <!-- Google Analytics -->
+        <script type="text/javascript">
+            (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+                (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+                m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+                                    })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+            ga('create', 'UA-55271438-2', 'auto');
+            ga('send', 'pageview');
+
+        </script>
+        <!-- End Google Analytics -->
+        
+    </head>
+    <body>
+
+        <div class="container-fluid">
+            
+            <div class="header">
+               
+                <div class="navbar navbar-inverse navbar-fixed-top" role="navigation">
+                    <!--                    <nav class="navbar navbar-inverse" role="navigation">-->
+                    <div class="container-fluid">
+                        <!-- Brand and toggle get grouped for better mobile display -->
+                        <div class="navbar-header">
+							<button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
+								<span class="sr-only">Toggle navigation</span>
+								<span class="icon-bar"></span>
+								<span class="icon-bar"></span>
+								<span class="icon-bar"></span>
+							</button>
+							<a id="title-logo" class="nav navbar-brand" href="#">
+								<img src="img/logo_text_white.png" alt="">
+							</a>
+                        </div>
+
+                        <!-- Collect the nav links, forms, and other content for toggling -->
+                        <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+                            <ul class="nav navbar-nav">
+                                <li><a href="#" class="navbar-link"></a></p></li>
+								<li>
+									<div class="btn-group ">
+										<button id="btn-run" class="btn btn-default navbar-btn">
+											<span class="glyphicon glyphicon-flash"></span> Run
+										</button>
+										<button id="btn-settings" class="btn btn-default navbar-btn disabled">
+											<span class="glyphicon glyphicon-cog"></span> Settings
+										</button>
+										<div class="btn-group" role="group">
+											<button class="btn btn-default navbar-btn dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
+												<span class="glyphicon glyphicon-file"></span>Examples <span class="caret"></span>
+											</button>
+											<ul id="examples-list" class="dropdown-menu" role="menu">
+												<!-- filled in runtime -->
+											</ul>
+										</div>
+										<button id="btn-help" class="btn btn-default navbar-btn" data-toggle="modal" data-target="#help-screen">
+											<span class="glyphicon glyphicon-question-sign"></span> Help
+										</button>
+										
+									</div>
+								</li>
+                        	</ul>
+							
+							<ul class="nav navbar-nav navbar-right">
+								<li><a href="../">Home</a></li>
+							</ul>
+							<ul class="nav navbar-nav navbar-right navbar-brand">
+								<a href="https://twitter.com/share" class="twitter-share-button" data-url="http://www.haxedomain.com/console" data-text="Online haxe REPL (read-evalue-print loop) available" data-hashtags="haxedomain.com">Tweet</a>
+								<script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0],p=/^http:/.test(d.location)?'http':'https';if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src=p+'://platform.twitter.com/widgets.js';fjs.parentNode.insertBefore(js,fjs);}}(document, 'script', 'twitter-wjs');</script>
+							</ul>
+							<ul class="nav navbar-nav navbar-right navbar-brand">
+								<iframe src="http://ghbtns.com/github-btn.html?user=prog4mr&repo=dconsole&type=watch&count=true"
+										allowtransparency="true" frameborder="0" scrolling="0" width="95" height="20"></iframe>
+							</ul>
+						</div><!-- /.navbar-collapse -->
+           		
+            		</div><!-- /.container-fluid -->
+        		</div>  <!--                    </nav>-->
+
+
+        </div>
+    <div class="row fill-h content">
+    
+    <!--
+    HELP SCREEN
+    -->
+		<div class="modal fade" id="help-screen" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+			<div class="modal-dialog modal-lg">
+				<div class="modal-content">
+					<div class="modal-header">
+						<button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+						<h4 class="modal-title" id="myModalLabel">Haxe Console</h4>
+					</div>
+					<div class="modal-body">
+						Haxe console is an online interpreter that can be used to test haxe syntax and code snippets from your browser. 
+						It runs on the client and relies on <a href="https://github.com/HaxeFoundation/hscript" target="_blank">hscript</a> to evaluate expressions without compiling.
+						<hr>
+						This page also uses <a href="https://github.com/prog4mr/dconsole" target="_blank">DConsole</a>, which wraps hscript and provides a cross-platform console to use in applications.
+						<hr>
+						This page repository can be found on <a href="https://github.com/prog4mr/dconsole-online" target="_blank">github</a>.
+						<hr>
+						<strong>Shorcuts:</strong>
+						<p></p>
+<!--
+						<div class="row">
+						<div class="col-xs-6">
+							<kbd>Enter</kbd>    Evaluate console input <p></p>
+							<kbd>Ctrl<em> + </em>Enter</kbd>    Continue to next line <p></p>
+							<kbd>Ctrl<em> + </em>R</kbd>    Run code <p></p>
+							<kbd>Ctrl<em> + </em>L</kbd>    Clear console <p></p>
+						</div>
+						<div class="col-xs-6">
+							<kbd>Up</kbd>    Previous history entry <p></p>
+							<kbd>Down</kbd>    Next history entry <p></p>
+							<kbd>PageUp</kbd>    Scroll console up <p></p>
+							<kbd>PageDown</kbd>    Scroll console down <p></p>
+						</div>
+						</div>
+-->
+					
+						<table class="table">
+<!--
+							<thead>
+								<tr>
+									<th>Row</th>
+									<th>First Name</th>
+									<th>Last Name</th>
+									<th>Email</th>
+								</tr>
+							</thead>
+-->
+							<tbody>
+								<tr>
+									<td><kbd>Enter</kbd></td>
+									<td>Evaluate console input.</td>
+									
+									<td><kbd>Up</kbd></td>
+									<td>Previous history entry.</td>
+								</tr>
+								<tr>
+									<td><kbd>Ctrl<em> + </em>Enter</kbd></td>
+									<td>Continue to next line.</td>
+									
+									<td><kbd>Down</kbd></td>
+									<td>Next history entry.</td>
+								</tr>
+								<tr>
+									<td><kbd>Ctrl<em> + </em>R</kbd></td>
+									<td>Run code.</td>
+
+									<td><kbd>PageUp</kbd></td>
+									<td>Scroll console up.</td>
+								</tr>
+								<tr>
+									<td><kbd>Ctrl<em> + </em>L</kbd></td>
+									<td>Clear console.</td>
+
+									<td><kbd>PageDown</kbd></td>
+									<td>Scroll console down.</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+				</div>
+			</div>
+		</div>
+       
+   	<!--
+    LEFT COLUMN
+    -->
+        <div class="col-xs-6 fill-h code-area">
+            <textarea id="textprogram" class="fill-h">
+//--------------------------------------
+// Simple hello world example.
+//--------------------------------------
+for(i in 0...3) {
+    trace(3 - i + "...");
+}
+
+trace("Hello World!!!\n");
+            </textarea>
+        </div>
+
+	<!--
+RIGHT COLUMN
+	-->
+        <div class="col-xs-6 fill-h code-area">
+            <div id="textconsole">
+            </div>
+        </div>
+    </div>
+    <!--            <div class="footer">heheheheh</div>-->
+    </div>
+
+
+<!-- Scripts -->
+<script src="http://code.jquery.com/jquery-2.1.1.min.js" ></script>
+<script src="scripts/combined.js"></script>
+<script>
+    
+	document.body.style.overflow = "hidden";
+	
+    var terminal;
+    var code;
+
+    $(function () {
+		
+        code = CodeMirror.fromTextArea($('#textprogram')[0], {
+            lineNumbers: true,
+            lineWrapping:true,
+            mode: "haxe",
+            theme: "neat"
+        });
+        
+        terminal = $('#textconsole').terminal(function(command, term) {
+			
+            if (command !== '') {
+                pgr.dconsole.DC.eval(command);
+            } else {
+                term.echo('');
+            }
+        }, {
+			keydown: function(e) {
+				if (e.which === 82 && e.ctrlKey) { // DISABLE CTRL+R
+					return true;
+				}
+			},
+            greetings: false,
+            name: 'dconsole',
+            height: "100%",
+            width: "100%",
+            prompt: '> ',
+        });
+        
+        // EVENT LISTENERS
+        document.addEventListener('console_log', function(evt) {
+            terminal.echo(evt.detail.data, {
+                finalize: function(div) {
+                    div.css("color", "#" + evt.detail.color);
+                }
+            });
+        });
+        
+        $('#btn-run').on('click', function(e) {
+            pgr.dconsole.DC.eval(code.getValue());
+        });
+        
+        document.addEventListener('console_run', function (e) { 
+            pgr.dconsole.DC.eval(code.getValue()); 
+        });
+        
+        Main.init();
+		Main.prepareExamples(code);
+		
+		//-----------------------------------
+		// Extra shortcuts
+		//-----------------------------------
+		// CTRL R 
+		$(document).keyup(function(e){
+			if (e.keyCode==82 && e.ctrlKey) {
+				pgr.dconsole.DC.eval(code.getValue()); 
+			}
+		});
+		
+		$(document).keydown(function(e) {
+			if (e.keyCode==82 && e.ctrlKey) {
+				e.preventDefault();
+				e.stopPropagation();
+			}
+		});
+		
+    });
+</script>
+</body>
+</html>
