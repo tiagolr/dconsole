@@ -1,7 +1,7 @@
 # DConsole
 
 ####Donsole-online
-The console is available online at [haxedomain.com](http://www.haxedomain.com/console).
+Try dconsole online [here](http://prog4mr.github.io/dconsole/).
 ___________
 **DConsole** or **The Console** is a real-time console that allows you to:
  
