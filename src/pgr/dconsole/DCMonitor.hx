@@ -62,7 +62,26 @@ class DCMonitor {
 	public function writeOutput() {
 		var output = new Array<String>();
 		
+		var childFields:Array<String> = null;
+		var child:Dynamic = null;
+		var parent:Dynamic = null;
+		
 		for (v in fields) {
+			childFields = v.field.split('.');
+			
+			if (childFields.length > 1)	{
+				parent = v.object;
+				
+				for (childField in childFields) {
+					child = Reflect.getProperty(parent, childField);
+					
+					if ( child != null)	
+						parent = child;
+					else break;
+				}
+				
+				output.push(v.alias + ':' + child + '\n');
+			} else 
 			output.push(v.alias + ':' + Reflect.getProperty(v.object, v.field) + '\n');
 		}
 		
