@@ -1,10 +1,8 @@
 #if luxe
 package pgr.dconsole.input;
-import luxe.Input.Key;
-import haxe.io.Input;
-import luxe.Sprite;
-import luxe.Input.KeyEvent;
 import luxe.Entity;
+import luxe.Input.Key;
+import luxe.Input.KeyEvent;
 import pgr.dconsole.DConsole;
 
 /**

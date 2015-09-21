@@ -1,20 +1,18 @@
 #if luxe
 package pgr.dconsole.ui;
-import phoenix.geometry.LineGeometry;
-import luxe.Draw;
-import phoenix.Camera;
-import phoenix.Batcher;
 import luxe.Input.Key;
 import luxe.Input.KeyEvent;
-import luxe.options.TextOptions;
 import luxe.Input.TextEvent;
-import luxe.Entity;
-import luxe.utils.Maths;
+import luxe.options.TextOptions;
 import luxe.Rectangle;
-import luxe.Text;
-import luxe.Vector;
-import phoenix.Color;
 import luxe.Sprite;
+import luxe.Text;
+import luxe.utils.Maths;
+import luxe.Vector;
+import phoenix.Batcher;
+import phoenix.Camera;
+import phoenix.Color;
+import phoenix.geometry.LineGeometry;
 
 /**
  * 
@@ -45,8 +43,8 @@ class LuxePromptText extends Text {
 		
         switch(event.keycode) {
             case Key.backspace:
-				text = text.substr(0, index - 1) + text.substr(index, text.length);
 				index--;
+				text = text.substr(0, index) + text.substr(index + 1, text.length);
             case Key.delete:
 				text = text.substr(0, index) + text.substr(index + 1, text.length);
             case Key.left:
@@ -166,6 +164,7 @@ class DCLuxeInterface implements DCInterface
 			color:new Color().rgb(DCThemes.current.PRM_C),
 			size: new Vector(Luxe.screen.width, PROMPT_HEIGHT),
 			centered:false,
+			depth:1, // fixes bug where prompt display is not visible
 			pos: new Vector(0, Luxe.screen.height - PROMPT_HEIGHT),
 			batcher:batcher,
 		});
@@ -192,6 +191,7 @@ class DCLuxeInterface implements DCInterface
 			color: new Color().rgb(DCThemes.current.PRM_TXT_C),
 			bounds: new Rectangle(0, 0, Luxe.screen.width, promptDisplay.size.y),
 			point_size: 15,
+			depth:1.1,
 			align_vertical: TextAlign.center,
 			batcher:batcher,
 		});

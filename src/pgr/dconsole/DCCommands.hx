@@ -168,7 +168,7 @@ class DCCommands
 		}
 		
 		if (alias == "") {
-			alias = DCUtil.formatAlias(this, Type.getClassName(Type.getClass(object)).toLowerCase(), ALIAS_TYPE.OBJECT);
+			alias = DCUtil.formatAlias(this, StringTools.replace(Type.getClassName(Type.getClass(object)).toLowerCase(), '.', '_'), ALIAS_TYPE.OBJECT);
 		} else {
 			alias = DCUtil.formatAlias(this, alias, ALIAS_TYPE.OBJECT);
 		}
