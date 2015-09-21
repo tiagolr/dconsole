@@ -5,6 +5,7 @@ package pgr.dconsole.ui;
  * @author TiagoLr
  */
 class DCEmtpyInterface implements DCInterface {
+	public var console:DConsole;
 	
 	public function new() {}
 	

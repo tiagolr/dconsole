@@ -101,6 +101,7 @@ class DConsole {
 		
 		// create console interface
 		this.interfc = interfc;
+		interfc.console = this;
 		interfc.init();
 		
 		commands = new DCCommands(this);

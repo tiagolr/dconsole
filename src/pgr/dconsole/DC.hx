@@ -2,11 +2,16 @@ package pgr.dconsole;
 import haxe.PosInfos;
 import pgr.dconsole.input.DCInput;
 import pgr.dconsole.input.DCEmptyInput;
+import pgr.dconsole.input.DCLuxeInput;
 import pgr.dconsole.ui.DCInterface;
 import pgr.dconsole.ui.DCEmtpyInterface;
 #if openfl
 import pgr.dconsole.input.DCOpenflInput;
 import pgr.dconsole.ui.DCOpenflInterface;
+#end
+#if luxe
+import pgr.dconsole.input.DCLuxeInput;
+import pgr.dconsole.ui.DCLuxeInterface;
 #end
 
  /**
@@ -33,7 +38,7 @@ class DC
 	 * @param	theme		Select the console theme from GCThemes.
 	 * @param	monitorRate The number of frames elapsed for each monitor refresh.
 	 */
-	public static function init(heightPt:Float = 33, align:String = "DOWN", theme:DCThemes.Theme = null, input:DCInput = null, interfc:DCInterface = null) {
+	public static function init(?heightPt:Float = 33, ?align:String = "DOWN", ?theme:DCThemes.Theme = null, input:DCInput = null, interfc:DCInterface = null) {
 		if (instance != null) {
 			return; // DConsole has been initialized already.
 		}
@@ -41,6 +46,8 @@ class DC
 		if (input == null) {
 			#if (openfl && !js)
 			input = new DCOpenflInput();
+			#elseif luxe
+			input = new DCLuxeInput();
 			#else
 			input = new DCEmptyInput();
 			#end
@@ -49,6 +56,8 @@ class DC
 		if (interfc == null) {
 			#if (openfl && !js)
 			interfc = new DCOpenflInterface(heightPt, align);
+			#elseif luxe
+			interfc = new DCLuxeInterface(heightPt, align);
 			#else
 			interfc = new DCEmtpyInterface();
 			#end

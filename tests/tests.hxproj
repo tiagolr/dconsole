@@ -8,9 +8,9 @@
     <movie fps="0" />
     <movie width="0" />
     <movie height="0" />
-    <movie version="3" />
+    <movie version="1" />
     <movie minorVersion="0" />
-    <movie platform="NME" />
+    <movie platform="Lime" />
     <movie background="#FFFFFF" />
     <movie preferredSDK=";3;" />
   </output>
@@ -39,10 +39,6 @@
   <compileTargets>
     <compile path="src\Main.hx" />
   </compileTargets>
-  <!-- Assets to embed into the output SWF -->
-  <library>
-    <!-- example: <asset path="..." id="..." update="..." glyphs="..." mode="..." place="..." sharepoint="..." /> -->
-  </library>
   <!-- Paths to exclude from the Project Explorer tree -->
   <hiddenPaths>
     <hidden path="obj" />

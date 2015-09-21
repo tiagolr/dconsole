@@ -63,7 +63,7 @@ class DCMonitor {
 		var output = new Array<String>();
 		
 		for (v in fields) {
-			output.push(v.alias + ':' + Reflect.getProperty(v.object, v.field) + '\n');
+			output.push(v.alias + ': ' + Reflect.getProperty(v.object, v.field) + '\n');
 		}
 		
 		console.interfc.writeMonitorOutput(output);

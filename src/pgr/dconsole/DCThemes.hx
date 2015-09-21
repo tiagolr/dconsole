@@ -40,7 +40,7 @@ class DCThemes
 		CON_A		: .7,		
 		CON_TXT_A	: 1,
 		
-		PRM_C		: 0xC5C5C5,
+		PRM_C		: 0xc5c5c5,
 		PRM_TXT_C	: 0x0,
 		
 		MON_C		: 0x000000,	
@@ -60,7 +60,7 @@ class DCThemes
 		CON_A		: .7,
 		CON_TXT_A	: 1,
 		
-		PRM_C		: 0x111111,
+		PRM_C		: 0x454545,
 		PRM_TXT_C	: 0xFFFFFF,
 		
 		MON_C		: 0x000000,

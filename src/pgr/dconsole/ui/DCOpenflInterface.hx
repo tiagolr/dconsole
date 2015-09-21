@@ -20,6 +20,8 @@ import pgr.dconsole.DCThemes.Theme;
 
 class DCOpenflInterface extends Sprite implements DCInterface
 {
+	var console:DConsole;
+	
 	var _promptFontYOffset:Int;
 	var yAlign:String;
 	var heightPt:Float; // percentage height
@@ -27,6 +29,7 @@ class DCOpenflInterface extends Sprite implements DCInterface
 	var maxWidth:Float; // width in pixels
 	var maxHeight:Float; // height in pixels
 	var margin:Int = 0;
+}
 	
 	var monitorDisplay:Sprite;
 	var txtMonitorLeft:TextField;

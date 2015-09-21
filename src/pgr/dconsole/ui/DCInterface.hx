@@ -7,6 +7,7 @@ package pgr.dconsole.ui;
 
 interface DCInterface
 {
+	var console:DConsole;
 	
 	public function init() : Void;
 	
