@@ -1,4 +1,4 @@
-package ;
+package;
 import flash.ui.Keyboard;
 import haxe.unit.TestCase;
 import flash.events.KeyboardEvent;

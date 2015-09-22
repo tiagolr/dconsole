@@ -20,7 +20,7 @@ import pgr.dconsole.DCThemes.Theme;
 
 class DCOpenflInterface extends Sprite implements DCInterface
 {
-	var console:DConsole;
+	public var console:DConsole;
 	
 	var _promptFontYOffset:Int;
 	var yAlign:String;
@@ -29,7 +29,6 @@ class DCOpenflInterface extends Sprite implements DCInterface
 	var maxWidth:Float; // width in pixels
 	var maxHeight:Float; // height in pixels
 	var margin:Int = 0;
-}
 	
 	var monitorDisplay:Sprite;
 	var txtMonitorLeft:TextField;
@@ -70,14 +69,14 @@ class DCOpenflInterface extends Sprite implements DCInterface
 	
 	function onResize(e:Event = null) {
 		
-		if (Std.is(this.parent, Stage)) {
-			var stg:Stage = cast this.parent;
-			maxWidth = stg.stageWidth;
-			maxHeight = stg.stageHeight;
-		} else {
-			maxWidth = this.parent.width;
-			maxHeight = this.parent.height;
-		}
+		//if (Std.is(this.parent, openfl.display.Stage)) {
+			//var stg:Stage = cast this.parent;
+			maxWidth = this.stage.stageWidth;
+			maxHeight = this.stage.stageHeight;
+		//} else {
+			//maxWidth = this.parent.width;
+			//maxHeight = this.parent.height;
+		//}
 		
 		drawConsole(); // redraws console.
 		drawMonitor();
@@ -318,6 +317,7 @@ class DCOpenflInterface extends Sprite implements DCInterface
 		format.color = color;
 		var l = Std.string(data).length;
 		tf.setTextFormat(format, tf.text.length - l - 1, tf.text.length - 1);
+		scrollToBottom();
 	}
 	
 	public function moveCarretToEnd() {
@@ -327,15 +327,19 @@ class DCOpenflInterface extends Sprite implements DCInterface
 	}
 	
 	public function scrollConsoleUp() {
+		txtConsole.scrollV -= txtConsole.bottomScrollV - txtConsole.scrollV +1;
+		if (txtConsole.scrollV < 0)
+			txtConsole.scrollV = 0;
+	}
+	
+	public function scrollConsoleDown() {
 		txtConsole.scrollV += txtConsole.bottomScrollV - txtConsole.scrollV +1;
 		if (txtConsole.scrollV > txtConsole.maxScrollV)
 			txtConsole.scrollV = txtConsole.maxScrollV;
 	}
 	
-	public function scrollConsoleDown() {
-		txtConsole.scrollV -= txtConsole.bottomScrollV - txtConsole.scrollV +1;
-		if (txtConsole.scrollV < 0)
-			txtConsole.scrollV = 0;
+	function scrollToBottom() {
+		txtConsole.scrollV = txtConsole.maxScrollV;
 	}
 	
 	/**

@@ -65,8 +65,8 @@ private class InputListener extends Entity {
 				case Key.enter: console.processInputLine();
 				case Key.pagedown: console.scrollDown();
 				case Key.pageup: console.scrollUp();
-				case Key.down: console.nextHistory();
-				case Key.up: console.prevHistory();
+				case Key.down: console.prevHistory();
+				case Key.up: console.nextHistory();
 			}
 		}
 		

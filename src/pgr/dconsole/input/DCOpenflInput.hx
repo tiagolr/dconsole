@@ -73,39 +73,14 @@ class DCOpenflInput implements DCInput {
 		if (!console.visible) {
 			return;
 		}
-
-		// ENTER KEY
-		else 
-		if (e.keyCode == 13) {
-			console.processInputLine();
-		}
 		
-		// PAGE DOWN
-		else if (e.keyCode == 33) {
-			console.scrollDown();
-		}
-		
-		// PAGE UP
-		else 
-		if (e.keyCode == 34) { 
-			console.scrollUp();
-		}
-		
-		// DOWN KEY
-		else
-		if (e.keyCode == 38) {
-			console.nextHistory();
-		}
-		
-		// UP KEY
-		else 
-		if (e.keyCode == 40) { 
-			console.prevHistory();
-		}
-		
-		else 
-		{
-			console.resetHistoryIndex();
+		switch (e.keyCode) {
+			case Keyboard.ENTER: console.processInputLine();
+			case Keyboard.PAGE_DOWN: console.scrollDown();
+			case Keyboard.PAGE_UP: console.scrollUp();
+			case Keyboard.UP: console.nextHistory();
+			case Keyboard.DOWN: console.prevHistory();
+			default: console.resetHistoryIndex(); //  
 		}
 
 		#if !(cpp || neko) // BUGFIX

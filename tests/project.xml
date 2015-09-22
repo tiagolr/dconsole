@@ -1,14 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
-
 <project>
-	<app main="TestRunner" file="test" path="bin" />
-
-	<set name="SHOW_CONSOLE" value="1"/>
-	<haxedef name="SHOW_CONSOLE"/>
 	
-	<haxelib name="mcover" />
+	<app main="TestRunner" path="bin" file="Test" />
+	
+	<source path="./" />
+	
 	<haxelib name="openfl" />
-	<haxelib name="dconsole"/>
+	<haxelib name="mcover" />
+	<haxelib name="dconsole" />
 	
-	<haxeflag name="--macro" value="mcover.MCover.coverage([''], ['../src'], null)" />
+	<haxeflag name="--macro" value="mcover.MCover.coverage([''], ['../src'], ['pgr.dconsole.input','pgr.dconsole.ui'])" />
+	
 </project>

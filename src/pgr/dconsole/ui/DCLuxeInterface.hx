@@ -1,5 +1,6 @@
 #if luxe
 package pgr.dconsole.ui;
+import pgr.dconsole.DConsole;
 import luxe.Input.Key;
 import luxe.Input.KeyEvent;
 import luxe.Input.TextEvent;
@@ -21,9 +22,11 @@ import phoenix.geometry.LineGeometry;
 class LuxePromptText extends Text {
 	public var cursor:LineGeometry;
 	var index(default, set):Int = 0;
+	var console:DConsole;
 	
-	public function new(options:TextOptions) {
+	public function new(options:TextOptions, console:DConsole) {
 		super(options);
+		this.console = console;
 		Luxe.timer.schedule(.5, blinkCursor, true);
 	}
 	
@@ -34,6 +37,7 @@ class LuxePromptText extends Text {
 		
 		this.text = text.substr(0, index) + event.text + text.substr(index, text.length);
 		index++;
+		console.resetHistoryIndex();
 	}
 	
 	override function onkeydown( event:KeyEvent ) {
@@ -194,7 +198,7 @@ class DCLuxeInterface implements DCInterface
 			depth:1.1,
 			align_vertical: TextAlign.center,
 			batcher:batcher,
-		});
+		}, console);
 		
 		promptCursor = Luxe.draw.line( {
 			color: new Color().rgb(DCThemes.current.PRM_TXT_C),

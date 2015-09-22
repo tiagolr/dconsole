@@ -1,8 +1,6 @@
 package pgr.dconsole;
-import haxe.PosInfos;
 import pgr.dconsole.input.DCInput;
 import pgr.dconsole.input.DCEmptyInput;
-import pgr.dconsole.input.DCLuxeInput;
 import pgr.dconsole.ui.DCInterface;
 import pgr.dconsole.ui.DCEmtpyInterface;
 #if openfl

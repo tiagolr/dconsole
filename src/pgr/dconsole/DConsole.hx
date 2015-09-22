@@ -304,7 +304,6 @@ class DConsole {
 		interfc.hideProfiler();
 	}
 
-	
 	public function prevHistory() {
 		_historyIndex--;
 		

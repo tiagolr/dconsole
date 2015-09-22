@@ -1,4 +1,4 @@
-package ;
+package;
 import pgr.dconsole.input.DCInput;
 import pgr.dconsole.ui.DCInterface;
 import flash.text.TextField;
@@ -67,9 +67,10 @@ class TestInput extends TestCase
 	/**
 	 * Tests disabled console behaviour to keystrokes.
 	 */
+	@:access(pgr.dconsole.ui.DCOpenflInterface.consoleDisplay)
 	public function testDisable() {
 		
-		var consoleDisplay = Reflect.getProperty(interfc, "consoleDisplay");
+		var consoleDisplay = interfc.consoleDisplay;
 		
 		console.disable();
 		pressKey(console.consoleKey.keycode);
@@ -185,6 +186,7 @@ class TestInput extends TestCase
 		
 	}
 	
+	@:access(pgr.dconsole.ui.DCOpenflInterface.txtConsole)
 	public function testScroll() {
 		
 		// enter a lot of text.
@@ -195,7 +197,7 @@ class TestInput extends TestCase
 			console.log("...");
 		}
 		
-		var txtConsole:TextField = Reflect.getProperty(interfc, "txtConsole");
+		var txtConsole:TextField = interfc.txtConsole;
 		
 		assertTrue(txtConsole.scrollV == txtConsole.maxScrollV);
 		pressKey(Keyboard.PAGE_UP);

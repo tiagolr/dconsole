@@ -1,4 +1,4 @@
-package ;
+package;
 import haxe.unit.TestRunner;
 class TestRunner {
     

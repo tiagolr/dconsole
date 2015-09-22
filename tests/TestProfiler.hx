@@ -1,4 +1,4 @@
-package ;
+package;
 import flash.ui.Keyboard;
 import haxe.unit.TestCase;
 import flash.events.KeyboardEvent;
@@ -244,10 +244,10 @@ class TestProfiler extends TestCase
 	//  AUX
 	//---------------------------------------------------------------------------------
 	function pressKey(key:Int, ctrl:Bool = false, shift:Bool = false) {
-		#if flash
-		interfc.dispatchEvent(new KeyboardEvent(KeyboardEvent.KEY_UP, true, false, 0, key, null, ctrl, false, shift));
-		#else 
-		interfc.stage.dispatchEvent(new KeyboardEvent(KeyboardEvent.KEY_UP, true, false, 0, key, 0, ctrl, false, shift));
+		#if (cpp && legacy)
+		interfc.dispatchEvent(new KeyboardEvent(KeyboardEvent.KEY_UP, true, false, 0, key, 0, ctrl, false, shift));
+		#else
+		interfc.stage.dispatchEvent(new KeyboardEvent(KeyboardEvent.KEY_UP, true, false, 0, key, null, ctrl, false, shift));
 		#end
 	}
 	
