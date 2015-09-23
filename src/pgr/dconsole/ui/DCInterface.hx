@@ -45,7 +45,6 @@ interface DCInterface
 	
 	public function setConsoleFont(font:String = null, embed:Bool = false, size:Int = 14, bold:Bool = false, italic:Bool = false, underline:Bool = false ) : Void;
 	
-	
 	public function setPromptFont(font:String = null, embed:Bool = false, size:Int = 16, bold:Bool = false, ?italic:Bool = false, underline:Bool = false ) : Void;
 	
 	public function setProfilerFont(font:String = null, embed:Bool = false, size:Int = 14, bold:Bool = false, ?italic:Bool = false, underline:Bool = false ) : Void;
@@ -57,18 +56,15 @@ interface DCInterface
 	 */
 	public function inputRemoveLastChar() : Void;
 	
-	
 	public function getInputTxt():String;
-	
 	
 	public function setInputTxt(string:String) : Void;
 	
-	
 	public function getConsoleText() : String;
 	
+	public function getMonitorText() : { col1:String, col2:String };
 	
 	public function clearInput() : Void;
-	
 	
 	public function clearConsole() : Void;
 

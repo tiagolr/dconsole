@@ -1,14 +1,15 @@
 package;
-import flash.ui.Keyboard;
-import haxe.unit.TestCase;
-import flash.events.KeyboardEvent;
+#if openfl
 import flash.Lib;
-import pgr.dconsole.ui.DCInterface;
+import flash.ui.Keyboard;
+#end
+import haxe.Timer;
+import haxe.unit.TestCase;
 import pgr.dconsole.DC;
 import pgr.dconsole.DCMonitor;
 import pgr.dconsole.DConsole;
 import pgr.dconsole.DCProfiler;
-import pgr.dconsole.ui.DCOpenflInterface;
+import pgr.dconsole.ui.DCInterface;
 
 /**
  * Tests profiler.
@@ -19,7 +20,7 @@ class TestProfiler extends TestCase
 {	 
 	var monitor:DCMonitor;
 	var profiler:DCProfiler;
-	var interfc:DCOpenflInterface;
+	var interfc:DCInterface;
 	var console:DConsole;
 	
 	override public function setup() {
@@ -31,9 +32,16 @@ class TestProfiler extends TestCase
 			profiler = console.profiler;
 		}
 		
+		#if openfl
 		console.setConsoleKey(Keyboard.TAB);
 		console.setMonitorKey(Keyboard.TAB, true);
 		console.setProfilerKey(Keyboard.TAB, false, true);
+		#elseif luxe
+		console.setConsoleKey(luxe.Input.Key.key_a);
+		console.setMonitorKey(luxe.Input.Key.key_b);
+		console.setProfilerKey(luxe.Input.Key.key_c);
+		#end
+		
 		interfc.clearInput();
 		interfc.clearConsole();
 		console.enable();
@@ -53,7 +61,7 @@ class TestProfiler extends TestCase
 	// test response with console disabled
 	public function testDisable() {
 		console.disable();
-		pressKey(console.consoleKey.keycode, false, true); // toggle profiler
+		TestRunner.pressKey(console.consoleKey.keycode, false, true); // toggle profiler
 		assertFalse(profiler.visible);
 		console.showProfiler();
 		//assertFalse(monitor.visible);
@@ -71,12 +79,10 @@ class TestProfiler extends TestCase
 		console.showProfiler();
 		assertTrue(profiler.visible);
 		
-		// SHIFT + console key
-		pressKey(console.consoleKey.keycode, false, true);
+		TestRunner.pressKey(console.profilerKey.keycode, console.profilerKey.ctrlKey, console.profilerKey.shiftKey);
 		assertFalse(profiler.visible);
 		
-		// SHIFT + Console key
-		pressKey(console.consoleKey.keycode, false, true);
+		TestRunner.pressKey(console.profilerKey.keycode, console.profilerKey.ctrlKey, console.profilerKey.shiftKey);
 		assertTrue(profiler.visible);
 		
 		// tests profiler and monitor not be visible at the same time.
@@ -153,17 +159,18 @@ class TestProfiler extends TestCase
 	// test samples statistics
 	public function testSample() {
 		
-		var startTime:Int;
+		var startTime;
 		var delta;
 		var h1, h2:SampleHistory;
 		var lastElapsed;
 		
+		
 		// Run sample, verify statistics
 		DC.beginProfile("start1");
-		startTime = Lib.getTimer();
+		startTime = Timer.stamp() * 1000;
 		delaySample("start1", 100);
 		DC.endProfile("start1");
-		delta = Lib.getTimer() - startTime;
+		delta = Timer.stamp() * 1000 - startTime;
 		
 		h1 = getHistory("start1");
 		assertTrue(h1.elapsed >= 100 && h1.elapsed <= 100 + delta);
@@ -176,10 +183,10 @@ class TestProfiler extends TestCase
 		
 		// Re-Run sample, verify updated statistics
 		DC.beginProfile("start1");
-		startTime = Lib.getTimer();
+		startTime = Timer.stamp() * 1000;
 		delaySample("start1", 200);
 		DC.endProfile("start1");
-		delta = Lib.getTimer() - startTime;
+		delta = Timer.stamp() * 1000 - startTime;
 		
 		assertTrue(h1.elapsed >= 200 && h1.elapsed <= 200 + delta);
 		assertTrue(h1.numParents == 0);
@@ -194,20 +201,20 @@ class TestProfiler extends TestCase
 	// test samples history/statistics with nested samples
 	public function testNestedSample() {
 		
-		var startTime:Int;
+		var startTime;
 		var delta;
 		var h1, h2:SampleHistory;
 		var lastElapsed;
 		
 		// run samples 1 and 2, sample 2 multiple times inside 1
 		DC.beginProfile("start1");
-		startTime = Lib.getTimer();
+		startTime = Timer.stamp() * 1000;
 		delaySample("start1", 100);
 			DC.beginProfile("start2");
 			delaySample("start2", 100);
 			DC.endProfile("start2");
 		DC.endProfile("start1");
-		delta = Lib.getTimer() - startTime;
+		delta = Timer.stamp() * 1000 - startTime;
 		
 		h1 = getHistory("start1");
 		h2 = getChild("start1", "start2");
@@ -243,14 +250,6 @@ class TestProfiler extends TestCase
 	//---------------------------------------------------------------------------------
 	//  AUX
 	//---------------------------------------------------------------------------------
-	function pressKey(key:Int, ctrl:Bool = false, shift:Bool = false) {
-		#if (cpp && legacy)
-		interfc.dispatchEvent(new KeyboardEvent(KeyboardEvent.KEY_UP, true, false, 0, key, 0, ctrl, false, shift));
-		#else
-		interfc.stage.dispatchEvent(new KeyboardEvent(KeyboardEvent.KEY_UP, true, false, 0, key, null, ctrl, false, shift));
-		#end
-	}
-	
 	function existsSample(s:String):Bool {
 		return (profiler.getSample(s) != null);
 	}

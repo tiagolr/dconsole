@@ -1,15 +1,14 @@
 package;
+#if openfl
 import flash.text.TextField;
 import flash.ui.Keyboard;
+#end
 import haxe.unit.TestCase;
-import flash.events.KeyboardEvent;
-import flash.Lib;
-import pgr.dconsole.ui.DCInterface;
 import pgr.dconsole.DC;
+import pgr.dconsole.DCMonitor;
 import pgr.dconsole.DConsole;
 import pgr.dconsole.DCProfiler;
-import pgr.dconsole.DCMonitor;
-import pgr.dconsole.ui.DCOpenflInterface;
+import pgr.dconsole.ui.DCInterface;
 
 /**
  * Tests monitor.
@@ -18,7 +17,7 @@ import pgr.dconsole.ui.DCOpenflInterface;
  */
 class TestMonitor extends TestCase
 {	 
-	var interfc:DCOpenflInterface;
+	var interfc:DCInterface;
 	var console:DConsole;
 	var monitor:DCMonitor;
 	var profiler:DCProfiler;
@@ -38,14 +37,21 @@ class TestMonitor extends TestCase
 		if (console == null) {
 			DC.init();
 			console = DC.instance;
-			interfc = cast console.interfc;
+			interfc = console.interfc;
 			monitor = console.monitor;
 			profiler = console.profiler;
 		}
 		
+		#if openfl
 		console.setConsoleKey(Keyboard.TAB);
 		console.setMonitorKey(Keyboard.TAB, true);
 		console.setProfilerKey(Keyboard.TAB, false, true);
+		#elseif luxe
+		console.setConsoleKey(luxe.Input.Key.key_a);
+		console.setMonitorKey(luxe.Input.Key.key_b);
+		console.setProfilerKey(luxe.Input.Key.key_c);
+		#end
+		
 		interfc.clearInput();
 		interfc.clearConsole();
 		console.enable();
@@ -88,7 +94,7 @@ class TestMonitor extends TestCase
 	public function testDisable() {
 		console.disable();
 		// CTRL + console key
-		pressKey(console.consoleKey.keycode, true);
+		TestRunner.pressKey(console.monitorKey.keycode, console.monitorKey.ctrlKey, console.monitorKey.shiftKey);
 		assertFalse(monitor.visible);
 		console.showMonitor();
 		//assertFalse(monitor.visible);
@@ -108,10 +114,10 @@ class TestMonitor extends TestCase
 		console.showMonitor();
 		assertTrue(monitor.visible);
 		
-		pressKey(console.consoleKey.keycode, true);
+		TestRunner.pressKey(console.monitorKey.keycode, console.monitorKey.ctrlKey, console.monitorKey.shiftKey);
 		assertFalse(monitor.visible);
 		
-		pressKey(console.consoleKey.keycode, true);
+		TestRunner.pressKey(console.monitorKey.keycode, console.monitorKey.ctrlKey, console.monitorKey.shiftKey);
 		assertTrue(monitor.visible);
 		
 		// tests profiler and monitor not be visible at the same time.
@@ -188,14 +194,6 @@ class TestMonitor extends TestCase
 	}
 	
 	
-	function pressKey(key:Int, ctrl:Bool = false, shift:Bool = false) {
-		#if (cpp && legacy) 
-		interfc.stage.dispatchEvent(new KeyboardEvent(KeyboardEvent.KEY_UP, true, false, 0, key, 0, ctrl, false, shift));
-		#else 
-		interfc.stage.dispatchEvent(new KeyboardEvent(KeyboardEvent.KEY_UP, true, false, 0, key, null, ctrl, false, shift));
-		#end
-	}
-	
 	
 	function refreshMonitor() {
 		monitor.writeOutput();
@@ -203,9 +201,8 @@ class TestMonitor extends TestCase
 	
 	
 	function monitorHasText(txt:String):Bool {
-		var txtMonitorLeft:TextField = Reflect.getProperty(interfc, "txtMonitorLeft");
-		var txtMonitorRight:TextField = Reflect.getProperty(interfc, "txtMonitorRight");
-		return (txtMonitorLeft.text.lastIndexOf(txt) != -1 || txtMonitorRight.text.lastIndexOf(txt) != -1);
+		var montxt = interfc.getMonitorText();
+		return (montxt.col1.lastIndexOf(txt) != -1 || montxt.col2.lastIndexOf(txt) != -1);
 	}
 	
 	

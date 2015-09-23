@@ -1,12 +1,12 @@
 package;
-import flash.ui.Keyboard;
-import haxe.unit.TestCase;
+#if openfl 
 import flash.events.KeyboardEvent;
-import flash.Lib;
-import pgr.dconsole.ui.DCInterface;
+import flash.ui.Keyboard;
+#end
+import haxe.unit.TestCase;
 import pgr.dconsole.DC;
 import pgr.dconsole.DConsole;
-import pgr.dconsole.ui.DCOpenflInterface;
+import pgr.dconsole.ui.DCInterface;
 
 /**
  * Tests console runtime commands.
@@ -15,7 +15,7 @@ import pgr.dconsole.ui.DCOpenflInterface;
  */
 class TestCommands extends TestCase
 {	 
-	var interfc:DCOpenflInterface;
+	var interfc:DCInterface;
 	var console:DConsole;
 	
 	var i:Int;
@@ -215,7 +215,19 @@ class TestCommands extends TestCase
 		interfc.clearConsole();
 		interfc.clearInput();
 		interfc.setInputTxt(command);
-		interfc.stage.dispatchEvent(new KeyboardEvent(KeyboardEvent.KEY_UP, true, false, 0, Keyboard.ENTER)); 
+		#if openfl
+		cast(interfc, pgr.dconsole.ui.DCOpenflInterface).stage.dispatchEvent(new KeyboardEvent(KeyboardEvent.KEY_UP, true, false, 0, Keyboard.ENTER)); 
+		#elseif luxe
+		cast(console.input, pgr.dconsole.input.DCLuxeInput).inputListener.onkeyup( {
+			scancode : 0,
+			keycode : luxe.Input.Key.enter,
+			state : null,
+			mod : null,
+			repeat : false,
+			timestamp : 0,
+			window_id : 0,
+		});
+		#end
 	}
 	
 	function consoleHasText(txt:String):Bool {

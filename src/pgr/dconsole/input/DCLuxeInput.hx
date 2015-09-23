@@ -12,7 +12,7 @@ import pgr.dconsole.DConsole;
 class DCLuxeInput implements DCInput {
 
 	public var console:DConsole;
-	var inputListener:InputListener;
+	public var inputListener:InputListener;
 	var enabled:Bool;
 	
 	public function new() {}
@@ -23,6 +23,7 @@ class DCLuxeInput implements DCInput {
 		inputListener = new InputListener();
 		inputListener.console = this.console;
 	}
+	
 	
 	public function enable() { enabled = true;}
 	public function disable() { enabled = false;}	

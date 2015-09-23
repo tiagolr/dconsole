@@ -1,0 +1,25 @@
+{
+  project : {
+    name : 'empty',
+    version : '1.0.0',
+    author : 'luxeengine',
+
+    app : {
+      name : 'luxe_empty',
+      package : 'com.luxeengine.empty',
+      main : 'TestRunner'
+    },
+
+    build : {
+      dependencies : {
+        luxe : '*',
+        dconsole: '*'
+      }
+    },
+  
+    files : {
+      config : 'config.json',
+      assets : 'assets/'
+    }
+  }
+}

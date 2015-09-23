@@ -1,16 +1,13 @@
 package;
-import pgr.dconsole.input.DCInput;
-import pgr.dconsole.ui.DCInterface;
+#if openfl
 import flash.text.TextField;
 import flash.ui.Keyboard;
+#end
 import haxe.unit.TestCase;
-import flash.events.KeyboardEvent;
-import flash.Lib;
-import pgr.dconsole.ui.DCInterface;
 import pgr.dconsole.DC;
 import pgr.dconsole.DConsole;
-import pgr.dconsole.ui.DCOpenflInterface;
-
+import pgr.dconsole.input.DCInput;
+import pgr.dconsole.ui.DCInterface;
 /**
  * Tests console reaction to keystrokes.
  * 
@@ -19,11 +16,17 @@ import pgr.dconsole.ui.DCOpenflInterface;
 class TestInput extends TestCase
 {	 
 	var input:DCInput;
-	var interfc:DCOpenflInterface;
+	var interfc:DCInterface;
 	var console:DConsole;
 	var i:Int;
 	var f:Float;
 	var s:String;
+	
+	var key_up:Int;
+	var key_down:Int;
+	var key_enter:Int;
+	var key_pageup:Int;
+	var key_pagedown:Int;
 	
 	override public function setup() {
 		if (console == null) {
@@ -33,9 +36,25 @@ class TestInput extends TestCase
 			input = console.input;
 		}
 		
+		#if openfl
 		console.setConsoleKey(Keyboard.TAB);
 		console.setMonitorKey(Keyboard.TAB, true);
 		console.setProfilerKey(Keyboard.TAB, false, true);
+		key_up 		 = Keyboard.UP;
+		key_down 	 = Keyboard.DOWN;
+		key_pageup 	 = Keyboard.PAGE_UP;
+		key_pagedown = Keyboard.PAGE_DOWN;
+		key_enter 	 = Keyboard.ENTER;
+		#elseif luxe
+		console.setConsoleKey(luxe.Input.Key.key_a);
+		console.setMonitorKey(luxe.Input.Key.key_b);
+		console.setProfilerKey(luxe.Input.Key.key_c);
+		key_up 		 = luxe.Input.Key.up;
+		key_down 	 = luxe.Input.Key.down;
+		key_pageup 	 = luxe.Input.Key.pageup;
+		key_pagedown = luxe.Input.Key.pagedown;
+		key_enter 	 = luxe.Input.Key.enter;
+		#end
 		interfc.clearInput();
 		interfc.clearConsole();
 		console.enable();
@@ -58,9 +77,9 @@ class TestInput extends TestCase
 	public function testConsoleToggleKey() {
 		console.hideConsole();
 		assertFalse(console.visible);
-		pressKey(console.consoleKey.keycode);
+		TestRunner.pressKey(console.consoleKey.keycode);
 		assertTrue(console.visible);
-		pressKey(console.consoleKey.keycode);
+		TestRunner.pressKey(console.consoleKey.keycode);
 		assertFalse(console.visible);
 	}
 	
@@ -68,12 +87,17 @@ class TestInput extends TestCase
 	 * Tests disabled console behaviour to keystrokes.
 	 */
 	@:access(pgr.dconsole.ui.DCOpenflInterface.consoleDisplay)
+	@:access(pgr.dconsoel.ui.DCLuxeInterface.consoleDisplay)
 	public function testDisable() {
 		
-		var consoleDisplay = interfc.consoleDisplay;
+		#if openfl 
+		var consoleDisplay = cast(interfc, pgr.dconsole.ui.DCOpenflInterface).consoleDisplay;
+		#elseif luxe
+		var consoleDisplay = untyped cast(interfc, pgr.dconsole.ui.DCLuxeInterface).consoleDisplay;
+		#end
 		
 		console.disable();
-		pressKey(console.consoleKey.keycode);
+		TestRunner.pressKey(console.consoleKey.keycode);
 		assertFalse(consoleDisplay.visible);
 		console.showConsole();
 		assertFalse(consoleDisplay.visible);
@@ -88,12 +112,12 @@ class TestInput extends TestCase
 		console.hideConsole();
 		
 		interfc.setInputTxt("SomeText");
-		pressKey(Keyboard.ENTER); 
+		TestRunner.pressKey(key_enter); 
 		assertTrue(interfc.getConsoleText() == "");
 		
-		pressKey(console.consoleKey.keycode);
+		TestRunner.pressKey(console.consoleKey.keycode);
 		assertTrue(console.visible);
-		pressKey(Keyboard.ENTER); 
+		TestRunner.pressKey(key_enter); 
 		assertFalse(interfc.getConsoleText() == "");
 	}
 	
@@ -148,45 +172,46 @@ class TestInput extends TestCase
 		// no history, try next history, previous history, prompt text remains the same.
 		console.clearHistory();
 		assertTrue(inputIsEmpty());
-		pressKey(Keyboard.UP); 
+		TestRunner.pressKey(key_up); 
 		assertTrue(inputIsEmpty());
-		pressKey(Keyboard.DOWN); 
+		TestRunner.pressKey(key_down); 
 		assertTrue(inputIsEmpty());
 		
 		// enter some commands.
 		interfc.setInputTxt("1");
-		pressKey(Keyboard.ENTER);
+		TestRunner.pressKey(key_enter);
 		interfc.setInputTxt("2");
-		pressKey(Keyboard.ENTER);
+		TestRunner.pressKey(key_enter);
 		interfc.setInputTxt("3");
-		pressKey(Keyboard.ENTER);
+		TestRunner.pressKey(key_enter);
 		assertTrue(inputIsEmpty());
 		
 		// test previousHistory
-		pressKey(Keyboard.UP);
+		TestRunner.pressKey(key_up);
 		assertTrue(inputHasText("3"));
-		pressKey(Keyboard.UP);
+		TestRunner.pressKey(key_up);
 		assertTrue(inputHasText("2"));
-		pressKey(Keyboard.UP);
+		TestRunner.pressKey(key_up);
 		assertTrue(inputHasText("1"));
-		pressKey(Keyboard.UP);
+		TestRunner.pressKey(key_up);
 		assertTrue(inputHasText("1"));
 		// test nextHistory
-		pressKey(Keyboard.DOWN);
+		TestRunner.pressKey(key_down);
 		assertTrue(inputHasText("2"));
-		pressKey(Keyboard.DOWN);
+		TestRunner.pressKey(key_down);
 		assertTrue(inputHasText("3"));
-		pressKey(Keyboard.DOWN);
+		TestRunner.pressKey(key_down);
 		assertTrue(inputHasText("3"));
 		
-		pressKey(Keyboard.ENTER);
-		pressKey(Keyboard.UP);
-		pressKey(Keyboard.UP);
+		TestRunner.pressKey(key_enter);
+		TestRunner.pressKey(key_up);
+		TestRunner.pressKey(key_up);
 		assertTrue(inputHasText("3"));
 		
 	}
 	
 	@:access(pgr.dconsole.ui.DCOpenflInterface.txtConsole)
+	@:access(pgr.dconsole.ui.DCLuxeInterface.txtConsole)
 	public function testScroll() {
 		
 		// enter a lot of text.
@@ -197,13 +222,24 @@ class TestInput extends TestCase
 			console.log("...");
 		}
 		
-		var txtConsole:TextField = interfc.txtConsole;
+		#if openfl
+		var txtConsole:TextField = cast(interfc, pgr.dconsole.ui.DCOpenflInterface).txtConsole;
 		
 		assertTrue(txtConsole.scrollV == txtConsole.maxScrollV);
-		pressKey(Keyboard.PAGE_UP);
+		TestRunner.pressKey(key_pageup);
 		assertTrue(txtConsole.scrollV < txtConsole.maxScrollV);
-		pressKey(Keyboard.PAGE_DOWN);
+		TestRunner.pressKey(key_pagedown);
 		assertTrue(txtConsole.scrollV == txtConsole.maxScrollV);
+		
+		#elseif luxe
+		var txt = cast(interfc, pgr.dconsole.ui.DCLuxeInterface).txtConsole;
+		var startY = txt.pos.y;
+		
+		TestRunner.pressKey(key_pageup);
+		assertTrue(txt.pos.y > startY);
+		TestRunner.pressKey(key_pagedown);
+		assertEquals(txt.pos.y, startY);
+		#end
 		
 	}
 	
@@ -224,10 +260,6 @@ class TestInput extends TestCase
 	
 	private function inputIsEmpty():Bool {
 		return interfc.getInputTxt() == "";
-	}
-	
-	private function pressKey(key:UInt) {
-		interfc.stage.dispatchEvent(new KeyboardEvent(KeyboardEvent.KEY_UP, true, false, 0, key)); 
 	}
 	
 }

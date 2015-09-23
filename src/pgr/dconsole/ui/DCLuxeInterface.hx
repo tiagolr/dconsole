@@ -428,6 +428,12 @@ class DCLuxeInterface implements DCInterface
 		return txtConsole.text;
 	}
 	
+	public function getMonitorText() {
+		return {
+			col1:txtMonitorLeft.text, 
+			col2:txtMonitorRight.text, 
+		}
+	}
 	
 	public function clearInput() {
 		txtPrompt.text = "";

@@ -57,15 +57,13 @@ class DCEmtpyInterface implements DCInterface {
 	 */
 	public function inputRemoveLastChar() {}
 	
-	
 	public function getInputTxt():String { return "";  }
-	
 	
 	public function setInputTxt(string:String) { }
 	
-	
 	public function getConsoleText() { return ""; }
 	
+	public function getMonitorText() { return { col1:"", col2:"" } }
 	
 	public function clearInput() {}
 	

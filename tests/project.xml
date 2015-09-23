@@ -9,6 +9,6 @@
 	<haxelib name="mcover" />
 	<haxelib name="dconsole" />
 	
-	<haxeflag name="--macro" value="mcover.MCover.coverage([''], ['../src'], ['pgr.dconsole.input','pgr.dconsole.ui'])" />
+	<haxeflag name="--macro" value="mcover.MCover.coverage([''], ['../src'], ['pgr.dconsole.input.DCLuxeInput', 'pgr.dconsole.input.DCEmtpyInput', 'pgr.dconsole.ui.DCLuxeInterface', 'pgr.dconsole.ui.DCEmtpyInterface'])" />
 	
 </project>

@@ -1,13 +1,14 @@
 package;
+#if openfl 
 import flash.ui.Keyboard;
+#elseif luxe
+import luxe.Input.Key;
+#end
 import haxe.unit.TestCase;
-import flash.events.KeyboardEvent;
-import flash.Lib;
-import pgr.dconsole.DCCommands;
-import pgr.dconsole.ui.DCInterface;
 import pgr.dconsole.DC;
 import pgr.dconsole.DConsole;
 import pgr.dconsole.DCUtil;
+import pgr.dconsole.ui.DCInterface;
 
 /**
  * Tests console runtime commands.
@@ -29,9 +30,11 @@ class TestUtils extends TestCase
 			interfc = console.interfc;
 		}
 		
-		console.setConsoleKey(Keyboard.TAB);
-		console.setMonitorKey(Keyboard.TAB, true);
-		console.setProfilerKey(Keyboard.TAB, false, true);
+		var key = #if openfl Keyboard.TAB #elseif luxe Key.tab #end;
+		
+		console.setConsoleKey(key);
+		console.setMonitorKey(key, true);
+		console.setProfilerKey(key, false, true);
 		interfc.clearInput();
 		interfc.clearConsole();
 		console.enable();
