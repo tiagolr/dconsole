@@ -25,7 +25,7 @@ class DCProfiler {
 	/** Number of spaces between each display field (Elapsed, average, etc..) */
 	static public inline var NUM_SPACES:Int = 8;
 	
-	public var refreshRate(default, null):Int;
+	public var refreshRate(default, null):Int = 100;
 	public var visible(default, null):Bool;
 	public var samples:Array<PFSample>;
 	public var history:Array<SampleHistory>;
@@ -64,7 +64,6 @@ class DCProfiler {
 	@:allow(pgr.dconsole.DConsole)
 	function hide() {
 		visible = false;
-		stopTimer();
 	}
 		
 	
@@ -263,19 +262,21 @@ class DCProfiler {
 	}
 	
 	
-	function stopTimer() {
-		if (refreshTimer != null) {
-			refreshTimer.stop();
-			refreshTimer = null;
-		}
-	}
-	
 	function startTimer() {
-		if (refreshTimer != null) {
-			stopTimer();
+		if (!visible) {
+			return;
 		}
-		refreshTimer = new Timer(refreshRate);
-		refreshTimer.run = writeOutput;
+		
+		function onTimer() {
+			writeOutput();
+			startTimer();
+		}
+		
+		#if openfl
+		Timer.delay(onTimer, refreshRate);
+		#elseif luxe
+		Luxe.timer.schedule(refreshRate / 1000, onTimer);
+		#end
 	}
 	
 	function getTimeMS():Int {

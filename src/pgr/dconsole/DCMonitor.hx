@@ -15,7 +15,7 @@ class DCMonitor {
 
 	public var startTime(default, null):Int;
 	public var visible(default, null):Bool;
-	public var refreshRate(default, null):Int;
+	public var refreshRate(default, null):Int = 100;
 	public var fields:Array<MonitorField>;
 	
 	var refreshTimer:Timer;
@@ -33,15 +33,13 @@ class DCMonitor {
 	@:allow(pgr.dconsole.DConsole)
 	function show() {
 		visible = true;
-		stopTimer();
+		writeOutput();
 		startTimer();
-		writeOutput(); // renders first frame.
 	}
 
 	@:allow(pgr.dconsole.DConsole)
 	function hide() {
 		visible = false;
-		stopTimer();
 	}
 	
 	public function addField(object:Dynamic, fieldName:String, alias:String) {
@@ -56,7 +54,6 @@ class DCMonitor {
 	
 	public function setRefreshRate(refreshRate:Int = 100) {
 		this.refreshRate = refreshRate;
-		startTimer();
 	}
 	
 	public function writeOutput() {
@@ -69,21 +66,23 @@ class DCMonitor {
 		console.interfc.writeMonitorOutput(output);
 	}
 	
-	
-	
-	function stopTimer() {
-		if (refreshTimer != null) {
-			refreshTimer.stop();
-			refreshTimer = null;
-		}
-	}
-	
 	function startTimer() {
-		if (refreshTimer != null) {
-			stopTimer();
+		if (!this.visible) {
+			return;
 		}
-		refreshTimer = new Timer(refreshRate);
-		refreshTimer.run = writeOutput;
+		
+		function onTimer() {
+			writeOutput();
+			startTimer();
+		}
+		
+		#if openfl
+		Timer.delay(onTimer, refreshRate);
+		#elseif luxe
+		Luxe.timer.schedule(refreshRate / 1000, onTimer);
+		#end
 	}
+	
+	
 	
 }

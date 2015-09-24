@@ -32,7 +32,7 @@ class TestInput extends TestCase
 		if (console == null) {
 			DC.init();
 			console = DC.instance;
-			interfc = cast console.interfc;
+			interfc = console.interfc;
 			input = console.input;
 		}
 		
@@ -87,13 +87,13 @@ class TestInput extends TestCase
 	 * Tests disabled console behaviour to keystrokes.
 	 */
 	@:access(pgr.dconsole.ui.DCOpenflInterface.consoleDisplay)
-	@:access(pgr.dconsoel.ui.DCLuxeInterface.consoleDisplay)
+	@:access(pgr.dconsole.ui.DCLuxeInterface.consoleDisplay)
 	public function testDisable() {
 		
 		#if openfl 
 		var consoleDisplay = cast(interfc, pgr.dconsole.ui.DCOpenflInterface).consoleDisplay;
 		#elseif luxe
-		var consoleDisplay = untyped cast(interfc, pgr.dconsole.ui.DCLuxeInterface).consoleDisplay;
+		var consoleDisplay = cast(interfc, pgr.dconsole.ui.DCLuxeInterface).consoleDisplay;
 		#end
 		
 		console.disable();
