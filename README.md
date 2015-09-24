@@ -14,7 +14,7 @@
 **Latest Changes - 5.0.0**
 * Luxe support added
 
-<img src="http://i1148.photobucket.com/albums/o562/ProG4mr/dconsole_luxe_zpsba5adzfd.gif" alt="luxe" width="350"/>
+<img src="http://i1148.photobucket.com/albums/o562/ProG4mr/dconsole_luxe_zpsba5adzfd.gif" alt="luxe"/>
 
 For more changes or other versions, see [CHANGELOG](https://github.com/ProG4mr/dconsole/blob/master/CHANGELOG). <br/><br/>
 Currently supported targets:
