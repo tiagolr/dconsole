@@ -25,7 +25,7 @@ Currently supported targets:
 * Luxe - Windows
 
 ####Donsole-online
-You can try dconsole [on this repo github pages](http://prog4mr.github.io/dconsole/).
+You can try dconsole [on this repo github pages](http://tiagolr.github.io/dconsole/).
 ####Install
 ```
 haxelib install dconsole
