@@ -130,7 +130,7 @@ DConsole can also run on html5 / javascript using jquery-terminal to process inp
 	</script>
    ```
 
-Notes: dead code elimination must be off ```-dce no```, otherwise problems may occur. You can also refer to this repo github pages [github pages](http://prog4mr.github.io/dconsole/) to see how to use dconsole with html5.
+Notes: dead code elimination must be off ```-dce no```, otherwise problems may occur. You can also refer to this repo github pages [github pages](http://tiagolr.github.io/dconsole/) to see how to use dconsole with html5.
 
 ####Tips and Tricks <br/>
 
