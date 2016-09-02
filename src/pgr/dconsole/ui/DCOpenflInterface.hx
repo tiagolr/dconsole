@@ -13,6 +13,8 @@ import openfl.display.Stage;
 import openfl.events.Event;
 import pgr.dconsole.DCThemes.Theme;
 
+using pgr.dconsole.utils.TextFormatExt;
+
 /**
  * 
  * @author TiagoLr ( ~~~ProG4mr~~~ )
@@ -41,6 +43,8 @@ class DCOpenflInterface extends Sprite implements DCInterface
 	var promptDisplay:Sprite;
 	var txtConsole:TextField;
 	var txtPrompt:TextField;
+	var tmpFormat:TextFormat;
+	var consoleTextFormat:TextFormat;
 	
 	public function new(heightPt:Float, align:String) {
 		super();
@@ -51,6 +55,7 @@ class DCOpenflInterface extends Sprite implements DCInterface
 		
 		this.heightPt = heightPt;
 		yAlign = align;
+		tmpFormat = new TextFormat();
 	}
 	
 	public function init() {
@@ -313,10 +318,10 @@ class DCOpenflInterface extends Sprite implements DCInterface
 		}
 		
 		// Applies text formatting
-		var format:TextFormat = new TextFormat();
-		format.color = color;
+		consoleTextFormat.copyTo(tmpFormat);
+		tmpFormat.color = color;
 		var l = Std.string(data).length;
-		tf.setTextFormat(format, tf.text.length - l - 1, tf.text.length - 1);
+		tf.setTextFormat(tmpFormat, tf.text.length - l - 1, tf.text.length - 1);
 		scrollToBottom();
 	}
 	
@@ -358,7 +363,8 @@ class DCOpenflInterface extends Sprite implements DCInterface
 			font = "Consolas";
 		}
 		embed ? txtConsole.embedFonts = true : txtConsole.embedFonts = false;
-		txtConsole.defaultTextFormat = new TextFormat(font, size, DCThemes.current.CON_TXT_C, bold, italic, underline, '', '', TextFormatAlign.LEFT, margin, margin);
+		consoleTextFormat = new TextFormat(font, size, DCThemes.current.CON_TXT_C, bold, italic, underline, '', '', TextFormatAlign.LEFT, margin, margin); 
+		txtConsole.defaultTextFormat = consoleTextFormat;
 		// TODO - redraw console here?
 	}
 	
