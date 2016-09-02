@@ -1,0 +1,30 @@
+package pgr.dconsole.utils;
+import flash.text.TextFormat;
+
+/**
+ * ...
+ * @author T1mL3arn
+ */
+class TextFormatExt {
+
+	static public inline function copyTo(from:TextFormat, to:TextFormat) {
+		to.font = from.font;
+		to.size = from.size;
+		to.color = from.color;
+		to.bold = from.bold;
+		to.italic = from.italic;
+		to.underline = from.underline;
+		to.url = from.url;
+		to.target = from.target;
+		to.align = from.align;
+		to.leftMargin = from.leftMargin;
+		to.rightMargin = from.rightMargin;
+		to.indent = from.indent;
+		to.leading = from.leading;
+		to.blockIndent = from.blockIndent;
+		to.bullet = from.bullet;
+		to.kerning = from.kerning;
+		to.letterSpacing = from.letterSpacing;
+		to.tabStops = from.tabStops;
+	}
+}
