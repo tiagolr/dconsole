@@ -26,6 +26,7 @@ class KhaPromptCursor {
   public var p1: Vector2;
   public var visible = true;
   public var thickness = 8;
+
   public function new(color: Int, p0: Vector2, p1: Vector2) {
     this.color = color;
     this.p0 = p0;
@@ -33,28 +34,39 @@ class KhaPromptCursor {
   }
 }
 
-class KhaPromptText {
-  //Text options
-  public var text: String = "";
+class KhaText {
+  public var text: String = "test";
   public var visible: Bool = true;
-  var color: Int;
+  public var color: Int;
   public var font: Font;
-  var fontSize: Int;
-  var x: Float;
-  var y: Float;
-  /////////////
+  public var fontSize: Int;
+  public var x: Float;
+  public var y: Float;
 
+  public function new(color: Int, font: Font, fontSize: Int, x: Float, y: Float) {
+    this.color = color;
+    this.font = font;
+    this.fontSize = fontSize;
+    this.x = x;
+    this.y = y;
+  }
+
+  public function render(fb: Framebuffer) {
+    fb.g2.color = color;
+    fb.g2.font = font;
+    fb.g2.fontSize = fontSize;
+    fb.g2.drawString(text, x, y);
+  }
+}
+
+class KhaPromptText extends KhaText {
 	public var cursor: KhaPromptCursor;
 	var index(default, set):Int = 0;
 	var console:DConsole;
 
 	public function new(color: Int, font: Font, fontSize: Int, x: Float, y: Float,
     console:DConsole, cursor: KhaPromptCursor) {
-    this.color = color;
-    this.font = font;
-    this.fontSize = fontSize;
-    this.x = x;
-    this.y = y;
+    super(color, font, fontSize, x, y);
 
     this.console = console;
     this.cursor = cursor;
@@ -100,7 +112,6 @@ class KhaPromptText {
 	inline function set_index(i:Int) {
 		index = Std.int(Math.min(text.length, Math.max(0, i)));
 
-
     //update cursor position
     var width = font.width(fontSize, text.substr(0, index));
 		if (width == 0) {
@@ -112,13 +123,8 @@ class KhaPromptText {
 		return index;
 	}
 
-  public function render(fb: Framebuffer) {
-    if (font != null) {
-      fb.g2.color = color;
-      fb.g2.font = font;
-      fb.g2.fontSize = fontSize;
-      fb.g2.drawString(text, x, y);
-    }
+  public override function render(fb: Framebuffer) {
+    super.render(fb);
     if (cursor.visible == true) {
       fb.g2.color = cursor.color;
       fb.g2.drawLine(cursor.p0.x, cursor.p0.y, cursor.p1.x, cursor.p1.y, cursor.thickness);
@@ -144,6 +150,7 @@ class DCKhaInterface implements DCInterface {
   var consoleDisplay:Sprite;
   var promptDisplay: Sprite;
 
+  var txtConsole: KhaText;
   var txtPrompt: KhaPromptText;
   var promptCursor: KhaPromptCursor;
 
@@ -161,9 +168,13 @@ class DCKhaInterface implements DCInterface {
   }
 
   public function init() {
-		createConsoleDisplay();
-    System.notifyOnFrames(function (framebuffers) { render(framebuffers[0]); });
-    Assets.loadFont("Consolas", function(font:Font) {txtPrompt.font = font;});
+    createConsoleDisplay();
+    Assets.loadFont("Consolas", function(font:Font) {
+      this.font = font;
+      txtPrompt.font = font;
+      txtConsole.font = font;
+      System.notifyOnFrames(function (framebuffers) { render(framebuffers[0]); });
+    });
   }
 
   function createImageBytes(color: Color, width: Int, height: Int): Bytes {
@@ -214,6 +225,11 @@ class DCKhaInterface implements DCInterface {
       new Vector2(0, System.windowHeight() - PROMPT_HEIGHT));
     //////////////
 
+    //TODO: multiline?
+    txtConsole = new KhaText(
+      (Std.int(DCThemes.current.CON_TXT_A * 255) << 24) | DCThemes.current.PRM_TXT_C,
+      font, fontSize, consoleDisplay.x, consoleDisplay.y + 3);
+
     promptCursor = new KhaPromptCursor(
       (255 << 24) | DCThemes.current.PRM_TXT_C,
       new Vector2(1, System.windowHeight() - PROMPT_HEIGHT + 3),
@@ -227,18 +243,28 @@ class DCKhaInterface implements DCInterface {
 
   public function render(fb: Framebuffer): Void {
     fb.g2.begin(false);
-    consoleDisplay.render(fb.g2);
-    promptDisplay.render(fb.g2);
-    txtPrompt.render(fb);
+    if (consoleDisplay.visible == true) consoleDisplay.render(fb.g2);
+    if (txtConsole.visible == true) txtConsole.render(fb);
+    if (promptDisplay.visible == true) promptDisplay.render(fb.g2);
+    if (txtPrompt.visible == true) txtPrompt.render(fb);
     fb.g2.end();
   }
 
+  public function showConsole() {
+		consoleDisplay.visible = true;
+		txtConsole.visible = true;
+		promptDisplay.visible = true;
+		txtPrompt.visible = true;
+		promptCursor.visible = true;
+	}
 
-
-
-  public function showConsole() : Void {}
-
-  public function hideConsole() : Void {}
+	public function hideConsole() {
+		consoleDisplay.visible = false;
+		txtConsole.visible = false;
+		promptDisplay.visible = false;
+		txtPrompt.visible = false;
+		promptCursor.visible = false;
+	}
 
   public function writeMonitorOutput(output:Array<String>) : Void {}
 
@@ -255,7 +281,17 @@ class DCKhaInterface implements DCInterface {
   //---------------------------------------------------------------------------------
   //  PUBLIC METHODS
   //---------------------------------------------------------------------------------
-  public function log(data:Dynamic, color:Int) : Void {trace(Std.string(data));}
+  public function log(data:Dynamic, color:Int) : Void {
+    var str:String = txtConsole.text + Std.string(data) + '\n';
+
+    if (str.length > 2000) {
+      str = str.substr(str.length - 2000);
+    }
+
+    txtConsole.text = str;
+    //TODO:
+    // scrollToBottom();
+  }
 
   public function moveCarretToEnd() {
 		txtPrompt.moveCarretToEnd();
