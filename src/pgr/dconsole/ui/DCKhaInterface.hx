@@ -167,6 +167,8 @@ class DCKhaInterface implements DCInterface {
   var align:String;
   var heightPt:Float; // percentage height
 
+  var consoleHeight: Int;
+
   var consoleDisplay:Sprite;
   var promptDisplay: Sprite;
 
@@ -183,6 +185,9 @@ class DCKhaInterface implements DCInterface {
   var txtMonitorLeft: KhaText;
   var txtMonitorRight: KhaText;
 
+  var profilerDisplay: Sprite;
+  var txtProfiler: KhaText;
+
   public function new(heightPt: Float, align:String) {
     if (heightPt <= 0 || heightPt > 100) heightPt = 100; // clamp to >0..1
     if (heightPt > 1) heightPt = Std.int(heightPt) / 100; // turn >0..100 into percentage from 1..0
@@ -194,6 +199,8 @@ class DCKhaInterface implements DCInterface {
   public function init() {
     createConsoleDisplay();
     createMonitorDisplay();
+    createProfilerDisplay();
+
     Assets.loadFont("Consolas", function(font:Font) {
       this.font = font;
       //TODO:
@@ -201,6 +208,7 @@ class DCKhaInterface implements DCInterface {
       txtConsole.font = font;
       txtMonitorLeft.font = font;
       txtMonitorRight.font = font;
+      txtProfiler.font = font;
       System.notifyOnFrames(function (framebuffers) { render(framebuffers[0]); });
     });
   }
@@ -224,7 +232,7 @@ class DCKhaInterface implements DCInterface {
 
   function createConsoleDisplay() {
     //consoleDisplay
-    var consoleHeight = Std.int(System.windowHeight() * heightPt) - PROMPT_HEIGHT;
+    consoleHeight = Std.int(System.windowHeight() * heightPt) - PROMPT_HEIGHT;
 
     var color = Color.fromValue(packColorBytes(DCThemes.current.CON_C, DCThemes.current.CON_A));
     var bytes = createImageBytes(color, System.windowWidth(), consoleHeight);
@@ -277,8 +285,8 @@ class DCKhaInterface implements DCInterface {
 
   function createMonitorDisplay() {
     var color = Color.fromValue(packColorBytes(DCThemes.current.MON_C, DCThemes.current.MON_A));
-    var bytes = createImageBytes(color, System.windowWidth(), System.windowHeight());
-    var image = Image.fromBytes(bytes, System.windowWidth(), System.windowHeight());
+    var bytes = createImageBytes(color, System.windowWidth(), System.windowHeight() - consoleHeight - PROMPT_HEIGHT);
+    var image = Image.fromBytes(bytes, System.windowWidth(), System.windowHeight() - consoleHeight - PROMPT_HEIGHT);
 
     monitorDisplay = new Sprite(image);
     monitorDisplay.setPosition(new Vector2(0, 0));
@@ -287,12 +295,12 @@ class DCKhaInterface implements DCInterface {
     txtMonitorLeft = new KhaText(
       packColorBytes(DCThemes.current.MON_TXT_C, DCThemes.current.MON_TXT_A),
       font, fontSize, monitorDisplay.x, monitorDisplay.y + 3,
-      Math.ceil(System.windowHeight() / fontSize));
+      Math.ceil((System.windowHeight() - consoleHeight - PROMPT_HEIGHT) / fontSize));
 
     txtMonitorRight = new KhaText(
       packColorBytes(DCThemes.current.MON_TXT_C, DCThemes.current.MON_TXT_A),
       font, fontSize, System.windowWidth() / 2, monitorDisplay.y + 3,
-      Math.ceil(System.windowHeight() / fontSize));
+      Math.ceil((System.windowHeight() - consoleHeight - PROMPT_HEIGHT) / fontSize));
 
   }
 
@@ -328,11 +336,35 @@ class DCKhaInterface implements DCInterface {
 		txtMonitorRight.visible = false;
 	}
 
-  public function writeProfilerOutput(output:String) : Void {}
+  function createProfilerDisplay() {
+    var color = Color.fromValue(packColorBytes(DCThemes.current.MON_C, DCThemes.current.MON_A));
+    var bytes = createImageBytes(color, System.windowWidth(), System.windowHeight() - consoleHeight - PROMPT_HEIGHT);
+    var image = Image.fromBytes(bytes, System.windowWidth(), System.windowHeight() - consoleHeight - PROMPT_HEIGHT);
 
-  public function showProfiler() : Void {}
+    profilerDisplay = new Sprite(image);
+    profilerDisplay.setPosition(new Vector2(0, 0));
 
-  public function hideProfiler() : Void {}
+    txtProfiler = new KhaText(
+      packColorBytes(DCThemes.current.MON_TXT_C, DCThemes.current.MON_TXT_A),
+      font, fontSize, profilerDisplay.x, profilerDisplay.y + 3,
+      Math.ceil((System.windowHeight() - consoleHeight - PROMPT_HEIGHT) / fontSize));
+  }
+
+
+  public function writeProfilerOutput(output:String) {
+    txtProfiler.text = "DC Profiler\n\n";
+    txtProfiler.text += output;
+  }
+
+  public function showProfiler() {
+    profilerDisplay.visible = true;
+    txtProfiler.visible = true;
+  }
+
+  public function hideProfiler() {
+    profilerDisplay.visible = false;
+    txtProfiler.visible = false;
+  }
 
   public function render(fb: Framebuffer): Void {
     fb.g2.begin(false);
@@ -342,8 +374,12 @@ class DCKhaInterface implements DCInterface {
     if (txtPrompt.visible == true) txtPrompt.render(fb);
 
     if (monitorDisplay.visible == true) monitorDisplay.render(fb.g2);
+    //TODO: rendering these seems to further dim the display
     if (txtMonitorLeft.visible == true) txtMonitorLeft.render(fb);
     if (txtMonitorRight.visible == true) txtMonitorRight.render(fb);
+
+    if (profilerDisplay.visible == true) profilerDisplay.render(fb.g2);
+    if (txtProfiler.visible == true) txtProfiler.render(fb);
 
     fb.g2.end();
   }
