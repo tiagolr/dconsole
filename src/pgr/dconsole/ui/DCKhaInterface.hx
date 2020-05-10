@@ -1,4 +1,4 @@
-#if kha_debug_html5
+#if kha
 package pgr.dconsole.ui;
 
 import Std;
@@ -25,7 +25,7 @@ class KhaPromptCursor {
   public var p0: Vector2;
   public var p1: Vector2;
   public var visible = true;
-  public var thickness = 8;
+  public var thickness = 2;
 
   public function new(color: Int, p0: Vector2, p1: Vector2) {
     this.color = color;
@@ -35,27 +35,52 @@ class KhaPromptCursor {
 }
 
 class KhaText {
-  public var text: String = "test";
+  public var text: String = "";
   public var visible: Bool = true;
   public var color: Int;
   public var font: Font;
   public var fontSize: Int;
   public var x: Float;
   public var y: Float;
+  public var maxLines:Int;
+  public var startFromLine = 0;
 
-  public function new(color: Int, font: Font, fontSize: Int, x: Float, y: Float) {
+  public function new(color: Int, font: Font, fontSize: Int, x: Float, y: Float, maxLines: Int=1) {
     this.color = color;
     this.font = font;
     this.fontSize = fontSize;
     this.x = x;
     this.y = y;
+    this.maxLines = maxLines;
   }
 
   public function render(fb: Framebuffer) {
     fb.g2.color = color;
     fb.g2.font = font;
     fb.g2.fontSize = fontSize;
-    fb.g2.drawString(text, x, y);
+    var lines = getLines();
+    for (i in startFromLine...Std.int(Math.min(lines.length, startFromLine + maxLines))) {
+      fb.g2.drawString(lines[i], x, y + fontSize * (i - startFromLine));
+    }
+  }
+
+  function getLines(): Array<String> {
+    return text.split("\n");
+  }
+
+  public function scrollToBottom() {
+    var totalLines = getLines().length;
+    if (totalLines > maxLines) {
+      startFromLine = totalLines - maxLines;
+    }
+  }
+
+  public function scrollUp() {
+    startFromLine = Std.int(Math.max(0, startFromLine - 1));
+  }
+
+  public function scrollDown() {
+    startFromLine = Std.int(Math.min(startFromLine + 1, getLines().length - maxLines));
   }
 }
 
@@ -71,11 +96,12 @@ class KhaPromptText extends KhaText {
     this.console = console;
     this.cursor = cursor;
 
-    if (Keyboard.get() != null) Keyboard.get().notify(onKeyDown, null, pressListener);
+    if (Keyboard.get() != null) Keyboard.get().notify(onKeyDown, null, onTextInput);
     Scheduler.addTimeTask(blinkCursor, 0, .5);
+
   }
 
-  public function pressListener(char: String) {
+  public function onTextInput(char: String) {
     if (this.visible == false) {
       return;
     }
@@ -98,9 +124,6 @@ class KhaPromptText extends KhaText {
     index--;
         case KeyCode.Right:
     index++;
-      //TODO: move to KhaInput
-        case KeyCode.Return:
-          console.commands.evaluate(text);
         default: return;
     }
   }
@@ -171,6 +194,7 @@ class DCKhaInterface implements DCInterface {
     createConsoleDisplay();
     Assets.loadFont("Consolas", function(font:Font) {
       this.font = font;
+      //TODO:
       txtPrompt.font = font;
       txtConsole.font = font;
       System.notifyOnFrames(function (framebuffers) { render(framebuffers[0]); });
@@ -198,10 +222,12 @@ class DCKhaInterface implements DCInterface {
     var bytes = createImageBytes(color, System.windowWidth(),
       Std.int(System.windowHeight() * heightPt) - PROMPT_HEIGHT);
 
+
+    var consoleHeight = Std.int(System.windowHeight() * heightPt) - PROMPT_HEIGHT;
     var image = Image.fromBytes(
       bytes,
       System.windowWidth(),
-      Std.int(System.windowHeight() * heightPt) - PROMPT_HEIGHT);
+      consoleHeight);
 
     consoleDisplay = new Sprite(image);
 
@@ -228,7 +254,8 @@ class DCKhaInterface implements DCInterface {
     //TODO: multiline?
     txtConsole = new KhaText(
       (Std.int(DCThemes.current.CON_TXT_A * 255) << 24) | DCThemes.current.PRM_TXT_C,
-      font, fontSize, consoleDisplay.x, consoleDisplay.y + 3);
+      font, fontSize, consoleDisplay.x, consoleDisplay.y + 3,
+      Math.ceil(consoleHeight / fontSize));
 
     promptCursor = new KhaPromptCursor(
       (255 << 24) | DCThemes.current.PRM_TXT_C,
@@ -239,7 +266,6 @@ class DCKhaInterface implements DCInterface {
     txtPrompt = new KhaPromptText((255 << 24) | DCThemes.current.PRM_TXT_C,
       font, fontSize, promptDisplay.x, promptDisplay.y + 3, console, promptCursor);
   }
-
 
   public function render(fb: Framebuffer): Void {
     fb.g2.begin(false);
@@ -289,17 +315,20 @@ class DCKhaInterface implements DCInterface {
     }
 
     txtConsole.text = str;
-    //TODO:
-    // scrollToBottom();
+    txtConsole.scrollToBottom();
   }
 
   public function moveCarretToEnd() {
 		txtPrompt.moveCarretToEnd();
 	}
 
-  public function scrollConsoleUp() : Void {}
+  public function scrollConsoleUp() : Void {
+    txtConsole.scrollUp();
+  }
 
-  public function scrollConsoleDown() : Void {}
+  public function scrollConsoleDown() : Void {
+    txtConsole.scrollDown();
+  }
 
   /**
    * Brings this display object to the front of display list.

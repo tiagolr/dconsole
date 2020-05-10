@@ -13,7 +13,7 @@ import pgr.dconsole.ui.DCEmtpyInterface;
 #if openfl
 import pgr.dconsole.ui.DCOpenflInterface;
 import pgr.dconsole.input.DCOpenflInput;
-#elseif kha_debug_html5
+#elseif kha
 import pgr.dconsole.ui.DCKhaInterface;
 import pgr.dconsole.input.DCKhaInput;
 #end

@@ -1,4 +1,4 @@
-#if kha_debug_html5
+#if kha
 package pgr.dconsole.input;
 
 import kha.input.Keyboard;

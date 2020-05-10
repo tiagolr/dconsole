@@ -11,7 +11,7 @@ import pgr.dconsole.ui.DCOpenflInterface;
 import pgr.dconsole.input.DCLuxeInput;
 import pgr.dconsole.ui.DCLuxeInterface;
 #end
-#if kha_debug_html5
+#if kha
 import pgr.dconsole.input.DCKhaInput;
 import pgr.dconsole.ui.DCKhaInterface;
 #end
@@ -50,7 +50,7 @@ class DC
 			input = new DCOpenflInput();
 			#elseif luxe
 			input = new DCLuxeInput();
-			#elseif kha_debug_html5
+			#elseif kha
 			input = new DCKhaInput();
 			#else
 			input = new DCEmptyInput();
@@ -65,7 +65,7 @@ class DC
 			Luxe.next(function() {
 				DC.registerClass(luxe.Vector, 'Vector');
 			});
-			#elseif kha_debug_html5
+			#elseif kha
 			interfc = new DCKhaInterface(heightPt, align);
 			#else
 			interfc = new DCEmtpyInterface();
