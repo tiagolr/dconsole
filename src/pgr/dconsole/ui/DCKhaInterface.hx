@@ -19,21 +19,6 @@ using kha.graphics2.GraphicsExtension;
 
 import kha2d.Sprite;
 
-
-class KhaPromptCursor {
-  public var color: Int;
-  public var p0: Vector2;
-  public var p1: Vector2;
-  public var visible = true;
-  public var thickness = 2;
-
-  public function new(color: Int, p0: Vector2, p1: Vector2) {
-    this.color = color;
-    this.p0 = p0;
-    this.p1 = p1;
-  }
-}
-
 class KhaText {
   public var text: String = "";
   public var visible: Bool = true;
@@ -81,6 +66,20 @@ class KhaText {
 
   public function scrollDown() {
     startFromLine = Std.int(Math.min(startFromLine + 1, getLines().length - maxLines));
+  }
+}
+
+class KhaPromptCursor {
+  public var color: Int;
+  public var p0: Vector2;
+  public var p1: Vector2;
+  public var visible = true;
+  public var thickness = 1;
+
+  public function new(color: Int, p0: Vector2, p1: Vector2) {
+    this.color = color;
+    this.p0 = p0;
+    this.p1 = p1;
   }
 }
 
@@ -162,8 +161,6 @@ class KhaPromptText extends KhaText {
   }
 }
 
-
-
 class DCKhaInterface implements DCInterface {
   public var console:DConsole;
 
@@ -182,6 +179,10 @@ class DCKhaInterface implements DCInterface {
 
   var PROMPT_HEIGHT = 20;
 
+  var monitorDisplay: Sprite;
+  var txtMonitorLeft: KhaText;
+  var txtMonitorRight: KhaText;
+
   public function new(heightPt: Float, align:String) {
     if (heightPt <= 0 || heightPt > 100) heightPt = 100; // clamp to >0..1
     if (heightPt > 1) heightPt = Std.int(heightPt) / 100; // turn >0..100 into percentage from 1..0
@@ -192,13 +193,20 @@ class DCKhaInterface implements DCInterface {
 
   public function init() {
     createConsoleDisplay();
+    createMonitorDisplay();
     Assets.loadFont("Consolas", function(font:Font) {
       this.font = font;
       //TODO:
       txtPrompt.font = font;
       txtConsole.font = font;
+      txtMonitorLeft.font = font;
+      txtMonitorRight.font = font;
       System.notifyOnFrames(function (framebuffers) { render(framebuffers[0]); });
     });
+  }
+
+  function packColorBytes(color: Int, alpha: Float = 1.): Int {
+    return (Std.int(alpha * 255) << 24) | color;
   }
 
   function createImageBytes(color: Color, width: Int, height: Int): Bytes {
@@ -216,64 +224,39 @@ class DCKhaInterface implements DCInterface {
 
   function createConsoleDisplay() {
     //consoleDisplay
-    var color = Color.fromValue(
-      (Std.int(DCThemes.current.CON_A * 255) << 24) | DCThemes.current.CON_C);
-
-    var bytes = createImageBytes(color, System.windowWidth(),
-      Std.int(System.windowHeight() * heightPt) - PROMPT_HEIGHT);
-
-
     var consoleHeight = Std.int(System.windowHeight() * heightPt) - PROMPT_HEIGHT;
-    var image = Image.fromBytes(
-      bytes,
-      System.windowWidth(),
-      consoleHeight);
+
+    var color = Color.fromValue(packColorBytes(DCThemes.current.CON_C, DCThemes.current.CON_A));
+    var bytes = createImageBytes(color, System.windowWidth(), consoleHeight);
+    var image = Image.fromBytes(bytes, System.windowWidth(), consoleHeight);
 
     consoleDisplay = new Sprite(image);
-
-    consoleDisplay.setPosition(
-      new Vector2(0, System.windowHeight() - Std.int(System.windowHeight() * heightPt)));
+    consoleDisplay.setPosition(new Vector2(0, System.windowHeight() * (1 - heightPt)));
     //////////////
 
     //promptDisplay
-    var color = Color.fromValue((255 << 24) | DCThemes.current.PRM_C);
-
+    var color = Color.fromValue(packColorBytes(DCThemes.current.PRM_C));
     var bytes = createImageBytes(color, System.windowWidth(), PROMPT_HEIGHT);
-
-    var image = Image.fromBytes(
-      bytes,
-      System.windowWidth(),
-      PROMPT_HEIGHT);
+    var image = Image.fromBytes(bytes, System.windowWidth(), PROMPT_HEIGHT);
 
     promptDisplay = new Sprite(image);
-
-    promptDisplay.setPosition(
-      new Vector2(0, System.windowHeight() - PROMPT_HEIGHT));
+    promptDisplay.setPosition(new Vector2(0, System.windowHeight() - PROMPT_HEIGHT));
     //////////////
 
-    //TODO: multiline?
     txtConsole = new KhaText(
-      (Std.int(DCThemes.current.CON_TXT_A * 255) << 24) | DCThemes.current.PRM_TXT_C,
-      font, fontSize, consoleDisplay.x, consoleDisplay.y + 3,
-      Math.ceil(consoleHeight / fontSize));
+      packColorBytes(DCThemes.current.PRM_TXT_C, DCThemes.current.CON_TXT_A),
+      font, fontSize, consoleDisplay.x, consoleDisplay.y + 3, Math.ceil(consoleHeight / fontSize));
 
     promptCursor = new KhaPromptCursor(
-      (255 << 24) | DCThemes.current.PRM_TXT_C,
+      packColorBytes(DCThemes.current.PRM_TXT_C),
       new Vector2(1, System.windowHeight() - PROMPT_HEIGHT + 3),
       new Vector2(1, System.windowHeight() - PROMPT_HEIGHT + 3 + fontSize));
 
     //TODO: align
-    txtPrompt = new KhaPromptText((255 << 24) | DCThemes.current.PRM_TXT_C,
-      font, fontSize, promptDisplay.x, promptDisplay.y + 3, console, promptCursor);
-  }
-
-  public function render(fb: Framebuffer): Void {
-    fb.g2.begin(false);
-    if (consoleDisplay.visible == true) consoleDisplay.render(fb.g2);
-    if (txtConsole.visible == true) txtConsole.render(fb);
-    if (promptDisplay.visible == true) promptDisplay.render(fb.g2);
-    if (txtPrompt.visible == true) txtPrompt.render(fb);
-    fb.g2.end();
+    txtPrompt = new KhaPromptText(
+      packColorBytes(DCThemes.current.PRM_TXT_C),
+      font, fontSize, promptDisplay.x, promptDisplay.y + 3,
+      console, promptCursor);
   }
 
   public function showConsole() {
@@ -292,17 +275,78 @@ class DCKhaInterface implements DCInterface {
 		promptCursor.visible = false;
 	}
 
-  public function writeMonitorOutput(output:Array<String>) : Void {}
+  function createMonitorDisplay() {
+    var color = Color.fromValue(packColorBytes(DCThemes.current.MON_C, DCThemes.current.MON_A));
+    var bytes = createImageBytes(color, System.windowWidth(), System.windowHeight());
+    var image = Image.fromBytes(bytes, System.windowWidth(), System.windowHeight());
 
-  public function showMonitor() : Void {}
+    monitorDisplay = new Sprite(image);
+    monitorDisplay.setPosition(new Vector2(0, 0));
 
-  public function hideMonitor() : Void {}
+    //TODO: maxWidth
+    txtMonitorLeft = new KhaText(
+      packColorBytes(DCThemes.current.MON_TXT_C, DCThemes.current.MON_TXT_A),
+      font, fontSize, monitorDisplay.x, monitorDisplay.y + 3,
+      Math.ceil(System.windowHeight() / fontSize));
+
+    txtMonitorRight = new KhaText(
+      packColorBytes(DCThemes.current.MON_TXT_C, DCThemes.current.MON_TXT_A),
+      font, fontSize, System.windowWidth() / 2, monitorDisplay.y + 3,
+      Math.ceil(System.windowHeight() / fontSize));
+
+  }
+
+  // Splits output into left and right monitor text fields
+	public function writeMonitorOutput(output:Array<String>) {
+		txtMonitorLeft.text = "";
+		txtMonitorRight.text = "";
+
+		txtMonitorLeft.text += "DC Monitor\n\n";
+		txtMonitorRight.text += "\n\n";
+
+		var i = 0;
+		while (output.length > 0) {
+
+			if (i % 2 == 0) {
+				txtMonitorLeft.text += output.shift();
+			} else {
+				txtMonitorRight.text += output.shift();
+			}
+			i++;
+		}
+	}
+
+  public function showMonitor() {
+		monitorDisplay.visible = true;
+		txtMonitorLeft.visible = true;
+		txtMonitorRight.visible = true;
+	}
+
+	public function hideMonitor() {
+		monitorDisplay.visible = false;
+		txtMonitorLeft.visible = false;
+		txtMonitorRight.visible = false;
+	}
 
   public function writeProfilerOutput(output:String) : Void {}
 
   public function showProfiler() : Void {}
 
   public function hideProfiler() : Void {}
+
+  public function render(fb: Framebuffer): Void {
+    fb.g2.begin(false);
+    if (consoleDisplay.visible == true) consoleDisplay.render(fb.g2);
+    if (txtConsole.visible == true) txtConsole.render(fb);
+    if (promptDisplay.visible == true) promptDisplay.render(fb.g2);
+    if (txtPrompt.visible == true) txtPrompt.render(fb);
+
+    if (monitorDisplay.visible == true) monitorDisplay.render(fb.g2);
+    if (txtMonitorLeft.visible == true) txtMonitorLeft.render(fb);
+    if (txtMonitorRight.visible == true) txtMonitorRight.render(fb);
+
+    fb.g2.end();
+  }
 
   //---------------------------------------------------------------------------------
   //  PUBLIC METHODS
@@ -335,13 +379,21 @@ class DCKhaInterface implements DCInterface {
    */
   public function toFront() : Void {}
 
-  public function setConsoleFont(font:String = null, embed:Bool = false, size:Int = 14, bold:Bool = false, italic:Bool = false, underline:Bool = false ) : Void {}
+  public function setConsoleFont(font:String = null, embed:Bool = false, size:Int = 14, bold:Bool = false, italic:Bool = false, underline:Bool = false ) : Void {
+    //TODO:
+  }
 
-  public function setPromptFont(font:String = null, embed:Bool = false, size:Int = 16, bold:Bool = false, ?italic:Bool = false, underline:Bool = false ) : Void {}
+  public function setPromptFont(font:String = null, embed:Bool = false, size:Int = 16, bold:Bool = false, ?italic:Bool = false, underline:Bool = false ) : Void {
+    //TODO:
+  }
 
-  public function setProfilerFont(font:String = null, embed:Bool = false, size:Int = 14, bold:Bool = false, ?italic:Bool = false, underline:Bool = false ) : Void {}
+  public function setProfilerFont(font:String = null, embed:Bool = false, size:Int = 14, bold:Bool = false, ?italic:Bool = false, underline:Bool = false ) : Void {
+    // TODO:
+  }
 
-  public function setMonitorFont(font:String = null, embed:Bool = false, size:Int = 14, bold:Bool = false, ?italic:Bool = false, underline:Bool = false ) : Void {}
+  public function setMonitorFont(font:String = null, embed:Bool = false, size:Int = 14, bold:Bool = false, ?italic:Bool = false, underline:Bool = false ) : Void {
+    //TODO:
+  }
 
   /**
    * Removes last input char
@@ -364,17 +416,24 @@ class DCKhaInterface implements DCInterface {
  		txtPrompt.moveCarretToEnd();
  	}
 
-  public function getConsoleText() : String {return null;}
-
-  public function getMonitorText() : { col1:String, col2:String } {
-    return null;
+  public function getConsoleText() : String {
+    return txtConsole.text;
   }
+
+  public function getMonitorText() {
+		return {
+			col1:txtMonitorLeft.text,
+			col2:txtMonitorRight.text,
+		}
+	}
 
   public function clearInput() {
 		txtPrompt.text = "";
 		txtPrompt.moveCarretToEnd();
 	}
 
-  public function clearConsole() : Void {}
+  public function clearConsole() : Void {
+    txtConsole.text = "";
+  }
 }
 #end

@@ -1,5 +1,8 @@
 package pgr.dconsole;
 import haxe.Timer;
+#if kha
+import kha.Scheduler;
+#end
 
 typedef MonitorField = {
 	object:Dynamic,
@@ -41,48 +44,52 @@ class DCMonitor {
 	function hide() {
 		visible = false;
 	}
-	
+
 	public function addField(object:Dynamic, fieldName:String, alias:String) {
 		var mfield:MonitorField = { object:object, field:fieldName, alias:alias };
 		fields.push(mfield);
 	}
-	
+
 	public function clear() {
 		fields = new Array<MonitorField>();
 	}
-	
-	
+
+
 	public function setRefreshRate(refreshRate:Int = 100) {
 		this.refreshRate = refreshRate;
 	}
-	
+
 	public function writeOutput() {
 		var output = new Array<String>();
-		
+
 		for (v in fields) {
 			output.push(v.alias + ': ' + Reflect.getProperty(v.object, v.field) + '\n');
 		}
-		
+
 		console.interfc.writeMonitorOutput(output);
 	}
-	
+
 	function startTimer() {
 		if (!this.visible) {
 			return;
 		}
-		
+
 		function onTimer() {
 			writeOutput();
+			#if !kha
 			startTimer();
+			#end
 		}
-		
+
 		#if openfl
 		Timer.delay(onTimer, refreshRate);
 		#elseif luxe
 		Luxe.timer.schedule(refreshRate / 1000, onTimer);
+		#elseif kha
+		Scheduler.addTimeTask(onTimer, 0, 1 / refreshRate);
 		#end
 	}
-	
-	
-	
+
+
+
 }
