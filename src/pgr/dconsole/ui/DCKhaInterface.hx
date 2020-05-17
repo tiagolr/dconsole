@@ -273,6 +273,13 @@ class DCKhaInterface implements DCInterface {
 		promptDisplay.visible = true;
 		txtPrompt.visible = true;
 		promptCursor.visible = true;
+
+    monitorDisplay.height = System.windowHeight() - consoleHeight - PROMPT_HEIGHT;
+    txtMonitorLeft.maxLines = Math.ceil(monitorDisplay.height / fontSize);
+    txtMonitorRight.maxLines = Math.ceil(monitorDisplay.height / fontSize);
+
+    profilerDisplay.height = System.windowHeight() - consoleHeight - PROMPT_HEIGHT;
+    txtProfiler.maxLines = Math.ceil(profilerDisplay.height / fontSize);
 	}
 
 	public function hideConsole() {
@@ -281,6 +288,13 @@ class DCKhaInterface implements DCInterface {
 		promptDisplay.visible = false;
 		txtPrompt.visible = false;
 		promptCursor.visible = false;
+
+    monitorDisplay.height = System.windowHeight();
+    txtMonitorLeft.maxLines = Math.ceil(monitorDisplay.height / fontSize);
+    txtMonitorRight.maxLines = Math.ceil(monitorDisplay.height / fontSize);
+
+    profilerDisplay.height = System.windowHeight();
+    txtProfiler.maxLines = Math.ceil(profilerDisplay.height / fontSize);
 	}
 
   function createMonitorDisplay() {
