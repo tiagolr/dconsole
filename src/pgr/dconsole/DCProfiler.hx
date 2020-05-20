@@ -2,12 +2,15 @@ package pgr.dconsole;
 import haxe.Timer;
 import pgr.dconsole.DCProfiler.PFSample;
 import pgr.dconsole.DCProfiler.SampleHistory;
+#if kha
+import kha.Scheduler;
+#end
 
 typedef PFSample = {
-	name:String,			
+	name:String,
 	startTime:Int,
 	elapsed:Int,
-	instances:Int, 		// number of begin() 
+	instances:Int, 		// number of begin()
 	openInstances:Int, 	// number of begin() without end()
 	numParents:Int, 	// number of parents
 	parentName:String,
@@ -260,32 +263,36 @@ class DCProfiler {
 		}
 		return null;
 	}
-	
-	
+
+
 	function startTimer() {
 		if (!visible) {
 			return;
 		}
-		
+
 		function onTimer() {
 			writeOutput();
+			#if !kha
 			startTimer();
+			#end
 		}
-		
+
 		#if openfl
 		Timer.delay(onTimer, refreshRate);
 		#elseif luxe
 		Luxe.timer.schedule(refreshRate / 1000, onTimer);
+		#elseif kha
+		Scheduler.addTimeTask(onTimer, 0, 1 / refreshRate);
 		#end
 	}
-	
+
 	function getTimeMS():Int {
 		return Std.int(Timer.stamp() * 1000);
 	}
 }
 
 class SampleHistory {
-	
+
 	public var name:String = "";
 	public var elapsed:Int = 0;
 	public var totalElapsed:Int = 0;

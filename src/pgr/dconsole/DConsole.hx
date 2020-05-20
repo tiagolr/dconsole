@@ -14,6 +14,10 @@ import pgr.dconsole.ui.DCEmtpyInterface;
 import pgr.dconsole.ui.DCOpenflInterface;
 import pgr.dconsole.input.DCOpenflInput;
 #end
+#if kha
+import pgr.dconsole.ui.DCKhaInterface;
+import pgr.dconsole.input.DCKhaInput;
+#end
 
 typedef SCKey = {
 	altKey:Bool,
@@ -25,9 +29,9 @@ typedef SCKey = {
 /**
  * DConsole is the main class of this lib, it should be instantiated only once
  * and then use its instance to control the console.
- * 
+ *
  * Its recomended to use DC class as API for this lib.
- * 
+ *
  * @author TiagoLr ( ~~~ProG4mr~~~ )
  */
 class DConsole {
@@ -45,20 +49,20 @@ class DConsole {
 	public var profiler:DCProfiler;
 	public var commands:DCCommands;
 
-	/** console toggle key */ 
+	/** console toggle key */
 	public var consoleKey:SCKey;
 	/** monitor toggle key */
 	public var monitorKey:SCKey;
 	/** profiler toggle key */
 	public var profilerKey:SCKey;
-	
+
 	public var enabled(default, null):Bool;
 	public var visible(default, null):Bool;
-	
-	
-	
+
+
+
 	public function new(input:DCInput = null, interfc:DCInterface = null, theme:DCThemes.Theme = null) {
-		
+
 		if (input == null) {
 			#if (openfl && !js)
 			input = new DCOpenflInput();
@@ -66,7 +70,7 @@ class DConsole {
 			input = new DCEmptyInput();
 			#end
 		}
-		
+
 		if (interfc == null) {
 			#if (openfl && !js)
 			interfc = new DCOpenflInterface(33, "DOWN");
@@ -74,40 +78,40 @@ class DConsole {
 			interfc = new DCEmtpyInterface();
 			#end
 		}
-		
+
 		if (theme == null) {
 			DCThemes.current = DCThemes.DARK;
 		} else {
 			DCThemes.current = theme;
 		}
-		
+
 		// default key is tab
 		setConsoleKey(9);
 		// default key is ctrl + tab
 		setMonitorKey(9, true);
 		// default key is shift + tab
 		setProfilerKey(9, false, true);
-		
+
 		// create monitor
 		monitor = new DCMonitor(this);
-		
+
 		// create profiler
 		profiler = new DCProfiler(this);
-		
+
 		// create input
 		this.input = input;
 		input.console = this;
 		input.init();
-		
+
 		// create console interface
 		this.interfc = interfc;
 		interfc.console = this;
 		interfc.init();
-		
+
 		commands = new DCCommands(this);
 
 		clearHistory();
-		
+
 		enable();
 		hideConsole();
 		hideMonitor();
@@ -122,8 +126,8 @@ class DConsole {
 		commands.registerCommand(toggleMonitor, "monitor", "", "Toggles monitor on and off", "Monitor is used to track variable values in runtime\nCONTROL + CONSOLE_KEY (default TAB) also toggles monitor");
 		commands.registerCommand(toggleProfiler, "profiler", "", "Toggles profiler on and off", "Profiler is used to profile app and view statistics like time elapsed and percentage in runtime\nSHIFT + CONSOLE_KEY (default TAB) also toggles profiler");
 	}
-	
-	
+
+
 	public function showConsole() {
 		visible = true;
 		if (!enabled) {
@@ -140,7 +144,7 @@ class DConsole {
 		interfc.hideConsole();
 	}
 
-	
+
 	public function enable() {
 		enabled = true;
 		if (visible) {
@@ -148,14 +152,14 @@ class DConsole {
 		}
 		if (monitor.visible) {
 			interfc.showMonitor();
-		} 
+		}
 		if (profiler.visible) {
 			interfc.showProfiler();
 		}
 		input.enable();
 	}
 
-	
+
 	public function disable() {
 		enabled = false;
 		interfc.hideConsole();
@@ -165,17 +169,17 @@ class DConsole {
 	}
 
 	public function setConsoleKey(keyCode:Int, ctrlKey:Bool = false, shiftKey:Bool = false, altKey:Bool = false) {
-		consoleKey = makeShorcutKey(keyCode, ctrlKey, shiftKey, altKey); 
+		consoleKey = makeShorcutKey(keyCode, ctrlKey, shiftKey, altKey);
 	}
-	
+
 	public function setMonitorKey(keyCode:Int, ctrlKey:Bool = false, shiftKey:Bool = false, altKey:Bool = false) {
-		monitorKey = makeShorcutKey(keyCode, ctrlKey, shiftKey, altKey); 
+		monitorKey = makeShorcutKey(keyCode, ctrlKey, shiftKey, altKey);
 	}
-	
+
 	public function setProfilerKey(keyCode:Int, ctrlKey:Bool = false, shiftKey:Bool = false, altKey:Bool = false) {
-		profilerKey = makeShorcutKey(keyCode, ctrlKey, shiftKey, altKey); 
+		profilerKey = makeShorcutKey(keyCode, ctrlKey, shiftKey, altKey);
 	}
-	
+
 	function makeShorcutKey(keyCode:Int, ctrlKey:Bool = false, shiftKey:Bool = false, altKey:Bool = false):SCKey {
 		return {
 			altKey:altKey,
@@ -185,15 +189,15 @@ class DConsole {
 		}
 	}
 
-	
+
 	public function log(data:Dynamic, color:Int = -1) {
-		
+
 		if (!Std.is(data, Float) && !Std.is(data, Bool) && data == "") {
 			return;
 		}
-		
+
 		interfc.log(data, color);
-		
+
 		#if js
 		// dispatches log inside a js event
 		var scolor = StringTools.hex(color, 6);
@@ -207,64 +211,64 @@ class DConsole {
 			);
 		#end
 	}
-	
+
 	public function logConfirmation(data:Dynamic) {
 		log(data, DCThemes.current.LOG_CON);
 	}
-	
+
 	public function logInfo(data:Dynamic) {
 		log(data, DCThemes.current.LOG_INF);
 	}
-	
+
 	public function logError(data:Dynamic) {
 		log(data, DCThemes.current.LOG_ERR);
 	}
-	
+
 	public function logWarning(data:Dynamic) {
 		log(data, DCThemes.current.LOG_WAR);
 	}
-	
+
 	/**
 	 * Clears input text;
 	 */
 	public function clearConsole(args:Array<String> = null) {
 		interfc.clearConsole();
 	}
-	
+
 	public function clearHistory() {
 		_historyArray = new Array<String>();
 		_historyIndex = -1;
 	}
-	
-	
+
+
 	public function monitorField(object:Dynamic, fieldName:String, alias:String) {
-		
+
 		if (fieldName == null || fieldName == "") {
 			logError("invalid fieldName");
 			return;
 		}
-		
+
 		if (alias == null || alias == "") {
 			logError("invalid alias");
 			return;
 		}
-		
+
 		if (object == null || !Reflect.isObject(object)) {
 			logError("invalid object.");
 			return;
 		}
-		
+
 		try {
 			Reflect.getProperty(object, fieldName);
 		} catch (e:Dynamic) {
 			logError("could not find field: " + fieldName);
 			return;
 		}
-		
+
 		monitor.addField(object, fieldName, alias);
 	}
-	
-	
+
+
 	public function toggleMonitor(args:Array<String> = null) {
 		if (monitor.visible) {
 			hideMonitor();
@@ -272,19 +276,19 @@ class DConsole {
 			showMonitor();
 		}
 	}
-	
+
 	public function showMonitor() {
 		hideProfiler();
 		monitor.show();
 		interfc.showMonitor();
 	}
-	
+
 	public function hideMonitor() {
 		monitor.hide();
 		interfc.hideMonitor();
 	}
-	
-	
+
+
 	public function toggleProfiler(args:Array<String> = null) {
 		if (profiler.visible) {
 			hideProfiler();
@@ -292,13 +296,13 @@ class DConsole {
 			showProfiler();
 		}
 	}
-	
+
 	public function showProfiler() {
 		hideMonitor();
 		profiler.show();
 		interfc.showProfiler();
 	}
-	
+
 	public function hideProfiler() {
 		profiler.hide();
 		interfc.hideProfiler();
@@ -306,11 +310,11 @@ class DConsole {
 
 	public function prevHistory() {
 		_historyIndex--;
-		
+
 		if (_historyIndex < 0) {
 			_historyIndex = 0;
 		}
-		
+
 		if (_historyIndex > _historyArray.length - 1) {
 			return;
 		}
@@ -320,11 +324,11 @@ class DConsole {
 	}
 
 	public function nextHistory() {
-		
+
 		if (_historyIndex + 1 > _historyArray.length - 1) {
 			return;
 		}
-		
+
 		_historyIndex++;
 
 		interfc.setInputTxt(_historyArray[_historyIndex]);
@@ -333,35 +337,35 @@ class DConsole {
 
 
 	public function processInputLine() {
-		
+
 		var currText = interfc.getInputTxt();
 		// no input to process
 		if (currText == '' || currText == null) {
 			return;
 		}
-		
+
 		// HISTORY
 		_historyArray.insert(0, currText);
 		resetHistoryIndex();
-		
+
 		// LOG AND CLEAN PROMPT
 		log("> " + currText);
 		interfc.clearInput();
-		
+
 		commands.evaluate(currText);
 	}
-	
+
 	// returns history index to beggining.
 	public function resetHistoryIndex() {
 		_historyIndex = -1;
 	}
-	
+
 	public function scrollDown() {
 		interfc.scrollConsoleDown();
 	}
-	
+
 	public function scrollUp() {
 		interfc.scrollConsoleUp();
 	}
-	
+
 }

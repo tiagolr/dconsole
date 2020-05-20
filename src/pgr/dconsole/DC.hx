@@ -11,24 +11,28 @@ import pgr.dconsole.ui.DCOpenflInterface;
 import pgr.dconsole.input.DCLuxeInput;
 import pgr.dconsole.ui.DCLuxeInterface;
 #end
+#if kha
+import pgr.dconsole.input.DCKhaInput;
+import pgr.dconsole.ui.DCKhaInterface;
+#end
 
  /**
   * DC class provides user API to The Console.
   * It creates a console instance that is added on top of other stage sprites (default).
-  * 
+  *
   * @author TiagoLr ( ~~~ProG4mr~~~ )
   */
 @:expose
-class DC 
+class DC
 {
 	inline static public var VERSION = "5.0.0";
 	/** Aligns console to bottom */
 	static public var ALIGN_DOWN:String = "DOWN";
 	/** Aligns console to top */
 	static public var ALIGN_UP:String = "UP";
-	
+
 	static public var instance:DConsole;
-	
+
 	/**
 	 * Inits TheConsole.
 	 * @param	heightPt	Pertentage height of the console
@@ -40,17 +44,19 @@ class DC
 		if (instance != null) {
 			return; // DConsole has been initialized already.
 		}
-		
+
 		if (input == null) {
 			#if (openfl && !js)
 			input = new DCOpenflInput();
 			#elseif luxe
 			input = new DCLuxeInput();
+			#elseif kha
+			input = new DCKhaInput();
 			#else
 			input = new DCEmptyInput();
 			#end
 		}
-		
+
 		if (interfc == null) {
 			#if (openfl && !js)
 			interfc = new DCOpenflInterface(heightPt, align);
@@ -59,11 +65,13 @@ class DC
 			Luxe.next(function() {
 				DC.registerClass(luxe.Vector, 'Vector');
 			});
+			#elseif kha
+			interfc = new DCKhaInterface(heightPt, align);
 			#else
 			interfc = new DCEmtpyInterface();
 			#end
 		}
-		
+
 		instance = new DConsole(input, interfc, theme);
 		DC.logInfo("~~~~~~~~~~ DCONSOLE ~~~~~~~~~~ (v" + VERSION + ")");
 	}
@@ -108,7 +116,7 @@ class DC
 		checkInstance();
 		instance.interfc.setConsoleFont(font, embed, size, bold, italic, underline);
 	}
-	
+
 	/**
 	 * Sets the monitor, console, and prompt fonts in one go.
 	 * Sizes and offsets use the default values.
@@ -127,7 +135,7 @@ class DC
 		instance.interfc.setConsoleFont(font, embed, size, bold, italic, underline);
 		instance.interfc.setProfilerFont(font, embed, size, bold, italic, underline);
 	}
-	
+
 	/**
 	 * Shows console.
 	 */
@@ -221,7 +229,7 @@ class DC
 	}
 	/**
 	 * Logs a message to the console.
-	 * @param	data	The message to log. 
+	 * @param	data	The message to log.
 	 * @param	color	The color of text. (-1 uses default color)
 	 */
 	public static function log(data:Dynamic, color:Int = -1) {
@@ -230,7 +238,7 @@ class DC
 	}
 	/**
 	 * Logs a warning message to the console.
-	 * @param	data	The message to log. 
+	 * @param	data	The message to log.
 	 */
 	static public function logWarning(data:Dynamic) {
 		checkInstance();
@@ -238,7 +246,7 @@ class DC
 	}
 	/**
 	 * Logs a error message to the console.
-	 * @param	data	The message to log. 
+	 * @param	data	The message to log.
 	 */
 	static public function logError(data:Dynamic) {
 		checkInstance();
@@ -246,7 +254,7 @@ class DC
 	}
 	/**
 	 * Logs a confirmation message to the console.
-	 * @param	data	The message to log. 
+	 * @param	data	The message to log.
 	 */
 	static public function logConfirmation(data:Dynamic) {
 		checkInstance();
@@ -254,18 +262,18 @@ class DC
 	}
 	/**
 	 * Logs a info message to the console.
-	 * @param	data	The message to log. 
+	 * @param	data	The message to log.
 	 */
 	static public function logInfo(data:Dynamic) {
 		checkInstance();
 		instance.logInfo(data);
 	}
-	
+
 	/**
-	 * Adds this field to be monitored. 
+	 * Adds this field to be monitored.
 	 * When monitor is visibile, the value will be visible and updated in realtime.
 	 * Private fields or fields with getter/setter are also supported.
-	 * 
+	 *
 	 * @param	object			object containing the field
 	 * @param	fieldName		field name, eg: "x" or "rotation"
 	 * @param	alias			name to be displayed
@@ -274,7 +282,7 @@ class DC
 		checkInstance();
 		instance.monitorField(object, fieldName, alias);
 	}
-	
+
 	/**
 	 * Sets the refresh rate of the monitor.
 	 * @param	refreshRate		Time (in milliseconds) between monitor values update.
@@ -283,11 +291,11 @@ class DC
 		checkInstance();
 		instance.monitor.setRefreshRate(refreshRate);
 	}
-	
+
 	/**
 	 * Registers a command to be invoked from the console.
 	 * For examples check GCCommands, all runtime commands are registered during console init().
-	 * 
+	 *
 	 * @param	Function		The method called when the command is invoked.
 	 * @param	alias			The command name used to invoke it from the console.
 	 * @param	shortcut		Alternative name used to invoke it.
@@ -295,15 +303,15 @@ class DC
 	 * @param	help			Long description shown in help.
 	 */
 	static public function registerCommand(Function:Array<String>->Void,
-										   alias:String, 
+										   alias:String,
 										   shortcut:String = "",
 										   description:String = "",
-										   help:String = "") 
+										   help:String = "")
 	{
 		checkInstance();
 		instance.commands.registerCommand(Function, alias, shortcut, description, help);
 	}
-	
+
 	/**
 	 * Registers an object to be used in the console.
 	 * @param	object		The object to register.
@@ -313,7 +321,7 @@ class DC
 		checkInstance();
 		instance.commands.registerObject(object, alias);
 	}
-	
+
 	/**
 	 * Allows a class static methods and properties to be used from the console.
 	 * @param	alias	The variable name that invokes this class.
@@ -326,7 +334,7 @@ class DC
 	/**
 	 * Registers a function to be called from the console.
 	 * If monitor argument is set, this function will be displayed on monitor window.
-	 * 
+	 *
 	 * @param	Function	The function to be registered.
 	 * @param	alias		The alias displayed in the console.
 	 * @param 	description	Short description shown in commands list.
@@ -343,7 +351,7 @@ class DC
 		checkInstance();
 		instance.commands.unregisterFunction(alias);
 	}
-	
+
 	public static function unregisterObject(alias:String) {
 		checkInstance();
 		instance.commands.unregisterObject(alias);
@@ -362,7 +370,7 @@ class DC
 		checkInstance();
 		instance.commands.clearRegistry();
 	}
-	
+
 	/**
 	 *  Resets profiler history and samples.
 	 *  If any samples are running, clearProfiler will fail.
@@ -371,7 +379,7 @@ class DC
 		checkInstance();
 		instance.profiler.clear();
 	}
-	
+
 	/**
 	 * Removes all registered fields from monitor
 	 */
@@ -379,16 +387,16 @@ class DC
 		checkInstance();
 		instance.monitor.clear();
 	}
-	
+
 	/**
-	 * Brings console to front in stage. 
+	 * Brings console to front in stage.
 	 * Useful when other ojects are added directly to stage, hiding the console.
 	 */
 	public static function toFront() {
 		checkInstance();
 		instance.interfc.toFront();
 	}
-	
+
 	/**
 	 * Begins profiling sample, use endProfile(sampleName) to display
 	 * time elapsed statistics between the two calls inside console profiler.
@@ -405,7 +413,7 @@ class DC
 		checkInstance();
 		instance.profiler.end(sampleName);
 	}
-	
+
 	/**
 	 * Set weather to print stack information when errors occur
 	 * @param	b
@@ -414,7 +422,7 @@ class DC
 		checkInstance();
 		instance.commands.printErrorStack = b;
 	}
-	
+
 	/**
 	 * Makes console interp evaluate expression
 	 * @param	expr
@@ -423,7 +431,7 @@ class DC
 		checkInstance();
 		instance.commands.evaluate(expr);
 	}
-	
+
 	//---------------------------------------------------------------------------------
 	//  PRIVATE / AUX
 	//---------------------------------------------------------------------------------
